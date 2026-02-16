@@ -1,0 +1,646 @@
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    position: relative;
+    z-index: 2;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    padding: var(--spacing-xl);
+    background: rgba(255, 255, 255, 0.6);
+    border: 3px solid var(--color-gold);
+    border-radius: 8px;
+    box-shadow: var(--shadow-strong);
+}
+
+.subtitle {
+    font-family: var(--font-typewriter);
+    color: var(--color-sepia-medium);
+    font-size: 1.1rem;
+    margin-top: var(--spacing-sm);
+    letter-spacing: 0.1em;
+}
+
+.searchInput {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-sepia-dark);
+    border-radius: 4px;
+    font-family: var(--font-typewriter);
+    font-size: 1rem;
+    width: 250px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.tabs {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.tab,
+.tabActive {
+    padding: var(--spacing-md) var(--spacing-lg);
+    background: rgba(255, 255, 255, 0.5);
+    border: 2px solid var(--color-sepia-light);
+    border-radius: 8px 8px 0 0;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    color: var(--color-sepia-dark);
+}
+
+.tab:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateY(-2px);
+}
+
+.tabActive {
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom-color: transparent;
+    transform: translateY(2px);
+    box-shadow: var(--shadow-medium);
+    color: var(--color-eldritch-purple);
+    border-color: var(--color-gold);
+}
+
+.content {
+    min-height: 500px;
+}
+
+.characteristic {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: rgba(212, 175, 55, 0.1);
+    border-radius: 8px;
+    border: 1px solid var(--color-gold);
+}
+
+.characteristic label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.characteristic input {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: var(--spacing-sm);
+}
+
+.derivedValues {
+    display: flex;
+    justify-content: space-around;
+    font-family: var(--font-typewriter);
+    font-size: 0.85rem;
+    color: var(--color-faded-ink);
+    margin-top: var(--spacing-xs);
+}
+
+.statBox {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, rgba(74, 44, 94, 0.1) 0%, rgba(45, 74, 62, 0.1) 100%);
+    border: 2px solid var(--color-eldritch-purple);
+    border-radius: 8px;
+    transition: all var(--transition-medium);
+}
+
+.statBox:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-medium);
+}
+
+.statBox h3 {
+    font-size: 0.9rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-eldritch-purple);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    font-family: var(--font-typewriter);
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--color-sepia-dark);
+}
+
+.skillPoints {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 3px solid var(--color-gold);
+    border-radius: 8px;
+}
+
+.skillPoints h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.pointsValue {
+    font-family: var(--font-typewriter);
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--color-sepia-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.skillPoints small {
+    color: var(--color-faded-ink);
+    font-family: var(--font-body);
+}
+
+.backstoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.backstoryGrid label {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-sepia-dark);
+}
+
+.actions {
+    margin-top: var(--spacing-2xl);
+    text-align: center;
+    padding: var(--spacing-xl);
+}
+
+.saveButton {
+    font-size: 1.2rem;
+    padding: var(--spacing-md) var(--spacing-2xl);
+    background: linear-gradient(135deg, var(--color-eldritch-purple) 0%, var(--color-eldritch-green) 100%);
+    border-color: var(--color-gold);
+}
+
+.saveButton:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 24px rgba(74, 44, 94, 0.4);
+}
+
+.occupationSelector {
+    position: relative;
+    grid-column: span 2;
+}
+
+.occupationDisplay {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.occupationDisplay input {
+    flex: 1;
+}
+
+.selectButton {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.7) 100%);
+    border: 2px solid var(--color-gold);
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    white-space: nowrap;
+}
+
+.selectButton:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.occupationInfo {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid var(--color-gold);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.occupationInfo>div {
+    margin-bottom: var(--spacing-xs);
+}
+
+.occupationInfo>div:last-child {
+    margin-bottom: 0;
+}
+
+.occupationInfo strong {
+    color: var(--color-sepia-dark);
+}
+
+/* Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: var(--spacing-lg);
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modalContent {
+    background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
+    border: 3px solid var(--color-gold);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 2px solid var(--color-gold);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--color-sepia-dark);
+}
+
+.modalClose {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--color-sepia-medium);
+    transition: all var(--transition-fast);
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.modalClose:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--color-sepia-dark);
+    transform: rotate(90deg);
+}
+
+.modalSearch {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--color-sepia-light);
+}
+
+.modalSearch input {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: var(--spacing-md);
+}
+
+.modalBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+}
+
+.occupationGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.occupationCard {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--color-sepia-medium);
+    border-radius: 8px;
+    padding: var(--spacing-lg);
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.occupationCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    border-color: var(--color-gold);
+    background: rgba(255, 255, 255, 1);
+}
+
+.occupationCardSelected {
+    border-color: var(--color-gold);
+    background: rgba(255, 248, 220, 1);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+}
+
+.occupationCardTitle {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 0 0 var(--spacing-md) 0;
+    color: var(--color-sepia-dark);
+}
+
+.occupationCardDetails {
+    margin-bottom: var(--spacing-md);
+}
+
+.occupationCardRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xs);
+    font-size: 0.9rem;
+}
+
+.occupationCardLabel {
+    color: var(--color-sepia-medium);
+    font-weight: 500;
+}
+
+.occupationCardValue {
+    font-family: var(--font-typewriter);
+    font-weight: bold;
+    color: var(--color-sepia-dark);
+}
+
+.occupationCardTags {
+    display: flex;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+}
+
+.occupationCardTag {
+    background: var(--color-eldritch-purple);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-family: var(--font-typewriter);
+}
+
+.occupationCardSkills {
+    border-top: 1px solid var(--color-sepia-light);
+    padding-top: var(--spacing-sm);
+    font-size: 0.85rem;
+}
+
+.occupationCardSkills strong {
+    color: var(--color-sepia-dark);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.occupationCardSkills p {
+    margin: 0;
+    color: var(--color-faded-ink);
+    line-height: 1.4;
+}
+
+.noResults {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-faded-ink);
+    font-style: italic;
+}
+
+/* Skills Tab Styles */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.pointsProgress {
+    margin-top: var(--spacing-md);
+}
+
+.progressBar {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xs);
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.7) 100%);
+    transition: width var(--transition-medium);
+}
+
+.pointsUsed {
+    text-align: center;
+    font-family: var(--font-typewriter);
+    font-size: 0.9rem;
+    color: var(--color-sepia-dark);
+}
+
+.emptyState {
+    text-align: center;
+    padding: var(--spacing-xl);
+    color: var(--color-faded-ink);
+    font-style: italic;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+}
+
+.skillsList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.personalSkillsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+
+
+.personalSkillsGrid .skillRow {
+    display: flex;
+    flex-direction: column;
+}
+
+.personalSkillsGrid .skillValues {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.personalSkillsGrid .skillInput,
+.personalSkillsGrid .skillTotal {
+    justify-content: space-between;
+    width: 100%;
+}
+
+.personalSkillsGrid .skillTotal {
+    border-top: 1px solid var(--color-sepia-light);
+    padding-top: var(--spacing-sm);
+}
+
+.skillRow {
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid var(--color-sepia-light);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    transition: all var(--transition-fast);
+}
+
+.skillRow:hover {
+    border-color: var(--color-gold);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skillInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+.skillName {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.skillBadge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    color: white;
+    font-size: 0.75rem;
+    font-family: var(--font-typewriter);
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.skillValues {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.skillInputGroup {
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.skillInput {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.skillInput label {
+    font-family: var(--font-typewriter);
+    color: var(--color-sepia-medium);
+    font-weight: 500;
+}
+
+.skillInput input {
+    width: 80px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-family: var(--font-typewriter);
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.skillTotal {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.totalLabel {
+    font-family: var(--font-typewriter);
+    color: var(--color-sepia-medium);
+    font-weight: 500;
+}
+
+.totalValue {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.derivedValues {
+    font-family: var(--font-typewriter);
+    color: var(--color-faded-ink);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--spacing-md);
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab,
+    .tabActive {
+        border-radius: 8px;
+    }
+
+    .backstoryGrid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,267 @@
+/* Skill Selector Modal Styles */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: var(--spacing-lg);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+    background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
+    border: 3px solid var(--color-gold);
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 2px solid var(--color-gold);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    color: var(--color-sepia-dark);
+}
+
+.description {
+    margin: var(--spacing-xs) 0 0 0;
+    color: var(--color-faded-ink);
+    font-size: 0.9rem;
+}
+
+.modalClose {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--color-sepia-medium);
+    transition: all var(--transition-fast);
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.modalClose:hover {
+    background: rgba(212, 175, 55, 0.2);
+    color: var(--color-sepia-dark);
+    transform: rotate(90deg);
+}
+
+.modalFilters {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 1px solid var(--color-sepia-light);
+}
+
+.searchInput {
+    width: 100%;
+    font-size: 1.1rem;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.categoryFilters {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.categoryFilters button {
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: rgba(255, 255, 255, 0.6);
+    border: 2px solid var(--color-sepia-light);
+    border-radius: 6px;
+    font-family: var(--font-typewriter);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.categoryFilters button:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-gold);
+}
+
+.categoryActive {
+    background: var(--color-gold) !important;
+    color: white !important;
+    border-color: var(--color-gold) !important;
+}
+
+.modalBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-xl);
+}
+
+.skillGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.skillCard {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--color-sepia-medium);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skillCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: var(--color-gold);
+}
+
+.skillCardSelected {
+    border-color: var(--color-gold);
+    background: rgba(255, 248, 220, 1);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+}
+
+.skillCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.skillCardHeader h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--color-sepia-dark);
+}
+
+.checkmark {
+    color: var(--color-gold);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.skillCardDetails {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.skillCategory {
+    color: var(--color-faded-ink);
+    font-style: italic;
+}
+
+.skillBase {
+    font-family: var(--font-typewriter);
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.specializationBadge {
+    display: inline-block;
+    margin-top: var(--spacing-xs);
+    padding: 2px 8px;
+    background: var(--color-eldritch-purple);
+    color: white;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-family: var(--font-typewriter);
+}
+
+.noResults {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-faded-ink);
+    font-style: italic;
+}
+
+.modalFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-top: 2px solid var(--color-gold);
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.1) 100%);
+}
+
+.selectedCount {
+    font-family: var(--font-typewriter);
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.modalActions {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.cancelButton,
+.confirmButton {
+    padding: var(--spacing-sm) var(--spacing-xl);
+    border-radius: 8px;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-medium);
+    border: 2px solid;
+}
+
+.cancelButton {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: var(--color-sepia-medium);
+    color: var(--color-sepia-dark);
+}
+
+.cancelButton:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+}
+
+.confirmButton {
+    background: linear-gradient(135deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.8) 100%);
+    border-color: var(--color-gold);
+    color: white;
+}
+
+.confirmButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
