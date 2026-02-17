@@ -16,6 +16,30 @@
     box-shadow: var(--shadow-strong);
 }
 
+.header {
+    position: relative;
+}
+
+.backButton {
+    position: absolute;
+    left: var(--spacing-md);
+    top: var(--spacing-md);
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--color-sepia-medium);
+    color: var(--color-sepia-dark);
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: var(--font-display);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.backButton:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
 .subtitle {
     font-family: var(--font-typewriter);
     color: var(--color-sepia-medium);

@@ -9,6 +9,7 @@ import { occupations, searchOccupations, getOccupationByName } from '@/data/occu
 import SkillSelectorModal from './SkillSelectorModal';
 import WeaponSelectorModal from './WeaponSelectorModal';
 import styles from './CharacterSheet.module.css';
+import Link from 'next/link';
 
 export default function CharacterSheet() {
     const [character, setCharacter] = useState<Character>({
@@ -345,6 +346,7 @@ export default function CharacterSheet() {
     return (
         <div className={styles.container}>
             <header className={styles.header}>
+                <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">voltar a tela de seleção</Link>
                 <h1>Ficha de Investigador</h1>
                 <p className={styles.subtitle}>Call of Cthulhu • 7ª Edição</p>
             </header>

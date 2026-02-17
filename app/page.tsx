@@ -60,7 +60,7 @@ export default async function Home() {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-start">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-start justify-items-center">
                         {characters.map((character: any) => {
                             const data = character.data;
                             return (
@@ -69,7 +69,7 @@ export default async function Home() {
                                     href={`/character/${character.id}`}
                                     className="block group"
                                 >
-                                    <div className="w-96 h-64 mx-auto bg-[var(--color-parchment)] rounded-xl shadow-lg border-4 border-red-500 p-6 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-2xl relative overflow-hidden flex flex-col justify-between">
+                                    <div className="w-full max-w-sm h-64 mx-auto bg-[var(--color-parchment)] rounded-xl shadow-lg border-2 border-[var(--border-color)] p-6 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-2xl relative overflow-hidden flex flex-col justify-between">
                                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                             {/* Ícone de fundo decorativo */}
                                             <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
@@ -81,7 +81,7 @@ export default async function Home() {
                                             {data.basicInfo?.name || 'Sem Nome'}
                                         </h3>
 
-                                        <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-xl">
+                                        <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
                                             <p className="flex items-center gap-2">
                                                 <span className="text-xl">🕵️</span>
                                                 <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
