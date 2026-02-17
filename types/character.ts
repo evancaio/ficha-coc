@@ -52,7 +52,6 @@ export interface BasicInfo {
   sex: string;
   residence: string;
   birthplace: string;
-  imageUrl?: string; // URL da imagem do personagem
 }
 
 export interface Backstory {
