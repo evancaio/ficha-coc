@@ -18,7 +18,7 @@ export interface DerivedStats {
   currentMP: number; // Pontos de Magia ATUAIS
   SAN: number; // Sanidade MÁXIMA
   currentSAN: number; // Sanidade ATUAL
-  LUCK: number; // Sorte (não usado mais - substituído por luckTokens)
+  LUCK: number; // Valor de Sorte original (atributo), mantido para referência
   luckTokens: number; // Moedas da Sorte ATUAIS
   maxLuckTokens: number; // Moedas da Sorte MÁXIMAS (padrão: 5)
   movementRate: number; // Taxa de Movimento
