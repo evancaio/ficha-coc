@@ -116,7 +116,24 @@ export default function CharacterSheet() {
         if (character.basicInfo.occupation) {
             const occupation = getOccupationByName(character.basicInfo.occupation);
             if (occupation) {
-                newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, newChars);
+                if (/\bou\b/i.test(occupation.skillPoints)) {
+                    // If user has already chosen which stat to use, apply it; otherwise strip optional groups
+                    if (character.occupationPointsChoice) {
+                        const chosen = character.occupationPointsChoice;
+                        // for each parenthesis group containing 'ou', pick the clause that includes chosen
+                        const processed = occupation.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, (m) => {
+                            const parts = m.replace(/[()]/g, '').split(/\bou\b/i).map(p => p.trim());
+                            const found = parts.find(p => new RegExp(`\\b${chosen}\\b`, 'i').test(p));
+                            return found || parts[0] || '';
+                        });
+                        newOccPoints = calculateOccupationPointsFromFormula(processed, newChars);
+                    } else {
+                        const stripped = occupation.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, '').trim();
+                        newOccPoints = calculateOccupationPointsFromFormula(stripped || occupation.skillPoints, newChars);
+                    }
+                } else {
+                    newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, newChars);
+                }
             }
         }
 
@@ -143,13 +160,26 @@ export default function CharacterSheet() {
         });
     };
 
+    const updateStatus = (key: keyof Character['status'], value: any) => {
+        setCharacter(prev => ({ ...prev, status: { ...prev.status, [key]: value } }));
+    };
+
     const handleOccupationSelect = (occupationName: string) => {
         const occupation = getOccupationByName(occupationName);
 
         // Recalculate occupation points based on the new occupation's formula
         let newOccPoints = calculateOccupationPoints(character.characteristics.EDU); // Default
+        let occChoice: string | null = null;
         if (occupation) {
-            newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, character.characteristics);
+            // If formula contains alternatives ("ou"), remove optional groups until player chooses
+            if (/\bou\b/i.test(occupation.skillPoints)) {
+                // compute base formula without the parenthetical 'ou' groups
+                const stripped = occupation.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, '').trim();
+                newOccPoints = calculateOccupationPointsFromFormula(stripped || occupation.skillPoints, character.characteristics);
+                occChoice = null;
+            } else {
+                newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, character.characteristics);
+            }
         }
 
         // Auto-populate occupation skills with suggested skills from the occupation
@@ -159,6 +189,7 @@ export default function CharacterSheet() {
             ...character,
             basicInfo: { ...character.basicInfo, occupation: occupationName },
             occupationSkillPoints: newOccPoints,
+            occupationPointsChoice: occChoice,
             selectedOccupationSkills: suggestedSkills // Auto-fill with suggested skills
         });
 
@@ -200,6 +231,61 @@ export default function CharacterSheet() {
 
     const handleSelectWeapon = (weapon: any) => {
         setCharacter(prev => ({ ...prev, weapons: [...prev.weapons, weapon] }));
+    };
+
+    const occupationHasChoices = (occupationFormula?: string) => {
+        if (!occupationFormula) return false;
+        return /\bou\b/i.test(occupationFormula);
+    };
+
+    const extractOccupationChoiceOptions = (occupationFormula?: string) => {
+        if (!occupationFormula) return [] as string[];
+        // First: if there's a parenthetical 'ou' group, prefer its parts
+        const m = occupationFormula.match(/\([^)]*\bou[^)]*\)/i);
+        if (m) {
+            const group = m[0].replace(/[()]/g, '');
+            const parts = group.split(/\bou\b/i).map(p => p.trim());
+            const tokens = parts.map(p => {
+                const t = p.match(/\b(EDU|STR|DEX|CON|SIZ|INT|POW|APP|APA|DES|FOR|POD|TAM)\b/i);
+                return t ? t[0].toUpperCase() : p;
+            });
+            // remove EDU if present
+            return Array.from(new Set(tokens.filter(t => t !== 'EDU')));
+        }
+
+        // Otherwise, scan the whole formula for attributes multiplied by 2 (or another multiplier pattern)
+        const attrRegex = /\b(EDU|STR|DEX|CON|SIZ|INT|POW|APP|APA|DES|FOR|POD|TAM)\b\s*[×x*]\s*2\b/gi;
+        const found: string[] = [];
+        let fm: RegExpExecArray | null;
+        while ((fm = attrRegex.exec(occupationFormula)) !== null) {
+            found.push(fm[1].toUpperCase());
+        }
+        const unique = Array.from(new Set(found.filter(t => t !== 'EDU')));
+        // return options only if there's more than one distinct attribute to choose from
+        return unique.length > 1 ? unique : [];
+    };
+
+    const applyOccupationChoice = (choice: string | null) => {
+        const occ = character.basicInfo.occupation ? getOccupationByName(character.basicInfo.occupation) : undefined;
+        if (!occ) return;
+        if (!occupationHasChoices(occ.skillPoints)) return;
+
+        if (!choice) {
+            // remove optional groups
+            const stripped = occ.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, '').trim();
+            const val = calculateOccupationPointsFromFormula(stripped || occ.skillPoints, character.characteristics);
+            setCharacter(prev => ({ ...prev, occupationSkillPoints: val, occupationPointsChoice: null }));
+            return;
+        }
+
+        const processed = occ.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, (m) => {
+            const parts = m.replace(/[()]/g, '').split(/\bou\b/i).map(p => p.trim());
+            const found = parts.find(p => new RegExp(`\\b${choice}\\b`, 'i').test(p));
+            return found || parts[0] || '';
+        });
+
+        const val = calculateOccupationPointsFromFormula(processed, character.characteristics);
+        setCharacter(prev => ({ ...prev, occupationSkillPoints: val, occupationPointsChoice: choice }));
     };
 
     const getTotalOccupationPointsUsed = () => {
@@ -342,6 +428,30 @@ export default function CharacterSheet() {
                                                 ...getOccupationByName(character.basicInfo.occupation)!.suggestedSkills,
                                                 ...(getOccupationByName(character.basicInfo.occupation)!.skillChoices?.map(c => c.description) || [])
                                             ].join(', ')}</div>
+                                            {occupationHasChoices(getOccupationByName(character.basicInfo.occupation)!.skillPoints) && (
+                                                <div style={{ marginTop: '8px' }}>
+                                                    <div style={{ fontSize: '0.9rem', color: 'var(--color-sepia-medium)', marginBottom: '6px' }}>Escolha qual atributo usar para os pontos adicionais:</div>
+                                                    {extractOccupationChoiceOptions(getOccupationByName(character.basicInfo.occupation)!.skillPoints).map(opt => (
+                                                        <button
+                                                            key={opt}
+                                                            onClick={() => applyOccupationChoice(opt)}
+                                                            className={styles.selectButton}
+                                                            style={{ marginRight: 8, padding: '6px 10px' }}
+                                                        >
+                                                            {opt}
+                                                        </button>
+                                                    ))}
+                                                    {character.occupationPointsChoice && (
+                                                        <button
+                                                            onClick={() => applyOccupationChoice(null)}
+                                                            className={styles.selectButton}
+                                                            style={{ marginLeft: 8, background: 'transparent', borderColor: 'var(--color-sepia-medium)', color: 'var(--color-sepia-dark)' }}
+                                                        >
+                                                            Limpar
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -558,6 +668,77 @@ export default function CharacterSheet() {
                                 <div className={styles.statBox}>
                                     <h3>Corpo</h3>
                                     <div className={styles.statValue}>{character.derivedStats.build}</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Status Section (moved out of backstory) */}
+                        <section className="card">
+                            <h2>Status</h2>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '6px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.severeInjury}
+                                            onChange={(e) => updateStatus('severeInjury', e.target.checked)}
+                                            style={{ marginRight: '8px' }}
+                                        />
+                                        Lesão Grave
+                                    </label>
+                                    <label style={{ display: 'block', marginBottom: '6px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.dying}
+                                            onChange={(e) => updateStatus('dying', e.target.checked)}
+                                            style={{ marginRight: '8px' }}
+                                        />
+                                        Morrendo
+                                    </label>
+                                    <label style={{ display: 'block', marginBottom: '6px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.temporaryInsanity}
+                                            onChange={(e) => updateStatus('temporaryInsanity', e.target.checked)}
+                                            style={{ marginRight: '8px' }}
+                                        />
+                                        Insanidade Temporária
+                                    </label>
+                                    <label style={{ display: 'block', marginBottom: '6px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.indefiniteInsanity}
+                                            onChange={(e) => updateStatus('indefiniteInsanity', e.target.checked)}
+                                            style={{ marginRight: '8px' }}
+                                        />
+                                        Insanidade Indefinida
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label>Ferimentos & Cicatrizes:</label>
+                                    <textarea
+                                        value={character.status.woundsAndScars}
+                                        onChange={(e) => updateStatus('woundsAndScars', e.target.value)}
+                                        placeholder="Descreva ferimentos e cicatrizes..."
+                                        style={{ width: '100%', minHeight: '64px', marginBottom: '8px' }}
+                                    />
+
+                                    <label>Manias & Fobias:</label>
+                                    <textarea
+                                        value={character.status.maniasAndPhobias}
+                                        onChange={(e) => updateStatus('maniasAndPhobias', e.target.value)}
+                                        placeholder="Descreva manias e fobias..."
+                                        style={{ width: '100%', minHeight: '64px', marginBottom: '8px' }}
+                                    />
+
+                                    <label>Encontro com Entidades Estranhas:</label>
+                                    <textarea
+                                        value={character.status.strangeEncounters}
+                                        onChange={(e) => updateStatus('strangeEncounters', e.target.value)}
+                                        placeholder="Descreva encontros estranhos..."
+                                        style={{ width: '100%', minHeight: '64px' }}
+                                    />
                                 </div>
                             </div>
                         </section>
@@ -935,20 +1116,7 @@ export default function CharacterSheet() {
                                         onChange={(e) => updateBackstory('traits', e.target.value)}
                                     />
                                 </div>
-                                <div>
-                                    <label>Ferimentos e Cicatrizes</label>
-                                    <textarea
-                                        value={character.backstory.injuriesScars}
-                                        onChange={(e) => updateBackstory('injuriesScars', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Fobias e Manias</label>
-                                    <textarea
-                                        value={character.backstory.phobiasManias}
-                                        onChange={(e) => updateBackstory('phobiasManias', e.target.value)}
-                                    />
-                                </div>
+                                {/* Ferimentos & Fobias moved to Status section */}
                             </div>
                         </section>
                     </div>

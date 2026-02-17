@@ -86,4 +86,5 @@ export interface Character {
   occupationSkillPoints: number;
   personalInterestPoints: number;
   selectedOccupationSkills: string[]; // Nomes das perícias ocupacionais selecionadas
+  occupationPointsChoice?: string | null; // e.g. 'DES' or 'FOR' when occupation formula has alternatives
 }

@@ -82,6 +82,15 @@ export function calculateOccupationPointsFromFormula(formula: string, chars: Cha
         parsedFormula = parsedFormula.replace(/POW/g, chars.POW.toString());
         parsedFormula = parsedFormula.replace(/APP/g, chars.APP.toString());
 
+        // Clean up any dangling operators introduced by stripping groups
+        parsedFormula = parsedFormula.trim();
+        // Remove trailing operator characters like + - * / or multiplication signs
+        parsedFormula = parsedFormula.replace(/[\+\-\*\/x×\s]+$/g, '');
+
+        if (!parsedFormula) {
+            return chars.EDU * 4;
+        }
+
         // Evaluate the formula safely
         const result = eval(parsedFormula);
         return Math.floor(result);
