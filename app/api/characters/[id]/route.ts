@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-type Props = {
-    params: Promise<{ id: string }>
-}
-
 // GET - Buscar ficha específica (público)
 export async function GET(
     request: NextRequest,
-    props: Props
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const params = await props.params;
-        const { id } = params;
+        const { id } = await context.params;
 
         const character = await prisma.character.findUnique({
             where: { id }
@@ -38,11 +33,10 @@ export async function GET(
 // PUT - Atualizar ficha (público - qualquer um pode editar)
 export async function PUT(
     request: NextRequest,
-    props: Props
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const params = await props.params;
-        const { id } = params;
+        const { id } = await context.params;
         const body = await request.json();
         const { name, occupation, data } = body;
 
@@ -68,11 +62,10 @@ export async function PUT(
 // DELETE - Deletar ficha (público - qualquer um pode deletar)
 export async function DELETE(
     request: NextRequest,
-    props: Props
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const params = await props.params;
-        const { id } = params;
+        const { id } = await context.params;
 
         await prisma.character.delete({
             where: { id }
