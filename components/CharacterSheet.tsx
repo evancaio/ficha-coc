@@ -260,6 +260,28 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         return skill.baseValue + skill.occupationPoints + skill.personalPoints;
     };
 
+    const handleSkillSpecializationChange = (skillName: string, specialization: string) => {
+        const updatedSkills = character.skills.map(skill => {
+            if (skill.name === skillName) {
+                return { ...skill, specialization };
+            }
+            return skill;
+        });
+
+        setCharacter({
+            ...character,
+            skills: updatedSkills
+        });
+    };
+
+    const isSpecializationSkill = (skillName: string) => {
+        return skillName.includes('Arte/Ofício') ||
+            skillName.includes('Ciência') ||
+            skillName.includes('Pilotar') ||
+            skillName.includes('Sobrevivência') ||
+            skillName.includes('Língua (Outra)');
+    };
+
     return (
         <div className={styles.container}>
             <Link href="/" className={styles.backButton}>
@@ -705,10 +727,24 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         const skill = character.skills.find(s => s.name === skillName);
                                         if (!skill) return null;
                                         const totalValue = getSkillTotalValue(skillName);
+                                        const needsSpec = isSpecializationSkill(skillName);
+
                                         return (
                                             <div key={skillName} className={styles.skillRow}>
                                                 <div className={styles.skillInfo}>
-                                                    <span className={styles.skillName}>{skillName}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className={styles.skillName}>{skillName}</span>
+                                                        {needsSpec && (
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Especifique..."
+                                                                className={`${styles.input} text-xs mt-1`}
+                                                                style={{ padding: '2px 6px', width: '100%' }}
+                                                                value={skill.specialization || ''}
+                                                                onChange={(e) => handleSkillSpecializationChange(skillName, e.target.value)}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     <span className={styles.skillBadge} style={{ background: '#2a9d8f' }}>Ocupacional</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
@@ -775,10 +811,24 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     .map(skill => {
 
                                         const totalValue = getSkillTotalValue(skill.name);
+                                        const needsSpec = isSpecializationSkill(skill.name);
+
                                         return (
                                             <div key={skill.name} className={styles.skillRow}>
                                                 <div className={styles.skillInfo}>
-                                                    <span className={styles.skillName}>{skill.name}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className={styles.skillName}>{skill.name}</span>
+                                                        {needsSpec && (
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Especifique..."
+                                                                className={`${styles.input} text-xs mt-1`}
+                                                                style={{ padding: '2px 6px', width: '100%' }}
+                                                                value={skill.specialization || ''}
+                                                                onChange={(e) => handleSkillSpecializationChange(skill.name, e.target.value)}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     <span className={styles.skillBadge} style={{ background: '#457b9d' }}>Pessoal</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
