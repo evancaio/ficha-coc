@@ -66,6 +66,15 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             injuriesScars: '',
             phobiasManias: ''
         },
+        status: {
+            severeInjury: false,
+            dying: false,
+            temporaryInsanity: false,
+            indefiniteInsanity: false,
+            woundsAndScars: '',
+            maniasAndPhobias: '',
+            strangeEncounters: ''
+        },
         occupationSkillPoints: 200,
         personalInterestPoints: 100,
         selectedOccupationSkills: []
@@ -507,6 +516,97 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <div className={styles.statBox}>
                                     <h3>Corpo</h3>
                                     <div className={styles.statValue}>{character.derivedStats.build}</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* STATUS */}
+                        <section className="card">
+                            <h2>⚠️ STATUS</h2>
+                            <div className={styles.statusSection}>
+                                <div className={styles.statusConditions}>
+                                    <label className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.severeInjury}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, severeInjury: e.target.checked }
+                                            })}
+                                        />
+                                        <span>Lesão Grave</span>
+                                    </label>
+                                    <label className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.dying}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, dying: e.target.checked }
+                                            })}
+                                        />
+                                        <span>Morrendo</span>
+                                    </label>
+                                    <label className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.temporaryInsanity}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, temporaryInsanity: e.target.checked }
+                                            })}
+                                        />
+                                        <span>Insanidade Temporária</span>
+                                    </label>
+                                    <label className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={character.status.indefiniteInsanity}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, indefiniteInsanity: e.target.checked }
+                                            })}
+                                        />
+                                        <span>Insanidade Indefinida</span>
+                                    </label>
+                                </div>
+                                <div className={styles.statusNotes}>
+                                    <div>
+                                        <label>Ferimentos & Cicatrizes:</label>
+                                        <textarea
+                                            value={character.status.woundsAndScars}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, woundsAndScars: e.target.value }
+                                            })}
+                                            placeholder="Descreva ferimentos e cicatrizes..."
+                                            rows={2}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Mania & Fobia:</label>
+                                        <textarea
+                                            value={character.status.maniasAndPhobias}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, maniasAndPhobias: e.target.value }
+                                            })}
+                                            placeholder="Descreva manias e fobias..."
+                                            rows={2}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Encontro com Entidades Estranhas:</label>
+                                        <textarea
+                                            value={character.status.strangeEncounters}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                status: { ...character.status, strangeEncounters: e.target.value }
+                                            })}
+                                            placeholder="Descreva encontros com entidades estranhas..."
+                                            rows={2}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </section>

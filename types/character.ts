@@ -65,6 +65,16 @@ export interface Backstory {
   phobiasManias: string;
 }
 
+export interface CharacterStatus {
+  severeInjury: boolean; // Lesão Grave
+  dying: boolean; // Morrendo
+  temporaryInsanity: boolean; // Insanidade Temporária
+  indefiniteInsanity: boolean; // Insanidade Indefinida
+  woundsAndScars: string; // Ferimentos & Cicatrizes
+  maniasAndPhobias: string; // Mania & Fobia
+  strangeEncounters: string; // Encontro com Entidades Estranhas
+}
+
 export interface Character {
   basicInfo: BasicInfo;
   characteristics: Characteristics;
@@ -72,6 +82,7 @@ export interface Character {
   skills: Skill[];
   weapons: Weapon[];
   backstory: Backstory;
+  status: CharacterStatus; // Status do personagem
   occupationSkillPoints: number;
   personalInterestPoints: number;
   selectedOccupationSkills: string[]; // Nomes das perícias ocupacionais selecionadas

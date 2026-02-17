@@ -243,6 +243,88 @@
     font-family: var(--font-body);
 }
 
+/* Status Section */
+.statusSection {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--spacing-xl);
+    align-items: start;
+}
+
+.statusConditions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: rgba(139, 0, 0, 0.05);
+    border: 2px solid rgba(139, 0, 0, 0.3);
+    border-radius: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-typewriter);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+}
+
+.checkboxLabel:hover {
+    background: rgba(139, 0, 0, 0.1);
+}
+
+.checkboxLabel input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--color-eldritch-purple);
+}
+
+.checkboxLabel span {
+    color: var(--color-sepia-dark);
+    font-weight: 500;
+}
+
+.statusNotes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.statusNotes>div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.statusNotes label {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--color-sepia-dark);
+    font-weight: bold;
+}
+
+.statusNotes textarea {
+    font-family: var(--font-typewriter);
+    font-size: 0.95rem;
+    padding: var(--spacing-sm);
+    border: 2px solid var(--color-sepia-light);
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    resize: vertical;
+    min-height: 60px;
+}
+
+.statusNotes textarea:focus {
+    border-color: var(--color-eldritch-purple);
+    outline: none;
+}
+
+
 .backstoryGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
