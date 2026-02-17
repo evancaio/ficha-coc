@@ -39,8 +39,8 @@ export interface Weapon {
   skill: string;
   damage: string;
   range: string;
-  attacks: number;
-  ammo: number;
+  attacks: string | number; // allowing string for "1 (3)"
+  ammo: string | number; // allowing string for "20/30"
   malfunction: string;
 }
 

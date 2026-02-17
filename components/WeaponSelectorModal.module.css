@@ -1,0 +1,132 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f4e4bc 100%);
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    border-radius: 8px;
+    border: 3px solid var(--color-gold);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease-out;
+}
+
+.header {
+    padding: var(--spacing-lg);
+    border-bottom: 2px solid var(--color-gold);
+    background: rgba(255, 255, 255, 0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h2 {
+    font-family: var(--font-display);
+    color: var(--color-sepia-dark);
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--color-sepia-dark);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.closeButton:hover {
+    color: var(--color-blood-red);
+}
+
+.content {
+    padding: var(--spacing-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.categoryGroup {
+    margin-bottom: var(--spacing-xl);
+}
+
+.categoryTitle {
+    font-family: var(--font-display);
+    color: var(--color-sepia-dark);
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-sepia-medium);
+}
+
+.weaponsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.weaponItem {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-sepia-light);
+    border-radius: 4px;
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.weaponItem:hover {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.weaponName {
+    font-family: var(--font-display);
+    font-weight: bold;
+    color: var(--color-sepia-dark);
+    font-size: 1.1rem;
+}
+
+.weaponDetails {
+    font-family: var(--font-typewriter);
+    font-size: 0.85rem;
+    color: var(--color-sepia-medium);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.detailTag {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

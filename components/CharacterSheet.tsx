@@ -7,6 +7,7 @@ import { saveCharacter, getCurrentCharacter } from '@/utils/storage';
 import { skills, getSkillBaseValue } from '@/data/skills';
 import { occupations, searchOccupations, getOccupationByName } from '@/data/occupations';
 import SkillSelectorModal from './SkillSelectorModal';
+import WeaponSelectorModal from './WeaponSelectorModal';
 import styles from './CharacterSheet.module.css';
 
 export default function CharacterSheet() {
@@ -76,6 +77,7 @@ export default function CharacterSheet() {
     const [showOccupationModal, setShowOccupationModal] = useState(false);
     const [showOccupationSkillsModal, setShowOccupationSkillsModal] = useState(false);
     const [personalSkillSearch, setPersonalSkillSearch] = useState('');
+    const [showWeaponModal, setShowWeaponModal] = useState(false);
 
 
     useEffect(() => {
@@ -196,6 +198,10 @@ export default function CharacterSheet() {
         });
     };
 
+    const handleSelectWeapon = (weapon: any) => {
+        setCharacter(prev => ({ ...prev, weapons: [...prev.weapons, weapon] }));
+    };
+
     const getTotalOccupationPointsUsed = () => {
         return character.skills.reduce((sum, skill) => sum + skill.occupationPoints, 0);
     };
@@ -219,9 +225,35 @@ export default function CharacterSheet() {
     };
 
     const getSkillTotalValue = (skillName: string) => {
-        const skill = character.skills.find(s => s.name === skillName);
-        if (!skill) return 0;
-        return skill.baseValue + skill.occupationPoints + skill.personalPoints;
+        const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '');
+
+        const canonicalCandidates: string[] = [];
+
+        const lower = skillName.toLowerCase();
+        if (lower.includes('armas de fogo')) {
+            // classify by most likely subcategory
+            if (lower.includes('pistola') || lower.includes('pistolas') || lower.includes('pst')) canonicalCandidates.push('Armas de Fogo (Pistolas)');
+            if (lower.includes('rifle') || lower.includes('espingarda') || lower.includes('arco') || lower.includes('arcos') || lower.includes('rifles')) canonicalCandidates.push('Armas de Fogo (Rifles/Espingardas)');
+            if (lower.includes('submetral') || lower.includes('smt')) canonicalCandidates.push('Armas de Fogo (Submetralhadoras)');
+            if (lower.includes('metralh') || lower.includes('mt')) canonicalCandidates.push('Armas de Fogo (Metralhadoras)');
+        }
+
+        // always try exact match first
+        const exact = character.skills.find(s => s.name === skillName);
+        if (exact) return (typeof exact.baseValue === 'number' ? exact.baseValue : 0) + exact.occupationPoints + exact.personalPoints;
+
+        // try canonical candidates
+        for (const cand of canonicalCandidates) {
+            const found = character.skills.find(s => s.name === cand);
+            if (found) return (typeof found.baseValue === 'number' ? found.baseValue : 0) + found.occupationPoints + found.personalPoints;
+        }
+
+        // fallback: fuzzy match by normalized name substring
+        const targetNorm = normalize(skillName);
+        const fuzzy = character.skills.find(s => normalize(s.name).includes(targetNorm) || targetNorm.includes(normalize(s.name)));
+        if (fuzzy) return (typeof fuzzy.baseValue === 'number' ? fuzzy.baseValue : 0) + fuzzy.occupationPoints + fuzzy.personalPoints;
+
+        return 0;
     };
 
     return (
@@ -771,8 +803,86 @@ export default function CharacterSheet() {
                 {activeTab === 'combat' && (
                     <div className="fade-in">
                         <section className="card">
-                            <h2>Combate e Armas</h2>
-                            <p><em>Em desenvolvimento</em></p>
+                            <h2>Suas Armas</h2>
+
+                            <div className="grid grid-2 mb-6">
+                                <div className={styles.statBox}>
+                                    <h3>Bônus de Dano</h3>
+                                    <div className={styles.statValue}>{character.derivedStats.damageBonus}</div>
+                                </div>
+                                <div className={styles.statBox}>
+                                    <h3>Corpo (Build)</h3>
+                                    <div className={styles.statValue}>{character.derivedStats.build}</div>
+                                </div>
+                            </div>
+
+                            <div className={styles.weaponsList}>
+                                {[{
+                                    name: 'Desarmado',
+                                    skill: 'Lutar (Briga)',
+                                    damage: `1d3 + ${character.derivedStats.damageBonus}`,
+                                    range: 'Toque',
+                                    attacks: 1,
+                                    ammo: '-',
+                                    malfunction: '-'
+                                }, ...character.weapons].map((weapon, index) => {
+                                    const skillTotal = getSkillTotalValue(weapon.skill);
+                                    const isUnarmed = weapon.name === 'Desarmado';
+                                    return (
+                                        <div
+                                            key={index}
+                                            className={`${styles.weaponCard} ${isUnarmed ? styles.unarmedCard : ''}`}
+                                        >
+                                            <div className={styles.weaponHeader}>
+                                                <h3 className={styles.weaponName}>{weapon.name}</h3>
+                                                <div className={styles.weaponSkill}>
+                                                    <span className={styles.weaponSkillLabel}>{weapon.skill}:</span>
+                                                    <span className={styles.weaponSkillValue}>{skillTotal}%</span>
+                                                    <span className={styles.weaponSkillSuccess}>
+                                                        ({Math.floor(skillTotal / 2)} / {Math.floor(skillTotal / 5)})
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className={styles.weaponStats}>
+                                                <div className={styles.weaponStat}>
+                                                    <label>Dano</label>
+                                                    <span>{weapon.damage}</span>
+                                                </div>
+                                                <div className={styles.weaponStat}>
+                                                    <label>Alcance</label>
+                                                    <span>{weapon.range}</span>
+                                                </div>
+                                                <div className={styles.weaponStat}>
+                                                    <label>Ataques</label>
+                                                    <span>{weapon.attacks}</span>
+                                                </div>
+                                                <div className={styles.weaponStat}>
+                                                    <label>Munição</label>
+                                                    <span>{weapon.ammo}</span>
+                                                </div>
+                                                <div className={styles.weaponStat}>
+                                                    <label>Defeito</label>
+                                                    <span>{weapon.malfunction}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+
+                        <section className="card mt-6">
+                            <div className={styles.sectionHeader}>
+                                <h2>Arsenal</h2>
+                                <button
+                                    className={styles.selectButton}
+                                    onClick={() => setShowWeaponModal(true)}
+                                >
+                                    Selecionar Armamento
+                                </button>
+                            </div>
+                            <p className="text-gray-400 italic mb-4">Adicione armas aqui...</p>
+                            {/* Arsenal placeholder */}
                         </section>
                     </div>
                 )}
@@ -946,6 +1056,12 @@ export default function CharacterSheet() {
                         ? getOccupationByName(character.basicInfo.occupation)?.suggestedSkills
                         : []
                 }
+            />
+
+            <WeaponSelectorModal
+                isOpen={showWeaponModal}
+                onClose={() => setShowWeaponModal(false)}
+                onSelect={handleSelectWeapon}
             />
 
 

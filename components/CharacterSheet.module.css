@@ -644,3 +644,110 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Combat Section Styles */
+.weaponsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.weaponCard {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--color-sepia-medium);
+    border-radius: 8px;
+    padding: var(--spacing-md);
+    transition: all var(--transition-normal);
+}
+
+.weaponCard:hover {
+    border-color: var(--color-gold);
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.unarmedCard {
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--color-sepia-dark);
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.weaponHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.weaponName {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.unarmedCard .weaponName {
+    color: var(--color-sepia-dark);
+    text-shadow: none;
+    font-weight: bold;
+    border-bottom: 1px solid var(--color-sepia-media);
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.weaponSkill {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    font-family: var(--font-typewriter);
+    font-size: 0.9rem;
+}
+
+.weaponSkillLabel {
+    color: var(--text-secondary);
+}
+
+.weaponSkillValue {
+    color: var(--text-primary);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.weaponSkillSuccess {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.weaponStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.weaponStat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.6);
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.04);
+}
+
+.weaponStat label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.weaponStat span {
+    font-family: var(--font-typewriter);
+    color: var(--text-primary);
+    font-weight: 600;
+}
