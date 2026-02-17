@@ -498,22 +498,28 @@ export default function CharacterSheet() {
                         <section className="card">
                             <h2>Características</h2>
                             <div className="grid grid-4">
-                                {Object.entries(character.characteristics).map(([key, value]) => (
-                                    <div key={key} className={styles.characteristic}>
-                                        <label>{key}</label>
-                                        <input
-                                            type="number"
-                                            value={value}
-                                            onChange={(e) => updateCharacteristics(key as keyof Characteristics, parseInt(e.target.value) || 0)}
-                                            min="0"
-                                            max="100"
-                                        />
-                                        <div className={styles.derivedValues}>
-                                            <span>½: {Math.floor(value / 2)}</span>
-                                            <span>⅕: {Math.floor(value / 5)}</span>
+                                {Object.entries(character.characteristics).map(([key, value]) => {
+                                    const labelMap = {
+                                        STR: 'FOR', CON: 'CON', SIZ: 'TAM', DEX: 'DES', APP: 'APP', INT: 'INT', POW: 'POD', EDU: 'EDU'
+                                    };
+                                    const displayLabel = (labelMap as any)[key] || key;
+                                    return (
+                                        <div key={key} className={styles.characteristic}>
+                                            <label>{displayLabel}</label>
+                                            <input
+                                                type="number"
+                                                value={value}
+                                                onChange={(e) => updateCharacteristics(key as keyof Characteristics, parseInt(e.target.value) || 0)}
+                                                min="0"
+                                                max="100"
+                                            />
+                                            <div className={styles.derivedValues}>
+                                                <span>½: {Math.floor(value / 2)}</span>
+                                                <span>⅕: {Math.floor(value / 5)}</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </section>
 
