@@ -375,6 +375,7 @@ export default function CharacterSheet({ initialCharacter, isNew = false }: Char
                                 />
                             </div>
                         </div>
+                    </div>
                 </section>
 
                 {/* Atributos */}
