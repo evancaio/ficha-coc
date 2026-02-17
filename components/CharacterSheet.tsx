@@ -1,250 +1,231 @@
-'use client';
+"use client";
 
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { Character, Characteristics, BasicInfo, Backstory } from '@/types/character';
-import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula } from '@/utils/calculations';
-import { saveCharacter, getCurrentCharacter } from '@/utils/storage';
-import { skills, getSkillBaseValue } from '@/data/skills';
-import { occupations, searchOccupations, getOccupationByName } from '@/data/occupations';
-import SkillSelectorModal from './SkillSelectorModal';
+import { Character, Skill, SkillChoice } from '../types/character';
+import { occupations } from '../data/occupations';
+import { skills, getSkillBaseValue, skillCategories } from '../data/skills';
+import { calculateAttributes, calculateDerivedStats, calculateSkillPoints } from '../utils/calculations';
+import { saveCharacter } from '../utils/storage';
 import styles from './CharacterSheet.module.css';
 
 interface CharacterSheetProps {
-    initialData?: Character;
-    characterId?: string;
+    initialCharacter?: Character;
+    isNew?: boolean;
 }
 
-export default function CharacterSheet({ initialData, characterId: initialCharacterId }: CharacterSheetProps) {
-    const [characterId, setCharacterId] = useState<string | undefined>(initialCharacterId);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const [character, setCharacter] = useState<Character>(initialData || {
+export default function CharacterSheet({ initialCharacter, isNew = false }: CharacterSheetProps) {
+    // Estado inicial padrão
+    const defaultCharacter: Character = {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         basicInfo: {
             name: '',
             player: '',
             occupation: '',
-            age: 25,
+            age: '',
             sex: '',
             residence: '',
             birthplace: ''
         },
-        characteristics: {
-            STR: 50,
-            CON: 50,
-            SIZ: 50,
-            DEX: 50,
-            APP: 50,
-            INT: 50,
-            POW: 50,
-            EDU: 50
+        attributes: {
+            STR: 50, CON: 50, SIZ: 50, DEX: 50, APP: 50,
+            INT: 50, POW: 50, EDU: 50, LUCK: 50
         },
-        derivedStats: calculateDerivedStats({
-            STR: 50,
-            CON: 50,
-            SIZ: 50,
-            DEX: 50,
-            APP: 50,
-            INT: 50,
-            POW: 50,
-            EDU: 50
-        }),
-        skills: skills.map(skill => ({
-            name: skill.name,
-            baseValue: typeof skill.baseValue === 'number' ? skill.baseValue : 0,
-            occupationPoints: 0,
-            personalPoints: 0
-        })),
-        weapons: [],
-        backstory: {
-            personalDescription: '',
-            ideology: '',
-            significantPeople: '',
-            meaningfulLocations: '',
-            treasuredPossessions: '',
-            traits: '',
-            injuriesScars: '',
-            phobiasManias: ''
+        derivedStats: {
+            sanity: 50, maxSanity: 99, magicPoints: 10, maxMagicPoints: 10,
+            hitPoints: 10, maxHitPoints: 10, movementRate: 8,
+            damageBonus: '0', build: 0, dodge: 25,
+            luckTokens: 0, maxLuckTokens: 3 // Sistema de Sorte Opcional (Pulp ou custom)
         },
+        skills: [],
+        selectedOccupation: null,
+        selectedOccupationSkills: [], // Inicializado vazio
+        personalInterestSkills: [],
         status: {
             severeInjury: false,
             dying: false,
             temporaryInsanity: false,
-            indefiniteInsanity: false,
-            woundsAndScars: '',
-            maniasAndPhobias: '',
-            strangeEncounters: ''
-        },
-        occupationSkillPoints: 200,
-        personalInterestPoints: 100,
-        selectedOccupationSkills: []
-    });
+            indefiniteInsanity: false
+        }
+    };
 
-    const [activeTab, setActiveTab] = useState<'info' | 'skills' | 'combat' | 'backstory'>('info');
-    const [occupationSearch, setOccupationSearch] = useState('');
-    const [showOccupationModal, setShowOccupationModal] = useState(false);
-    const [showOccupationSkillsModal, setShowOccupationSkillsModal] = useState(false);
-    const [personalSkillSearch, setPersonalSkillSearch] = useState('');
+    const [character, setCharacter] = useState<Character>(initialCharacter || defaultCharacter);
+    const [isClient, setIsClient] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [lastSaved, setLastSaved] = useState<string | null>(null);
 
-
+    // Inicialização no cliente
     useEffect(() => {
-        // Only load from local storage if NO initial data (cloud data) was provided
-        if (!initialData) {
-            const saved = getCurrentCharacter();
-            if (saved) {
-                setCharacter(saved);
-            }
+        setIsClient(true);
+        if (isNew && !initialCharacter) {
+            // Se for nova ficha, inicializa perícias e recalcula status
+            initializeCharacter();
         }
-    }, [initialData]);
+    }, [isNew, initialCharacter]);
 
+    // Função para recalcular status derivados quando atributos mudam
+    const recalculateStats = (currentAttributes: any) => {
+        const derived = calculateDerivedStats(currentAttributes);
+        return derived;
+    };
+
+    // Inicializa a ficha com todas as perícias base
+    const initializeCharacter = () => {
+        const initialSkills = skills.map(skillDef => ({
+            name: skillDef.name,
+            baseValue: getSkillBaseValue(skillDef.name, defaultCharacter.attributes),
+            occupationPoints: 0,
+            personalPoints: 0
+        }));
+
+        setCharacter(prev => ({
+            ...prev,
+            skills: initialSkills,
+            derivedStats: recalculateStats(prev.attributes)
+        }));
+    };
+
+    // Auto-save effect
     useEffect(() => {
-        // Close modal on ESC key
-        const handleEscape = (event: KeyboardEvent) => {
-            if (event.key === 'Escape') {
-                setShowOccupationModal(false);
+        if (!isClient) return;
+
+        const timer = setTimeout(async () => {
+            if (character.basicInfo.name) { // Só salva se tiver pelo menos o nome
+                setSaving(true);
+                try {
+                    const saved = await saveCharacter(character);
+                    if (saved) {
+                        setLastSaved(new Date().toLocaleTimeString());
+                    }
+                } catch (error) {
+                    console.error("Erro ao salvar:", error);
+                } finally {
+                    setSaving(false);
+                }
             }
-        };
+        }, 2000); // Salva 2s após a última alteração
 
-        if (showOccupationModal) {
-            document.addEventListener('keydown', handleEscape);
-            document.body.style.overflow = 'hidden'; // Prevent background scroll
-        }
+        return () => clearTimeout(timer);
+    }, [character, isClient]);
 
-        return () => {
-            document.removeEventListener('keydown', handleEscape);
-            document.body.style.overflow = 'unset';
-        };
-    }, [showOccupationModal]);
 
-    const updateCharacteristics = (key: keyof Characteristics, value: number) => {
-        const newChars = { ...character.characteristics, [key]: value };
-        const newDerived = calculateDerivedStats(newChars);
-        const newPersonalPoints = calculatePersonalInterestPoints(newChars.INT);
+    // Handlers de input
+    const handleBasicInfoChange = (field: string, value: string) => {
+        setCharacter(prev => ({
+            ...prev,
+            basicInfo: { ...prev.basicInfo, [field]: value },
+            updatedAt: new Date().toISOString()
+        }));
+    };
 
-        // Calculate occupation points based on the occupation's formula
-        let newOccPoints = calculateOccupationPoints(newChars.EDU); // Default
-        if (character.basicInfo.occupation) {
-            const occupation = getOccupationByName(character.basicInfo.occupation);
-            if (occupation) {
-                newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, newChars);
+    const handleAttributeChange = (attr: string, value: string) => {
+        const numValue = parseInt(value) || 0;
+        const newAttributes = { ...character.attributes, [attr]: numValue };
+        const newDerivedStats = recalculateStats(newAttributes);
+
+        // Se mudar atributos, pode mudar valores base de perícias (ex: Esquiva)
+        const updatedSkills = character.skills.map(skill => {
+            const def = skills.find(s => s.name === skill.name);
+            if (def && typeof def.baseValue === 'string') {
+                return {
+                    ...skill,
+                    baseValue: getSkillBaseValue(skill.name, newAttributes)
+                };
             }
-        }
-
-        setCharacter({
-            ...character,
-            characteristics: newChars,
-            derivedStats: newDerived,
-            occupationSkillPoints: newOccPoints,
-            personalInterestPoints: newPersonalPoints
-        });
-    };
-
-    const updateBasicInfo = (key: keyof BasicInfo, value: string | number) => {
-        setCharacter({
-            ...character,
-            basicInfo: { ...character.basicInfo, [key]: value }
-        });
-    };
-
-    const updateBackstory = (key: keyof Backstory, value: string) => {
-        setCharacter({
-            ...character,
-            backstory: { ...character.backstory, [key]: value }
-        });
-    };
-
-    const handleOccupationSelect = (occupationName: string) => {
-        const occupation = getOccupationByName(occupationName);
-
-        // Recalculate occupation points based on the new occupation's formula
-        let newOccPoints = calculateOccupationPoints(character.characteristics.EDU); // Default
-        if (occupation) {
-            newOccPoints = calculateOccupationPointsFromFormula(occupation.skillPoints, character.characteristics);
-        }
-
-        // Auto-populate occupation skills with suggested skills from the occupation
-        const suggestedSkills = occupation?.suggestedSkills || [];
-
-        setCharacter({
-            ...character,
-            basicInfo: { ...character.basicInfo, occupation: occupationName },
-            occupationSkillPoints: newOccPoints,
-            selectedOccupationSkills: suggestedSkills // Auto-fill with suggested skills
+            return skill;
         });
 
-        setOccupationSearch('');
-        setShowOccupationModal(false);
+        setCharacter(prev => ({
+            ...prev,
+            attributes: newAttributes,
+            derivedStats: { ...prev.derivedStats, ...newDerivedStats }, // Mantém status atuais (ex: HP atual) mas atualiza máximos se necessário?
+            // Na verdade, calculateDerivedStats retorna os máximos. Para HP atual, precisamos ver a lógica.
+            // Simplificação: atualiza tudo por enquanto. Num app real, trataria HP atual vs Max separado se HP atual < Max.
+            skills: updatedSkills,
+            updatedAt: new Date().toISOString()
+        }));
     };
 
-    const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+    const handleSkillChange = (skillName: string, type: 'occupation' | 'personal', value: string) => {
+        const points = parseInt(value) || 0;
 
-    const handleSave = async () => {
-        // Legacy local save
-        saveCharacter(character);
-
-        setIsSaving(true);
-        try {
-            const method = characterId ? 'PATCH' : 'POST';
-            const url = characterId ? `/api/characters/${characterId}` : '/api/characters';
-
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    name: character.basicInfo.name || 'Novo Investigador',
-                    occupation: character.basicInfo.occupation,
-                    data: character
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save');
-            }
-
-            const savedChar = await response.json();
-
-            if (!characterId && savedChar.id) {
-                setCharacterId(savedChar.id);
-            }
-
-            // Show success modal instead of alert
-            setShowSaveSuccess(true);
-        } catch (error) {
-            console.error('Error saving:', error);
-            alert('Erro ao salvar na nuvem. Mas salvo localmente.');
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleSelectOccupationSkills = (skillNames: string[]) => {
-        setCharacter({
-            ...character,
-            selectedOccupationSkills: skillNames
-        });
-    };
-
-
-
-    const handleSkillPointChange = (skillName: string, points: number, type: 'occupation' | 'personal') => {
         const updatedSkills = character.skills.map(skill => {
             if (skill.name === skillName) {
-                if (type === 'occupation') {
-                    return { ...skill, occupationPoints: points };
-                } else {
-                    return { ...skill, personalPoints: points };
-                }
+                return {
+                    ...skill,
+                    [type === 'occupation' ? 'occupationPoints' : 'personalPoints']: points
+                };
+            }
+            return skill;
+        });
+
+        setCharacter(prev => ({
+            ...prev,
+            skills: updatedSkills,
+            updatedAt: new Date().toISOString()
+        }));
+    };
+
+    const handleSkillSpecializationChange = (skillName: string, specialization: string) => {
+        const updatedSkills = character.skills.map(skill => {
+            if (skill.name === skillName) {
+                return { ...skill, specialization };
             }
             return skill;
         });
 
         setCharacter({
             ...character,
-            skills: updatedSkills
+            skills: updatedSkills,
+            updatedAt: new Date().toISOString()
         });
     };
+
+    const isSpecializationSkill = (skillName: string) => {
+        return skillName.includes('Arte e Ofício') || // Updated to the generic name
+            skillName.includes('Ciência') ||
+            skillName.includes('Pilotar') ||
+            skillName.includes('Sobrevivência') ||
+            skillName.includes('Língua (Outra)');
+    };
+
+    // Modal de Ocupação
+    const [showOccupationModal, setShowOccupationModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const filteredOccupations = occupations.filter(occ =>
+        occ.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const selectOccupation = (occupationName: string) => {
+        const occupation = occupations.find(o => o.name === occupationName);
+        if (!occupation) return;
+
+        // Resetar pontos de ocupação anteriores
+        const resetSkills = character.skills.map(s => ({ ...s, occupationPoints: 0 }));
+
+        // Identificar skills da ocupação
+        // Algumas são fixas, outras são escolhas.
+        // Para simplificar, adicionamos as fixas à lista de "selectedOccupationSkills"
+        // E o usuário gerencia os pontos manualmente.
+
+        setCharacter(prev => ({
+            ...prev,
+            basicInfo: { ...prev.basicInfo, occupation: occupation.name },
+            selectedOccupation: occupation,
+            skills: resetSkills,
+            selectedOccupationSkills: occupation.suggestedSkills, // Inicia com as sugeridas
+            updatedAt: new Date().toISOString()
+        }));
+        setShowOccupationModal(false);
+    };
+
+    // Renderização
+    if (!isClient) return <div className="p-8 text-center text-[var(--color-parchment)]">Carregando Grimório...</div>;
+
+    const { occupationPoints, personalPoints } = calculateSkillPoints(character);
 
     const getTotalOccupationPointsUsed = () => {
         return character.skills.reduce((sum, skill) => sum + skill.occupationPoints, 0);
@@ -260,27 +241,17 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         return skill.baseValue + skill.occupationPoints + skill.personalPoints;
     };
 
-    const handleSkillSpecializationChange = (skillName: string, specialization: string) => {
-        const updatedSkills = character.skills.map(skill => {
-            if (skill.name === skillName) {
-                return { ...skill, specialization };
-            }
-            return skill;
-        });
+    const usedOccupationPoints = getTotalOccupationPointsUsed();
+    const usedPersonalPoints = getTotalPersonalPointsUsed();
 
-        setCharacter({
-            ...character,
-            skills: updatedSkills
-        });
-    };
+    // Helper para verificar se skill é da ocupação
+    const isOccupationSkill = (skillName: string) => {
+        // Verifica se está na lista de sugeridas ou se foi adicionada manualmente (lógica futura para escolhas)
+        return character.selectedOccupationSkills.includes(skillName) ||
+            // Também verificar se é uma sub-perícia de uma skill genérica da ocupação (ex: Lutar)
+            character.selectedOccupation?.suggestedSkills.some(s => skillName.startsWith(s));
+    }
 
-    const isSpecializationSkill = (skillName: string) => {
-        return skillName.includes('Arte/Ofício') ||
-            skillName.includes('Ciência') ||
-            skillName.includes('Pilotar') ||
-            skillName.includes('Sobrevivência') ||
-            skillName.includes('Língua (Outra)');
-    };
 
     return (
         <div className={styles.container}>
@@ -290,211 +261,144 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             <header className={styles.header}>
                 <h1>Ficha de Investigador</h1>
                 <p className={styles.subtitle}>Call of Cthulhu • 7ª Edição</p>
+
+                {saving && <span className="text-xs text-gray-500 absolute top-4 right-4 animate-pulse">Salvando...</span>}
+                {!saving && lastSaved && <span className="text-xs text-gray-400 absolute top-4 right-4">Salvo às {lastSaved}</span>}
             </header>
 
-            <div className={styles.tabs}>
-                <button
-                    className={activeTab === 'info' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('info')}
-                >
-                    Informações
-                </button>
-                <button
-                    className={activeTab === 'skills' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('skills')}
-                >
-                    Perícias
-                </button>
-                <button
-                    className={activeTab === 'combat' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('combat')}
-                >
-                    Combate
-                </button>
-                <button
-                    className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('backstory')}
-                >
-                    História
-                </button>
-            </div>
+            <form className={styles.form} onSubmit={(e) => e.preventDefault()}>
+                {/* Informações Básicas */}
+                <section className={styles.section}>
+                    <h2 className={styles.sectionTitle}>Dados do Investigador</h2>
+                    <div className={styles.grid2}>
+                        <div className={styles.inputGroup}>
+                            <label>Nome</label>
+                            <input
+                                type="text"
+                                value={character.basicInfo.name}
+                                onChange={(e) => handleBasicInfoChange('name', e.target.value)}
+                                className={styles.input}
+                                placeholder="Nome do Personagem"
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Jogador</label>
+                            <input
+                                type="text"
+                                value={character.basicInfo.player}
+                                onChange={(e) => handleBasicInfoChange('player', e.target.value)}
+                                className={styles.input}
+                                placeholder="Seu Nome"
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Ocupação</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={character.basicInfo.occupation}
+                                    readOnly
+                                    className={`${styles.input} cursor-pointer bg-gray-50`}
+                                    onClick={() => setShowOccupationModal(true)}
+                                    placeholder="Selecione..."
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOccupationModal(true)}
+                                    className="px-3 py-1 bg-[var(--color-sepia-dark)] text-[#f4e8d0] rounded hover:bg-[var(--color-sepia-medium)]"
+                                >
+                                    🔍
+                                </button>
+                            </div>
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Idade</label>
+                            <input
+                                type="number"
+                                value={character.basicInfo.age}
+                                onChange={(e) => handleBasicInfoChange('age', e.target.value)}
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Sexo</label>
+                            <input
+                                type="text"
+                                value={character.basicInfo.sex}
+                                onChange={(e) => handleBasicInfoChange('sex', e.target.value)}
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Residência</label>
+                            <input
+                                type="text"
+                                value={character.basicInfo.residence}
+                                onChange={(e) => handleBasicInfoChange('residence', e.target.value)}
+                                className={styles.input}
+                            />
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>Local de Nascimento</label>
+                            <input
+                                type="text"
+                                value={character.basicInfo.birthplace}
+                                onChange={(e) => handleBasicInfoChange('birthplace', e.target.value)}
+                                className={styles.input}
+                            />
+                        </div>
+                    </div>
+                </section>
 
-            <div className={styles.content}>
-                {activeTab === 'info' && (
-                    <div className="fade-in">
-                        {/* Informações Básicas */}
-                        <section className="card">
-                            <h2>Informações Básicas</h2>
-                            <div className="grid grid-2">
-                                <div>
-                                    <label>Nome do Investigador</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.name}
-                                        onChange={(e) => updateBasicInfo('name', e.target.value)}
-                                        placeholder="Nome completo"
-                                    />
-                                </div>
-                                <div>
-                                    <label>Jogador</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.player}
-                                        onChange={(e) => updateBasicInfo('player', e.target.value)}
-                                        placeholder="Seu nome"
-                                    />
-                                </div>
-                                <div className={styles.occupationSelector}>
-                                    <label>Ocupação</label>
-                                    <div className={styles.occupationDisplay}>
-                                        <input
-                                            type="text"
-                                            value={character.basicInfo.occupation}
-                                            readOnly
-                                            placeholder="Clique para selecionar ocupação..."
-                                            onClick={() => setShowOccupationModal(true)}
-                                            style={{ cursor: 'pointer' }}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowOccupationModal(true)}
-                                            className={styles.selectButton}
-                                        >
-                                            🔍 Selecionar
-                                        </button>
-                                    </div>
-                                    {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation) && (
-                                        <div className={styles.occupationInfo}>
-                                            <div><strong>Pontos de Perícia:</strong> {character.occupationSkillPoints} ({getOccupationByName(character.basicInfo.occupation)!.skillPoints})</div>
-                                            <div><strong>Nível de Crédito:</strong> {getOccupationByName(character.basicInfo.occupation)!.creditRating}</div>
-                                            <div><strong>Perícias Sugeridas:</strong> {[
-                                                ...getOccupationByName(character.basicInfo.occupation)!.suggestedSkills,
-                                                ...(getOccupationByName(character.basicInfo.occupation)!.skillChoices?.map(c => c.description) || [])
-                                            ].join(', ')}</div>
-                                        </div>
-                                    )}
-                                </div>
-                                <div>
-                                    <label>Idade</label>
+                {/* Atributos */}
+                <section className={styles.section}>
+                    <h2 className={styles.sectionTitle}>Características</h2>
+                    <div className={styles.attributesGrid}>
+                        {Object.entries(character.attributes).map(([key, value]) => (
+                            <div key={key} className={styles.attributeBox}>
+                                <label>{key}</label>
+                                <div className={styles.attributeValues}>
                                     <input
                                         type="number"
-                                        value={character.basicInfo.age}
-                                        onChange={(e) => updateBasicInfo('age', parseInt(e.target.value) || 0)}
-                                        min="15"
-                                        max="90"
+                                        className={styles.mainValue}
+                                        value={value}
+                                        onChange={(e) => handleAttributeChange(key, e.target.value)}
                                     />
-                                </div>
-                                <div>
-                                    <label>Sexo</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.sex}
-                                        onChange={(e) => updateBasicInfo('sex', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Residência</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.residence}
-                                        onChange={(e) => updateBasicInfo('residence', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Local de Nascimento</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.birthplace}
-                                        onChange={(e) => updateBasicInfo('birthplace', e.target.value)}
-                                    />
+                                    <div className={styles.subValues}>
+                                        <span>{Math.floor(value / 2)}</span>
+                                        <span>{Math.floor(value / 5)}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </section>
+                        ))}
+                    </div>
+                </section>
 
-                        {/* Características */}
-                        <section className="card">
-                            <h2>Características</h2>
-                            <div className="grid grid-4">
-                                {Object.entries(character.characteristics).map(([key, value]) => (
-                                    <div key={key} className={styles.characteristic}>
-                                        <label>{key}</label>
-                                        <input
-                                            type="number"
-                                            value={value}
-                                            onChange={(e) => updateCharacteristics(key as keyof Characteristics, parseInt(e.target.value) || 0)}
-                                            min="0"
-                                            max="100"
-                                        />
-                                        <div className={styles.derivedValues}>
-                                            <span>½: {Math.floor(value / 2)}</span>
-                                            <span>⅕: {Math.floor(value / 5)}</span>
-                                        </div>
-                                    </div>
-                                ))}
+                {/* Status Derivados e Vitalidade */}
+                <section className="mb-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Vitalidade & Sanidade */}
+                        <div className="bg-[rgba(255,255,255,0.5)] p-4 rounded-lg border border-[var(--color-sepia-light)]">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-[var(--color-sepia-dark)]">Sanidade (SAN)</h3>
+                                <div className="text-2xl font-bold">{character.derivedStats.sanity} / {character.derivedStats.maxSanity}</div>
                             </div>
-                        </section>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-bold text-[var(--color-sepia-dark)]">Pontos de Magia (PM)</h3>
+                                <div className="text-2xl font-bold">{character.derivedStats.magicPoints} / {character.derivedStats.maxMagicPoints}</div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold text-[var(--color-sepia-dark)]">Pontos de Vida (PV)</h3>
+                                <div className="text-2xl font-bold text-[var(--color-blood-red)]">{character.derivedStats.hitPoints} / {character.derivedStats.maxHitPoints}</div>
+                            </div>
+                        </div>
 
-                        {/* Stats Derivados */}
+                        {/* Movimento e Combate */}
                         <section className="card">
-                            <h2>Atributos Derivados</h2>
-                            <div className="grid grid-3">
+                            <div className="grid grid-cols-3 gap-4 text-center">
                                 <div className={styles.statBox}>
-                                    <h3>Pontos de Vida</h3>
-                                    <div className={styles.editableStat}>
-                                        <input
-                                            type="number"
-                                            value={character.derivedStats.currentHP}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                derivedStats: { ...character.derivedStats, currentHP: parseInt(e.target.value) || 0 }
-                                            })}
-                                            min="0"
-                                            max={character.derivedStats.HP}
-                                            className={styles.currentValue}
-                                        />
-                                        <span className={styles.separator}>/</span>
-                                        <span className={styles.maxValue}>{character.derivedStats.HP}</span>
-                                    </div>
-                                </div>
-                                <div className={styles.statBox}>
-                                    <h3>Pontos de Magia</h3>
-                                    <div className={styles.editableStat}>
-                                        <input
-                                            type="number"
-                                            value={character.derivedStats.currentMP}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                derivedStats: { ...character.derivedStats, currentMP: parseInt(e.target.value) || 0 }
-                                            })}
-                                            min="0"
-                                            max={character.derivedStats.MP}
-                                            className={styles.currentValue}
-                                        />
-                                        <span className={styles.separator}>/</span>
-                                        <span className={styles.maxValue}>{character.derivedStats.MP}</span>
-                                    </div>
-                                </div>
-                                <div className={styles.statBox}>
-                                    <h3>Sanidade</h3>
-                                    <div className={styles.editableStat}>
-                                        <input
-                                            type="number"
-                                            value={character.derivedStats.currentSAN}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                derivedStats: { ...character.derivedStats, currentSAN: parseInt(e.target.value) || 0 }
-                                            })}
-                                            min="0"
-                                            max={99}
-                                            className={styles.currentValue}
-                                        />
-                                        <span className={styles.separator}>/</span>
-                                        <span className={styles.maxValue}>{character.derivedStats.SAN}</span>
-                                    </div>
-                                </div>
-                                <div className={styles.statBox}>
-                                    <h3>🪙 Moedas da Sorte</h3>
-                                    <div className={styles.luckTokens}>
+                                    <h3>Sorte</h3>
+                                    <div className={styles.luckContainer}>
                                         <button
                                             type="button"
                                             onClick={() => setCharacter({
@@ -599,133 +503,78 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     <div>
                                         <label>Ferimentos & Cicatrizes:</label>
                                         <textarea
-                                            value={character.status.woundsAndScars}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                status: { ...character.status, woundsAndScars: e.target.value }
-                                            })}
-                                            placeholder="Descreva ferimentos e cicatrizes..."
-                                            rows={2}
-                                        />
+                                            className={styles.textarea}
+                                            placeholder="Descreva ferimentos..."
+                                        ></textarea>
                                     </div>
                                     <div>
-                                        <label>Mania & Fobia:</label>
+                                        <label>Fobias & Manias:</label>
                                         <textarea
-                                            value={character.status.maniasAndPhobias}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                status: { ...character.status, maniasAndPhobias: e.target.value }
-                                            })}
-                                            placeholder="Descreva manias e fobias..."
-                                            rows={2}
-                                        />
+                                            className={styles.textarea}
+                                            placeholder="Descreva insanidades..."
+                                        ></textarea>
                                     </div>
-                                    <div>
-                                        <label>Encontro com Entidades Estranhas:</label>
-                                        <textarea
-                                            value={character.status.strangeEncounters}
-                                            onChange={(e) => setCharacter({
-                                                ...character,
-                                                status: { ...character.status, strangeEncounters: e.target.value }
-                                            })}
-                                            placeholder="Descreva encontros com entidades estranhas..."
-                                            rows={2}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Pontos de Perícia */}
-                        <section className="card">
-                            <h2>Pontos de Perícia</h2>
-                            <div className="grid grid-2">
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos Ocupacionais</h3>
-                                    <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
-                                    <small>
-                                        {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
-                                            ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
-                                            : 'EDU × 4'}
-                                    </small>
-                                </div>
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos de Interesse Pessoal</h3>
-                                    <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
-                                    <small>INT × 2</small>
                                 </div>
                             </div>
                         </section>
                     </div>
-                )}
+                </section>
 
-                {activeTab === 'skills' && (
-                    <div className="fade-in">
-                        {/* Pontos de Perícia */}
-                        <section className="card">
-                            <h2>Pontos de Perícia</h2>
-                            <div className="grid grid-2">
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos Ocupacionais</h3>
-                                    <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
-                                    <small>
-                                        {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
-                                            ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
-                                            : 'EDU × 4'}
-                                    </small>
-                                    <div className={styles.pointsProgress}>
-                                        <div className={styles.progressBar}>
-                                            <div
-                                                className={styles.progressFill}
-                                                style={{ width: `${Math.min(100, (getTotalOccupationPointsUsed() / character.occupationSkillPoints) * 100)}%` }}
-                                            />
-                                        </div>
-                                        <div className={styles.pointsUsed}>
-                                            {getTotalOccupationPointsUsed()} / {character.occupationSkillPoints} usados
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos de Interesse Pessoal</h3>
-                                    <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
-                                    <small>INT × 2</small>
-                                    <div className={styles.pointsProgress}>
-                                        <div className={styles.progressBar}>
-                                            <div
-                                                className={styles.progressFill}
-                                                style={{ width: `${Math.min(100, (getTotalPersonalPointsUsed() / character.personalInterestPoints) * 100)}%` }}
-                                            />
-                                        </div>
-                                        <div className={styles.pointsUsed}>
-                                            {getTotalPersonalPointsUsed()} / {character.personalInterestPoints} usados
-                                        </div>
-                                    </div>
-                                </div>
+                {/* Pontos de Perícia - FIXED LAYOUT */}
+                <section className="mb-8">
+                    <h2 className={styles.sectionTitle}>Pontos de Perícia</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className={`${styles.box} p-4 text-center`}>
+                            <h3 className={styles.label}>Pontos Ocupacionais</h3>
+                            <div className="text-4xl font-bold my-2 text-[var(--color-sepia-dark)]">
+                                {occupationPoints}
                             </div>
-                        </section>
+                            <div className="text-xs text-gray-500 mb-2">
+                                {character.selectedOccupation?.skillPoints}
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-2">
+                                <div
+                                    className="bg-[var(--color-eldritch-purple)] h-2.5 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.min((usedOccupationPoints / occupationPoints) * 100, 100)}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs mt-1 text-right">{usedOccupationPoints} / {occupationPoints} usados</p>
+                        </div>
 
-                        {/* Perícias Ocupacionais */}
-                        <section className="card">
-                            <div className={styles.sectionHeader}>
-                                <h2>Perícias Ocupacionais</h2>
-                                {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)?.skillChoices && getOccupationByName(character.basicInfo.occupation)!.skillChoices!.length > 0 && (
-                                    <button
-                                        className={styles.selectButton}
-                                        onClick={() => setShowOccupationSkillsModal(true)}
-                                    >
-                                        + Selecionar Perícias
-                                    </button>
-                                )}
+                        <div className={`${styles.box} p-4 text-center`}>
+                            <h3 className={styles.label}>Pontos de Interesse Pessoal</h3>
+                            <div className="text-4xl font-bold my-2 text-[var(--color-sepia-dark)]">
+                                {personalPoints}
                             </div>
-                            {character.selectedOccupationSkills.length === 0 ? (
-                                <p className={styles.emptyState}>
-                                    Nenhuma perícia ocupacional selecionada. Clique em "Selecionar Perícias" para adicionar.
-                                </p>
-                            ) : (
-                                <div className={styles.skillsList}>
-                                    {character.selectedOccupationSkills.map(skillName => {
-                                        const skill = character.skills.find(s => s.name === skillName);
-                                        if (!skill) return null;
+                            <div className="text-xs text-gray-500 mb-2">
+                                INT × 2
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mt-2">
+                                <div
+                                    className="bg-[var(--color-eldritch-green)] h-2.5 rounded-full transition-all duration-300"
+                                    style={{ width: `${Math.min((usedPersonalPoints / personalPoints) * 100, 100)}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs mt-1 text-right">{usedPersonalPoints} / {personalPoints} usados</p>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Lista de Perícias */}
+                <section className={styles.section}>
+                    <h2 className={styles.sectionTitle}>Perícias</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {/* Vamos agrupar visualmente ou apenas listar? Lista alfabética é o padrão */}
+                        {/* Mas precisamos separar as ocupacionais das pessoais para facilitar */}
+
+                        <div className="col-span-full">
+                            <h3 className={`${styles.label} mb-4 border-b pb-2`}>Perícias da Ocupação ({character.basicInfo.occupation || 'Nenhuma'})</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                                {character.skills
+                                    .filter(skill => isOccupationSkill(skill.name)) // Filtra apenas as da ocupação
+                                    .map(skill => {
+                                        const skillName = skill.name;
                                         const totalValue = getSkillTotalValue(skillName);
                                         const needsSpec = isSpecializationSkill(skillName);
 
@@ -748,66 +597,37 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                     <span className={styles.skillBadge} style={{ background: '#2a9d8f' }}>Ocupacional</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
-                                                    <div className={styles.skillInputGroup}>
-                                                        <div className={styles.skillInput}>
-                                                            <label>Ocupacional:</label>
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                max={character.occupationSkillPoints}
-                                                                value={skill.occupationPoints}
-                                                                onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'occupation')}
-                                                            />
-                                                        </div>
-                                                        <div className={styles.skillInput}>
-                                                            <label>Pessoal:</label>
-                                                            <input
-                                                                type="number"
-                                                                min="0"
-                                                                max={character.personalInterestPoints}
-                                                                value={skill.personalPoints}
-                                                                onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'personal')}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className={styles.skillTotal}>
-                                                        <span className={styles.totalLabel}>Total:</span>
-                                                        <span className={styles.totalValue}>{totalValue}%</span>
-                                                        <span className={styles.derivedValues}>
-                                                            ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
-                                                        </span>
+                                                    <span className={styles.skillBase}>Base: {skill.baseValue}</span>
+                                                    <input
+                                                        type="number"
+                                                        className={styles.skillInput}
+                                                        value={skill.occupationPoints || ''}
+                                                        onChange={(e) => handleSkillChange(skill.name, 'occupation', e.target.value)}
+                                                        placeholder="pts"
+                                                    />
+                                                    <span className={styles.skillTotal}>{totalValue}</span>
+                                                    <div className={styles.skillHalves}>
+                                                        <span>{Math.floor(totalValue / 2)}</span>
+                                                        <span>{Math.floor(totalValue / 5)}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         );
                                     })}
-                                </div>
-                            )}
-                        </section>
-
-                        {/* Perícias de Interesse Pessoal */}
-                        <section className="card">
-                            <div className={styles.sectionHeader}>
-                                <h2>Perícias de Interesse Pessoal</h2>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar perícia..."
-                                    value={personalSkillSearch}
-                                    onChange={(e) => setPersonalSkillSearch(e.target.value)}
-                                    className={styles.searchInput}
-                                />
                             </div>
-                            <div className={styles.personalSkillsGrid}>
+                            {character.selectedOccupation && (
+                                <p className="text-xs text-gray-500 mt-2">
+                                    Sugestões: {character.selectedOccupation.suggestedSkills.join(', ')}
+                                </p>
+                            )}
+                        </div>
+
+                        <div className="col-span-full mt-8">
+                            <h3 className={`${styles.label} mb-4 border-b pb-2`}>Interesses Pessoais & Outras Perícias</h3>
+                            {/* Campo de busca de perícias para adicionar? Por enquanto lista todas as outras */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                                 {character.skills
-                                    .filter(skill =>
-                                        !character.selectedOccupationSkills.includes(skill.name) &&
-                                        skill.name.toLowerCase().includes(personalSkillSearch.toLowerCase())
-                                    )
-                                    .sort((a, b) => {
-                                        const totalA = a.baseValue + a.occupationPoints + a.personalPoints;
-                                        const totalB = b.baseValue + b.occupationPoints + b.personalPoints;
-                                        return totalB - totalA;
-                                    })
+                                    .filter(skill => !isOccupationSkill(skill.name)) // Todas as que NÃO são da ocupação
                                     .map(skill => {
 
                                         const totalValue = getSkillTotalValue(skill.name);
@@ -832,243 +652,62 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                     <span className={styles.skillBadge} style={{ background: '#457b9d' }}>Pessoal</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
-                                                    <div className={styles.skillInput}>
-                                                        <label>Pontos:</label>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            max={character.personalInterestPoints}
-                                                            value={skill.personalPoints}
-                                                            onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'personal')}
-                                                        />
-                                                    </div>
-                                                    <div className={styles.skillTotal}>
-                                                        <span className={styles.totalLabel}>Total:</span>
-                                                        <span className={styles.totalValue}>{totalValue}%</span>
-                                                        <span className={styles.derivedValues}>
-                                                            ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
-                                                        </span>
+                                                    <span className={styles.skillBase}>Base: {skill.baseValue}</span>
+                                                    <input
+                                                        type="number"
+                                                        className={styles.skillInput}
+                                                        value={skill.personalPoints || ''}
+                                                        onChange={(e) => handleSkillChange(skill.name, 'personal', e.target.value)}
+                                                        placeholder="pts"
+                                                    />
+                                                    <span className={styles.skillTotal}>{totalValue}</span>
+                                                    <div className={styles.skillHalves}>
+                                                        <span>{Math.floor(totalValue / 2)}</span>
+                                                        <span>{Math.floor(totalValue / 5)}</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         );
                                     })}
                             </div>
-                        </section>
+                        </div>
+
                     </div>
-                )}
+                </section>
+            </form>
 
-                {activeTab === 'combat' && (
-                    <div className="fade-in">
-                        <section className="card">
-                            <h2>Combate e Armas</h2>
-                            <p><em>Em desenvolvimento</em></p>
-                        </section>
-                    </div>
-                )}
-
-                {activeTab === 'backstory' && (
-                    <div className="fade-in">
-                        <section className="card">
-                            <h2>História do Personagem</h2>
-                            <div className={styles.backstoryGrid}>
-                                <div>
-                                    <label>Descrição Pessoal</label>
-                                    <textarea
-                                        value={character.backstory.personalDescription}
-                                        onChange={(e) => updateBackstory('personalDescription', e.target.value)}
-                                        placeholder="Aparência física, maneirismos..."
-                                    />
-                                </div>
-                                <div>
-                                    <label>Ideologia/Crenças</label>
-                                    <textarea
-                                        value={character.backstory.ideology}
-                                        onChange={(e) => updateBackstory('ideology', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Pessoas Significativas</label>
-                                    <textarea
-                                        value={character.backstory.significantPeople}
-                                        onChange={(e) => updateBackstory('significantPeople', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Locais Importantes</label>
-                                    <textarea
-                                        value={character.backstory.meaningfulLocations}
-                                        onChange={(e) => updateBackstory('meaningfulLocations', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Posses Valiosas</label>
-                                    <textarea
-                                        value={character.backstory.treasuredPossessions}
-                                        onChange={(e) => updateBackstory('treasuredPossessions', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Traços</label>
-                                    <textarea
-                                        value={character.backstory.traits}
-                                        onChange={(e) => updateBackstory('traits', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Ferimentos e Cicatrizes</label>
-                                    <textarea
-                                        value={character.backstory.injuriesScars}
-                                        onChange={(e) => updateBackstory('injuriesScars', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Fobias e Manias</label>
-                                    <textarea
-                                        value={character.backstory.phobiasManias}
-                                        onChange={(e) => updateBackstory('phobiasManias', e.target.value)}
-                                    />
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                )}
-            </div>
-
-            <div className={styles.actions}>
-                <button onClick={handleSave} className={styles.saveButton}>
-                    💾 Salvar Personagem
-                </button>
-            </div>
-
-            {/* Occupation Selection Modal */}
             {showOccupationModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowOccupationModal(false)}>
-                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <div className={styles.modalHeader}>
-                            <h2>Selecionar Ocupação</h2>
-                            <button
-                                className={styles.modalClose}
-                                onClick={() => setShowOccupationModal(false)}
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        <div className={styles.modalSearch}>
-                            <input
-                                type="text"
-                                value={occupationSearch}
-                                onChange={(e) => setOccupationSearch(e.target.value)}
-                                placeholder="🔍 Buscar ocupação..."
-                                autoFocus
-                            />
-                        </div>
-
-                        <div className={styles.modalBody}>
-                            <div className={styles.occupationGrid}>
-                                {searchOccupations(occupationSearch).map((occ) => (
-                                    <div
-                                        key={occ.name}
-                                        className={`${styles.occupationCard} ${character.basicInfo.occupation === occ.name ? styles.occupationCardSelected : ''
-                                            }`}
-                                        onClick={() => handleOccupationSelect(occ.name)}
-                                    >
-                                        <h3 className={styles.occupationCardTitle}>{occ.name}</h3>
-                                        <div className={styles.occupationCardDetails}>
-                                            <div className={styles.occupationCardRow}>
-                                                <span className={styles.occupationCardLabel}>Pontos de Perícia:</span>
-                                                <span className={styles.occupationCardValue}>{occ.skillPoints}</span>
-                                            </div>
-                                            <div className={styles.occupationCardRow}>
-                                                <span className={styles.occupationCardLabel}>Crédito:</span>
-                                                <span className={styles.occupationCardValue}>{occ.creditRating}</span>
-                                            </div>
-                                            {occ.era && (
-                                                <div className={styles.occupationCardTags}>
-                                                    <span className={styles.occupationCardTag}>{occ.era}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className={styles.occupationCardSkills}>
-                                            <strong>Perícias:</strong>
-                                            <p>{[
-                                                ...occ.suggestedSkills,
-                                                ...(occ.skillChoices?.map(c => c.description) || [])
-                                            ].join(', ')}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            {searchOccupations(occupationSearch).length === 0 && (
-                                <div className={styles.noResults}>
-                                    <p>Nenhuma ocupação encontrada para "{occupationSearch}"</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Skill Selector Modals */}
-            <SkillSelectorModal
-                isOpen={showOccupationSkillsModal}
-                onClose={() => setShowOccupationSkillsModal(false)}
-                onSelect={handleSelectOccupationSkills}
-                selectedSkills={character.selectedOccupationSkills}
-                multiSelect={true}
-                title="Selecionar Perícias Ocupacionais"
-                description={`Escolha as perícias relacionadas à sua ocupação para alocar pontos ocupacionais. ${character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)?.skillChoices
-                    ? `(Escolhas restantes: ${(
-                        (getOccupationByName(character.basicInfo.occupation)?.suggestedSkills.length || 0) +
-                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0)
-                    ) - character.selectedOccupationSkills.length})`
-                    : ''
-                    }`}
-                maxSelections={
-                    character.basicInfo.occupation
-                        ? (getOccupationByName(character.basicInfo.occupation)?.suggestedSkills.length || 0) +
-                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0)
-                        : undefined
-                }
-                lockedSkills={
-                    character.basicInfo.occupation
-                        ? getOccupationByName(character.basicInfo.occupation)?.suggestedSkills
-                        : []
-                }
-            />
-
-
-            {/* Save Success Modal */}
-            {showSaveSuccess && (
                 <div className={styles.modalOverlay}>
-                    <div className={`${styles.modalContent} ${styles.successModalContent}`}>
-                        <div className={styles.successHeader}>
-                            <h2 className={styles.successTitle}>Sucesso!</h2>
-                        </div>
-                        <div className={styles.successBody}>
-                            <div className={styles.successIcon}>✅</div>
-                            <p className={styles.successMessage}>Seu investigador foi salvo com sucesso no Grimório.</p>
-
-                            <div className={styles.characterNameDisplay}>
-                                {character.basicInfo.name || 'Investigador Sem Nome'}
-                            </div>
-
-                            <div className={styles.successActions}>
-                                <button
-                                    onClick={() => setShowSaveSuccess(false)}
-                                    className={`${styles.actionButton} ${styles.secondaryAction}`}
+                    <div className={styles.modal}>
+                        <h2>Selecione uma Ocupação</h2>
+                        <input
+                            type="text"
+                            placeholder="Buscar ocupação..."
+                            className={styles.searchInput}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            autoFocus
+                        />
+                        <div className={styles.occupationList}>
+                            {filteredOccupations.map(occ => (
+                                <div
+                                    key={occ.name}
+                                    className={styles.occupationItem}
+                                    onClick={() => selectOccupation(occ.name)}
                                 >
-                                    Continuar Editando
-                                </button>
-                                <button
-                                    onClick={() => window.location.href = '/'}
-                                    className={`${styles.actionButton} ${styles.primaryAction}`}
-                                >
-                                    Voltar para a Galeria
-                                </button>
-                            </div>
+                                    <strong>{occ.name}</strong>
+                                    <span style={{ fontSize: '0.8em', color: '#666' }}>
+                                        ({occ.skillPoints})
+                                    </span>
+                                </div>
+                            ))}
                         </div>
+                        <button
+                            className={styles.closeButton}
+                            onClick={() => setShowOccupationModal(false)}
+                        >
+                            Fechar
+                        </button>
                     </div>
                 </div>
             )}
