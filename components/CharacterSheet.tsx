@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Character, Skill, SkillChoice } from '../types/character';
 import { occupations } from '../data/occupations';
 import { skills, getSkillBaseValue, skillCategories } from '../data/skills';
-import { calculateAttributes, calculateDerivedStats, calculateSkillPoints } from '../utils/calculations';
+import { calculateAttributes, calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints } from '../utils/calculations';
 import { saveCharacter } from '../utils/storage';
 import styles from './CharacterSheet.module.css';
 
@@ -225,7 +225,9 @@ export default function CharacterSheet({ initialCharacter, isNew = false }: Char
     // Renderização
     if (!isClient) return <div className="p-8 text-center text-[var(--color-parchment)]">Carregando Grimório...</div>;
 
-    const { occupationPoints, personalPoints } = calculateSkillPoints(character);
+    // Calculando pontos usados
+    const occupationPoints = character.occupationSkillPoints;
+    const personalPoints = character.personalInterestPoints;
 
     const getTotalOccupationPointsUsed = () => {
         return character.skills.reduce((sum, skill) => sum + skill.occupationPoints, 0);
@@ -270,84 +272,109 @@ export default function CharacterSheet({ initialCharacter, isNew = false }: Char
                 {/* Informações Básicas */}
                 <section className={styles.section}>
                     <h2 className={styles.sectionTitle}>Dados do Investigador</h2>
-                    <div className={styles.grid2}>
-                        <div className={styles.inputGroup}>
-                            <label>Nome</label>
+                    <div className="flex flex-col md:flex-row gap-6">
+                        {/* Área da Imagem */}
+                        <div className="w-full md:w-1/4 flex flex-col items-center gap-2">
+                            <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-200 border-2 border-[var(--color-sepia-dark)] rounded overflow-hidden shadow-inner flex items-center justify-center relative">
+                                {character.basicInfo.imageUrl ? (
+                                    <img
+                                        src={character.basicInfo.imageUrl}
+                                        alt="Retrato"
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/150x150?text=?'; }}
+                                    />
+                                ) : (
+                                    <span className="text-4xl opacity-20">👤</span>
+                                )}
+                            </div>
                             <input
                                 type="text"
-                                value={character.basicInfo.name}
-                                onChange={(e) => handleBasicInfoChange('name', e.target.value)}
-                                className={styles.input}
-                                placeholder="Nome do Personagem"
+                                placeholder="URL da Imagem..."
+                                value={character.basicInfo.imageUrl || ''}
+                                onChange={(e) => handleBasicInfoChange('imageUrl', e.target.value)}
+                                className={`${styles.input} text-xs text-center w-full`}
                             />
                         </div>
-                        <div className={styles.inputGroup}>
-                            <label>Jogador</label>
-                            <input
-                                type="text"
-                                value={character.basicInfo.player}
-                                onChange={(e) => handleBasicInfoChange('player', e.target.value)}
-                                className={styles.input}
-                                placeholder="Seu Nome"
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label>Ocupação</label>
-                            <div className="flex gap-2">
+
+                        {/* Campos de Texto */}
+                        <div className="w-full md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className={styles.inputGroup}>
+                                <label>Nome</label>
                                 <input
                                     type="text"
-                                    value={character.basicInfo.occupation}
-                                    readOnly
-                                    className={`${styles.input} cursor-pointer bg-gray-50`}
-                                    onClick={() => setShowOccupationModal(true)}
-                                    placeholder="Selecione..."
+                                    value={character.basicInfo.name}
+                                    onChange={(e) => handleBasicInfoChange('name', e.target.value)}
+                                    className={styles.input}
+                                    placeholder="Nome do Personagem"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowOccupationModal(true)}
-                                    className="px-3 py-1 bg-[var(--color-sepia-dark)] text-[#f4e8d0] rounded hover:bg-[var(--color-sepia-medium)]"
-                                >
-                                    🔍
-                                </button>
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Jogador</label>
+                                <input
+                                    type="text"
+                                    value={character.basicInfo.player}
+                                    onChange={(e) => handleBasicInfoChange('player', e.target.value)}
+                                    className={styles.input}
+                                    placeholder="Seu Nome"
+                                />
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Ocupação</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={character.basicInfo.occupation}
+                                        readOnly
+                                        className={`${styles.input} cursor-pointer bg-gray-50`}
+                                        onClick={() => setShowOccupationModal(true)}
+                                        placeholder="Selecione..."
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowOccupationModal(true)}
+                                        className="px-3 py-1 bg-[var(--color-sepia-dark)] text-[#f4e8d0] rounded hover:bg-[var(--color-sepia-medium)]"
+                                    >
+                                        🔍
+                                    </button>
+                                </div>
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Idade</label>
+                                <input
+                                    type="number"
+                                    value={character.basicInfo.age}
+                                    onChange={(e) => handleBasicInfoChange('age', e.target.value)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Sexo</label>
+                                <input
+                                    type="text"
+                                    value={character.basicInfo.sex}
+                                    onChange={(e) => handleBasicInfoChange('sex', e.target.value)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Residência</label>
+                                <input
+                                    type="text"
+                                    value={character.basicInfo.residence}
+                                    onChange={(e) => handleBasicInfoChange('residence', e.target.value)}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <div className={styles.inputGroup}>
+                                <label>Local de Nascimento</label>
+                                <input
+                                    type="text"
+                                    value={character.basicInfo.birthplace}
+                                    onChange={(e) => handleBasicInfoChange('birthplace', e.target.value)}
+                                    className={styles.input}
+                                />
                             </div>
                         </div>
-                        <div className={styles.inputGroup}>
-                            <label>Idade</label>
-                            <input
-                                type="number"
-                                value={character.basicInfo.age}
-                                onChange={(e) => handleBasicInfoChange('age', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label>Sexo</label>
-                            <input
-                                type="text"
-                                value={character.basicInfo.sex}
-                                onChange={(e) => handleBasicInfoChange('sex', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label>Residência</label>
-                            <input
-                                type="text"
-                                value={character.basicInfo.residence}
-                                onChange={(e) => handleBasicInfoChange('residence', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label>Local de Nascimento</label>
-                            <input
-                                type="text"
-                                value={character.basicInfo.birthplace}
-                                onChange={(e) => handleBasicInfoChange('birthplace', e.target.value)}
-                                className={styles.input}
-                            />
-                        </div>
-                    </div>
                 </section>
 
                 {/* Atributos */}
