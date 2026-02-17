@@ -4,7 +4,7 @@ import prisma from "@/lib/prisma";
 // GET - Buscar ficha específica (público)
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;
@@ -33,7 +33,7 @@ export async function GET(
 // PUT - Atualizar ficha (público - qualquer um pode editar)
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;
@@ -62,7 +62,7 @@ export async function PUT(
 // DELETE - Deletar ficha (público - qualquer um pode deletar)
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { id } = await params;

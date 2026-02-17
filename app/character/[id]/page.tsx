@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import CharacterSheet from "@/components/CharacterSheet";
 
-export default async function CharacterPage({ params }: { params: { id: string } }) {
+export default async function CharacterPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     if (id === "new") {
