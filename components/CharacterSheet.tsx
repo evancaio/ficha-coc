@@ -367,87 +367,140 @@ export default function CharacterSheet({ initialCharacter, isNew = false }: Char
                 {/* === ABA: PERÍCIAS === */}
                 {activeTab === 'skills' && (
                     <div className="space-y-8 animate-fadeIn">
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                            {/* Painel Pontos Ocupacionais */}
-                            <div className="bg-[#f0e6d2] p-6 rounded-lg shadow-inner border border-[#d4c5a9]">
-                                <h3 className="font-bold text-center mb-2 text-[var(--color-sepia-dark)]">Pontos Ocupacionais</h3>
-                                <div className="text-center text-4xl mb-2">{usedOccupationPoints} / {availOccupationPoints}</div>
-                                <div className="w-full bg-gray-300 rounded-full h-2">
-                                    <div className="bg-[#2a9d8f] h-2 rounded-full transition-all" style={{ width: `${Math.min((usedOccupationPoints / availOccupationPoints) * 100, 100)}%` }}></div>
-                                </div>
+                        {/* Resumo de Pontos (Discreto) */}
+                        <div className="flex justify-between items-center text-sm text-[var(--color-sepia-dark)] border-b border-[var(--color-sepia-medium)] pb-2 mb-6 font-serif">
+                            <div>
+                                <span className="font-bold">Pontos Ocupacionais:</span> {usedOccupationPoints} / {availOccupationPoints}
                             </div>
-                            {/* Painel Pontos Pessoais */}
-                            <div className="bg-[#f0e6d2] p-6 rounded-lg shadow-inner border border-[#d4c5a9]">
-                                <h3 className="font-bold text-center mb-2 text-[var(--color-sepia-dark)]">Pontos de Interesse Pessoal</h3>
-                                <div className="text-center text-4xl mb-2">{usedPersonalPoints} / {availPersonalPoints}</div>
-                                <div className="w-full bg-gray-300 rounded-full h-2">
-                                    <div className="bg-[#e76f51] h-2 rounded-full transition-all" style={{ width: `${Math.min((usedPersonalPoints / availPersonalPoints) * 100, 100)}%` }}></div>
-                                </div>
+                            <div>
+                                <span className="font-bold">Interesse Pessoal:</span> {usedPersonalPoints} / {availPersonalPoints}
                             </div>
-                        </section>
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* COLUNA ESQUERDA: OCUPACIONAIS */}
                             <div>
-                                <h3 className="text-xl font-bold mb-4 pb-2 border-b border-[var(--color-sepia-dark)] text-[#2a9d8f]">
-                                    Perícias de Ocupação {character.basicInfo.occupation && `(${character.basicInfo.occupation})`}
+                                <h3 className="text-xl font-bold mb-4 pb-2 border-b-2 border-[var(--color-sepia-dark)] text-[var(--color-sepia-dark)] font-serif">
+                                    Perícias da Ocupação
                                 </h3>
-                                <div className="space-y-2">
+                                <div className="grid grid-cols-1 gap-4">
                                     {character.skills
                                         .filter(skill => isOccupationSkill(skill.name))
                                         .map(skill => {
                                             const total = getSkillTotalValue(skill.name);
                                             return (
-                                                <div key={skill.name} className="flex items-center justify-between bg-[rgba(255,255,255,0.5)] p-2 rounded hover:bg-[rgba(255,255,255,0.8)] transition-colors">
-                                                    <div className="flex-1">
-                                                        <div className="font-bold text-sm">{skill.name}</div>
-                                                        {isSpecializationSkill(skill.name) && (
-                                                            <input type="text" placeholder="Especifique..." className="text-xs w-full bg-transparent border-b border-gray-400" value={skill.specialization || ''} onChange={e => handleSkillSpecializationChange(skill.name, e.target.value)} />
-                                                        )}
-                                                        <span className="text-xs text-gray-500">Base: {skill.baseValue}</span>
+                                                <div key={skill.name} className={styles.skillCard}>
+                                                    <div className={styles.skillCardHeader}>
+                                                        <div className="flex flex-col">
+                                                            <span className={styles.skillCardName}>{skill.name}</span>
+                                                            {isSpecializationSkill(skill.name) && (
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Especifique..."
+                                                                    className="text-xs bg-transparent border-b border-gray-300 w-full mt-1"
+                                                                    value={skill.specialization || ''}
+                                                                    onChange={e => handleSkillSpecializationChange(skill.name, e.target.value)}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        <span className={styles.skillBadge} style={{ background: '#2a9d8f' }}>OCUPACIONAL</span>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <input type="number" placeholder="Pts" className="w-16 p-1 text-center bg-white border border-gray-300 rounded" value={skill.occupationPoints || ''} onChange={e => handleSkillChange(skill.name, 'occupation', e.target.value)} />
-                                                        <div className="w-10 text-center font-bold text-lg">{total}</div>
-                                                        <div className="flex flex-col text-[0.6rem] text-gray-500 w-6 text-center">
-                                                            <span>{Math.floor(total / 2)}</span>
-                                                            <span>{Math.floor(total / 5)}</span>
+
+                                                    <div className={styles.skillCardInputs}>
+                                                        <div className={styles.skillCardInputBlock}>
+                                                            <span>Ocup:</span>
+                                                            <input
+                                                                type="text"
+                                                                className={styles.skillCardInput}
+                                                                value={skill.occupationPoints || ''}
+                                                                onChange={e => handleSkillChange(skill.name, 'occupation', e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className={styles.skillCardInputBlock}>
+                                                            <span>Pes:</span>
+                                                            <input
+                                                                type="text"
+                                                                className={styles.skillCardInput}
+                                                                value={skill.personalPoints || ''}
+                                                                onChange={e => handleSkillChange(skill.name, 'personal', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+                                                        <span>Base: {skill.baseValue}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span>Total: <strong className="text-lg text-[var(--color-sepia-dark)]">{total}</strong></span>
+                                                            <span className="opacity-70">({Math.floor(total / 2)} / {Math.floor(total / 5)})</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             );
                                         })}
                                     {(!character.selectedOccupation && character.skills.filter(s => isOccupationSkill(s.name)).length === 0) && (
-                                        <p className="text-sm italic text-gray-500">Selecione uma ocupação na aba Investigador para ver as perícias sugeridas.</p>
+                                        <div className="p-4 border border-dashed border-gray-300 rounded text-center text-gray-500 text-sm">
+                                            Selecione uma ocupação na aba Investigador para ver as perícias.
+                                        </div>
                                     )}
                                 </div>
                             </div>
 
                             {/* COLUNA DIREITA: PESSOAIS / OUTRAS */}
                             <div>
-                                <h3 className="text-xl font-bold mb-4 pb-2 border-b border-[var(--color-sepia-dark)] text-[#e76f51]">
+                                <h3 className="text-xl font-bold mb-4 pb-2 border-b-2 border-[var(--color-sepia-dark)] text-[var(--color-sepia-dark)] font-serif">
                                     Outras Perícias
                                 </h3>
-                                <div className="space-y-2 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                                <div className="grid grid-cols-1 gap-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
                                     {character.skills
                                         .filter(skill => !isOccupationSkill(skill.name))
                                         .map(skill => {
                                             const total = getSkillTotalValue(skill.name);
                                             return (
-                                                <div key={skill.name} className="flex items-center justify-between bg-[rgba(255,255,255,0.3)] p-2 rounded hover:bg-[rgba(255,255,255,0.8)] transition-colors">
-                                                    <div className="flex-1">
-                                                        <div className="font-bold text-sm text-[#3e3e3e]">{skill.name}</div>
-                                                        {isSpecializationSkill(skill.name) && (
-                                                            <input type="text" placeholder="Especifique..." className="text-xs w-full bg-transparent border-b border-gray-400" value={skill.specialization || ''} onChange={e => handleSkillSpecializationChange(skill.name, e.target.value)} />
-                                                        )}
-                                                        <span className="text-xs text-gray-500">Base: {skill.baseValue}</span>
+                                                <div key={skill.name} className={styles.skillCard}>
+                                                    <div className={styles.skillCardHeader}>
+                                                        <div className="flex flex-col">
+                                                            <span className={styles.skillCardName}>{skill.name}</span>
+                                                            {isSpecializationSkill(skill.name) && (
+                                                                <input
+                                                                    type="text"
+                                                                    placeholder="Especifique..."
+                                                                    className="text-xs bg-transparent border-b border-gray-300 w-full mt-1"
+                                                                    value={skill.specialization || ''}
+                                                                    onChange={e => handleSkillSpecializationChange(skill.name, e.target.value)}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        {skill.personalPoints > 0 && <span className={styles.skillBadge} style={{ background: '#e76f51' }}>PESSOAL</span>}
                                                     </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <input type="number" placeholder="Pts" className="w-16 p-1 text-center bg-white border border-gray-300 rounded" value={skill.personalPoints || ''} onChange={e => handleSkillChange(skill.name, 'personal', e.target.value)} />
-                                                        <div className="w-10 text-center font-bold text-lg text-[#3e3e3e]">{total}</div>
-                                                        <div className="flex flex-col text-[0.6rem] text-gray-500 w-6 text-center">
-                                                            <span>{Math.floor(total / 2)}</span>
-                                                            <span>{Math.floor(total / 5)}</span>
+
+                                                    <div className={styles.skillCardInputs}>
+                                                        <div className={styles.skillCardInputBlock}>
+                                                            <span>Ocup:</span>
+                                                            <input
+                                                                type="text"
+                                                                className={styles.skillCardInput}
+                                                                value={skill.occupationPoints || ''}
+                                                                onChange={e => handleSkillChange(skill.name, 'occupation', e.target.value)}
+                                                                disabled
+                                                                style={{ opacity: 0.5, background: '#f0f0f0' }}
+                                                            />
+                                                        </div>
+                                                        <div className={styles.skillCardInputBlock}>
+                                                            <span>Pes:</span>
+                                                            <input
+                                                                type="text"
+                                                                className={styles.skillCardInput}
+                                                                value={skill.personalPoints || ''}
+                                                                onChange={e => handleSkillChange(skill.name, 'personal', e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500">
+                                                        <span>Base: {skill.baseValue}</span>
+                                                        <div className="flex items-center gap-2">
+                                                            <span>Total: <strong className="text-lg text-[var(--color-sepia-dark)]">{total}</strong></span>
+                                                            <span className="opacity-70">({Math.floor(total / 2)} / {Math.floor(total / 5)})</span>
                                                         </div>
                                                     </div>
                                                 </div>
