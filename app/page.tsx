@@ -35,15 +35,15 @@ export default async function Home() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <header className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="text-6xl font-bold mb-6 drop-shadow-sm text-[var(--color-eldritch-purple)]" style={{ fontFamily: 'var(--font-display)' }}>
             📜 Fichas Call of Cthulhu
           </h1>
-          <p className="text-xl text-[var(--color-sepia-medium)] mb-6">
+          <p className="text-2xl text-[var(--color-sepia-medium)] mb-8 font-serif italic">
             Galeria Pública de Personagens
           </p>
           <Link
             href="/character/new"
-            className="inline-block px-8 py-4 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform"
+            className="inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-xl font-bold rounded-lg shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-[var(--color-gold)]"
           >
             ✨ Criar Nova Ficha
           </Link>
@@ -51,43 +51,56 @@ export default async function Home() {
 
         {/* Lista de Fichas */}
         {characters.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-2xl text-[var(--color-sepia-medium)] mb-4">
-              Nenhuma ficha encontrada
+          <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-[var(--color-sepia-media)]">
+            <p className="text-3xl text-[var(--color-sepia-medium)] mb-4 font-serif">
+              Nenhuma ficha encontrada no Grimório
             </p>
-            <p className="text-lg text-[var(--color-faded-ink)]">
-              Crie a primeira ficha agora mesmo!
+            <p className="text-xl text-[var(--color-faded-ink)]">
+              Seja o primeiro a registrar um investigador!
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {characters.map((character: any) => {
               const data = character.data;
               return (
                 <Link
                   key={character.id}
                   href={`/character/${character.id}`}
-                  className="block"
+                  className="block group"
                 >
-                  <div className="card hover:scale-105 transition-transform cursor-pointer h-full">
-                    <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+                  <div className="h-full bg-[var(--color-parchment)] rounded-xl shadow-md border border-[var(--color-sepia-light)] p-6 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:border-[var(--color-eldritch-green)] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      {/* Ícone de fundo decorativo */}
+                      <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                      </svg>
+                    </div>
+
+                    <h3 className="text-3xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
                       {data.basicInfo?.name || 'Sem Nome'}
                     </h3>
-                    <div className="space-y-1 text-[var(--color-sepia-medium)]">
-                      <p>
-                        <strong>Ocupação:</strong> {data.basicInfo?.occupation || 'Não definida'}
+
+                    <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
+                      <p className="flex items-center gap-2">
+                        <span className="text-xl">🕵️</span>
+                        <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
                       </p>
-                      <p>
-                        <strong>Idade:</strong> {data.basicInfo?.age || '?'} anos
+                      <p className="flex items-center gap-2">
+                        <span className="text-xl">🎂</span>
+                        <span>{data.basicInfo?.age || '?'} anos</span>
                       </p>
                       {data.basicInfo?.residence && (
-                        <p>
-                          <strong>Residência:</strong> {data.basicInfo.residence}
+                        <p className="flex items-center gap-2">
+                          <span className="text-xl">🏠</span>
+                          <span className="truncate">{data.basicInfo.residence}</span>
                         </p>
                       )}
                     </div>
-                    <div className="mt-4 pt-4 border-t border-[var(--color-sepia-light)] text-sm text-[var(--color-faded-ink)]">
-                      Atualizado: {new Date(character.updatedAt).toLocaleDateString('pt-BR')}
+
+                    <div className="mt-6 pt-4 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
+                      <span>Atualizado em:</span>
+                      <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
                     </div>
                   </div>
                 </Link>

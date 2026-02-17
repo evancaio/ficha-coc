@@ -176,6 +176,8 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         setShowOccupationModal(false);
     };
 
+    const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+
     const handleSave = async () => {
         // Legacy local save
         saveCharacter(character);
@@ -205,12 +207,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
             if (!characterId && savedChar.id) {
                 setCharacterId(savedChar.id);
-                // Optional: Update URL without reload?
-                // window.history.pushState({}, '', `/character/${savedChar.id}`);
-                // Or just let them continue editing
             }
 
-            alert('Personagem salvo na nuvem com sucesso!');
+            // Show success modal instead of alert
+            setShowSaveSuccess(true);
         } catch (error) {
             console.error('Error saving:', error);
             alert('Erro ao salvar na nuvem. Mas salvo localmente.');
@@ -986,6 +986,39 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             />
 
 
+            {/* Save Success Modal */}
+            {showSaveSuccess && (
+                <div className={styles.modalOverlay}>
+                    <div className={`${styles.modalContent} ${styles.successModalContent}`}>
+                        <div className={styles.successHeader}>
+                            <h2 className={styles.successTitle}>Sucesso!</h2>
+                        </div>
+                        <div className={styles.successBody}>
+                            <div className={styles.successIcon}>✅</div>
+                            <p className={styles.successMessage}>Seu investigador foi salvo com sucesso no Grimório.</p>
+
+                            <div className={styles.characterNameDisplay}>
+                                {character.basicInfo.name || 'Investigador Sem Nome'}
+                            </div>
+
+                            <div className={styles.successActions}>
+                                <button
+                                    onClick={() => setShowSaveSuccess(false)}
+                                    className={`${styles.actionButton} ${styles.secondaryAction}`}
+                                >
+                                    Continuar Editando
+                                </button>
+                                <button
+                                    onClick={() => window.location.href = '/'}
+                                    className={`${styles.actionButton} ${styles.primaryAction}`}
+                                >
+                                    Voltar para a Galeria
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
