@@ -1,110 +1,82 @@
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+// GET - Buscar ficha específica (público)
 export async function GET(
-    req: Request,
+    request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
-
         const { id } = await params;
 
         const character = await prisma.character.findUnique({
-            where: {
-                id,
-                userId, // Ensure ownership
-            },
+            where: { id }
         });
 
         if (!character) {
-            return new NextResponse("Not Found", { status: 404 });
+            return NextResponse.json(
+                { error: 'Character not found' },
+                { status: 404 }
+            );
         }
 
         return NextResponse.json(character);
     } catch (error) {
-        console.error("[CHARACTER_GET]", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        console.error('Error fetching character:', error);
+        return NextResponse.json(
+            { error: 'Failed to fetch character' },
+            { status: 500 }
+        );
     }
 }
 
-export async function PATCH(
-    req: Request,
+// PUT - Atualizar ficha (público - qualquer um pode editar)
+export async function PUT(
+    request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
-
         const { id } = await params;
-        const body = await req.json();
+        const body = await request.json();
         const { name, occupation, data } = body;
 
-        const character = await prisma.character.findUnique({
-            where: { id, userId },
-        });
-
-        if (!character) {
-            return new NextResponse("Not Found", { status: 404 });
-        }
-
-        const updatedCharacter = await prisma.character.update({
-            where: {
-                id,
-            },
+        const character = await prisma.character.update({
+            where: { id },
             data: {
-                name,
-                occupation,
-                data,
-            },
+                name: name || 'Sem Nome',
+                occupation: occupation || null,
+                data: data
+            }
         });
 
-        return NextResponse.json(updatedCharacter);
+        return NextResponse.json(character);
     } catch (error) {
-        console.error("[CHARACTER_PATCH]", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        console.error('Error updating character:', error);
+        return NextResponse.json(
+            { error: 'Failed to update character' },
+            { status: 500 }
+        );
     }
 }
 
+// DELETE - Deletar ficha (público - qualquer um pode deletar)
 export async function DELETE(
-    req: Request,
+    request: Request,
     { params }: { params: { id: string } }
 ) {
     try {
-        const { userId } = await auth();
-
-        if (!userId) {
-            // 401
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
-
         const { id } = await params;
 
-        const character = await prisma.character.findUnique({
-            where: { id, userId },
-        });
-
-        if (!character) {
-            return new NextResponse("Not Found", { status: 404 });
-        }
-
         await prisma.character.delete({
-            where: {
-                id,
-            },
+            where: { id }
         });
 
-        return new NextResponse(null, { status: 204 });
+        return NextResponse.json({ success: true });
     } catch (error) {
-        console.error("[CHARACTER_DELETE]", error);
-        return new NextResponse("Internal Error", { status: 500 });
+        console.error('Error deleting character:', error);
+        return NextResponse.json(
+            { error: 'Failed to delete character' },
+            { status: 500 }
+        );
     }
 }

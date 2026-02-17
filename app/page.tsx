@@ -1,40 +1,80 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import prisma from "@/lib/prisma";
 
 export default async function Home() {
-  const { userId } = await auth();
-
-  if (userId) {
-    redirect("/dashboard");
-  }
+  // Buscar todas as fichas do banco
+  const characters = await prisma.character.findMany({
+    orderBy: {
+      updatedAt: 'desc'
+    },
+    take: 50 // Limitar a 50 fichas mais recentes
+  });
 
   return (
-    <main className="min-h-screen bg-[var(--color-parchment-light)] flex items-center justify-center p-8">
-      <div className="text-center max-w-2xl">
-        <h1 className="text-5xl font-[family-name:var(--font-display)] text-[var(--color-sepia-dark)] mb-6">
-          Ficha de Investigador
-        </h1>
-        <p className="text-xl font-[family-name:var(--font-typewriter)] text-[var(--color-sepia-medium)] mb-8">
-          Call of Cthulhu • 7ª Edição
-        </p>
-        <p className="text-lg mb-8 text-[var(--color-sepia-dark)]">
-          Crie e gerencie suas fichas de personagem para Call of Cthulhu de forma fácil e organizada.
-        </p>
-        <div className="flex gap-4 justify-center">
+    <main className="min-h-screen bg-[var(--color-parchment-light)] p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold mb-4" style={{ fontFamily: 'var(--font-display)' }}>
+            📜 Fichas Call of Cthulhu
+          </h1>
+          <p className="text-xl text-[var(--color-sepia-medium)] mb-6">
+            Galeria Pública de Personagens
+          </p>
           <Link
-            href="/sign-in"
-            className="bg-[var(--color-gold)] text-[var(--color-sepia-dark)] px-6 py-3 rounded-md hover:brightness-110 font-bold shadow-md transition-all"
+            href="/character/new"
+            className="inline-block px-8 py-4 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white font-bold rounded-lg shadow-lg hover:scale-105 transition-transform"
           >
-            Entrar
+            ✨ Criar Nova Ficha
           </Link>
-          <Link
-            href="/sign-up"
-            className="bg-[var(--color-sepia-dark)] text-white px-6 py-3 rounded-md hover:brightness-110 font-bold shadow-md transition-all"
-          >
-            Criar Conta
-          </Link>
-        </div>
+        </header>
+
+        {/* Lista de Fichas */}
+        {characters.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-2xl text-[var(--color-sepia-medium)] mb-4">
+              Nenhuma ficha criada ainda
+            </p>
+            <p className="text-lg text-[var(--color-faded-ink)]">
+              Seja o primeiro a criar uma ficha!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {characters.map((character) => {
+              const data = character.data as any;
+              return (
+                <Link
+                  key={character.id}
+                  href={`/character/${character.id}`}
+                  className="block"
+                >
+                  <div className="card hover:scale-105 transition-transform cursor-pointer h-full">
+                    <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+                      {data.basicInfo?.name || 'Sem Nome'}
+                    </h3>
+                    <div className="space-y-1 text-[var(--color-sepia-medium)]">
+                      <p>
+                        <strong>Ocupação:</strong> {data.basicInfo?.occupation || 'Não definida'}
+                      </p>
+                      <p>
+                        <strong>Idade:</strong> {data.basicInfo?.age || '?'} anos
+                      </p>
+                      {data.basicInfo?.residence && (
+                        <p>
+                          <strong>Residência:</strong> {data.basicInfo.residence}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-[var(--color-sepia-light)] text-sm text-[var(--color-faded-ink)]">
+                      Atualizado: {new Date(character.updatedAt).toLocaleDateString('pt-BR')}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
     </main>
   );
