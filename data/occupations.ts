@@ -436,7 +436,24 @@ export const occupations: Occupation[] = [
         name: "Diletante",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "50–99",
-        suggestedSkills: ["Armas de Fogo", "Arte/Ofício", "Cavalgar"]
+        suggestedSkills: ["Armas de Fogo", "Arte/Ofício", "Cavalgar"], // Mantendo como sugestão geral, mas definindo a escolha abaixo
+        skillChoices: [
+            {
+                count: 1,
+                options: ["Arte/Ofício", "Armas de Fogo", "Cavalgar"], // Opções explícitas
+                description: "Arte e Ofício (qualquer), Armas de Fogo ou Cavalgar"
+            },
+            {
+                count: 1,
+                options: [],
+                description: "Uma outra perícia como especialidade pessoal ou da era" // Geralmente Diletantes tem isso
+            },
+            {
+                count: 2,
+                options: ["Charme", "Intimidação", "Lábia", "Persuasão"], // E perícias interpessoais
+                description: "Duas perícias interpessoais"
+            }
+        ]
     },
     {
         name: "Dublê",
