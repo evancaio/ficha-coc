@@ -44,7 +44,16 @@ export default function CharacterSheet() {
         }),
         skills: skills.map(skill => ({
             name: skill.name,
-            baseValue: typeof skill.baseValue === 'number' ? skill.baseValue : 0,
+            baseValue: getSkillBaseValue(skill.name, {
+                STR: 50,
+                CON: 50,
+                SIZ: 50,
+                DEX: 50,
+                APP: 50,
+                INT: 50,
+                POW: 50,
+                EDU: 50
+            }),
             occupationPoints: 0,
             personalPoints: 0
         })),
@@ -138,12 +147,19 @@ export default function CharacterSheet() {
             }
         }
 
+        // Update dynamic skill base values that depend on characteristics (ex: Esquivar, Língua (Nativa))
+        const updatedSkills = character.skills.map(s => ({
+            ...s,
+            baseValue: getSkillBaseValue(s.name, newChars)
+        }));
+
         setCharacter({
             ...character,
             characteristics: newChars,
             derivedStats: newDerived,
             occupationSkillPoints: newOccPoints,
-            personalInterestPoints: newPersonalPoints
+            personalInterestPoints: newPersonalPoints,
+            skills: updatedSkills
         });
     };
 
@@ -184,14 +200,34 @@ export default function CharacterSheet() {
         }
 
         // Auto-populate occupation skills with suggested skills from the occupation
-        const suggestedSkills = occupation?.suggestedSkills || [];
+        const suggestedSkills = [...(occupation?.suggestedSkills || [])];
+
+        // Ensure 'Nível de Crédito' is included and set its base to occupation minimum
+        let minCredit = 0;
+        if (occupation && occupation.creditRating) {
+            const parts = occupation.creditRating.split(/[–\-]/);
+            const parsed = parseInt(parts[0].trim().replace(/[^0-9]/g, ''), 10);
+            if (!isNaN(parsed)) minCredit = parsed;
+        }
+
+        if (!suggestedSkills.includes('Nível de Crédito')) suggestedSkills.push('Nível de Crédito');
+
+        // Update or add the 'Nível de Crédito' skill in the character.skills list
+        const updatedSkills = character.skills.slice();
+        const creditIdx = updatedSkills.findIndex(s => s.name === 'Nível de Crédito');
+        if (creditIdx >= 0) {
+            updatedSkills[creditIdx] = { ...updatedSkills[creditIdx], baseValue: minCredit };
+        } else {
+            updatedSkills.push({ name: 'Nível de Crédito', baseValue: minCredit, occupationPoints: 0, personalPoints: 0 });
+        }
 
         setCharacter({
             ...character,
             basicInfo: { ...character.basicInfo, occupation: occupationName },
             occupationSkillPoints: newOccPoints,
             occupationPointsChoice: occChoice,
-            selectedOccupationSkills: suggestedSkills // Auto-fill with suggested skills
+            selectedOccupationSkills: suggestedSkills, // Auto-fill with suggested skills
+            skills: updatedSkills
         });
 
         setOccupationSearch('');
