@@ -31,110 +31,81 @@ export default async function Home() {
   }
 
   return (
-    <main className="min-h-screen p-4 md:p-8">
-      <div className="container animate-fade-in">
+    <main className="min-h-screen bg-[var(--color-parchment-light)] p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <header className="text-center mb-16 pt-8">
-          <div className="inline-block mb-4 px-4 py-1 rounded-full bg-[var(--bg-tertiary)] border border-[var(--border-color)] text-[var(--text-secondary)] text-sm font-medium tracking-wider uppercase">
-            Sistema de RPG
-          </div>
-          <h1 className="mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--text-primary)] to-[var(--text-secondary)]">
-            Grimório de Investigadores
+        <header className="text-center mb-12">
+          <h1 className="text-6xl font-bold mb-6 drop-shadow-sm text-[var(--color-eldritch-purple)]" style={{ fontFamily: 'var(--font-display)' }}>
+            📜 Fichas Call of Cthulhu
           </h1>
-          <p className="text-xl text-[var(--text-secondary)] mb-10 max-w-2xl mx-auto font-serif">
-            "A mais antiga e forte emoção da humanidade é o medo, e o tipo mais antigo e forte de medo é o medo do desconhecido."
+          <p className="text-2xl text-[var(--color-sepia-medium)] mb-8 font-serif italic">
+            Galeria Pública de Personagens
           </p>
-
           <Link
             href="/character/new"
-            className="modern-btn group"
+            className="inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-xl font-bold rounded-lg shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-[var(--color-gold)]"
           >
-            <span className="text-xl mr-2 group-hover:rotate-90 transition-transform duration-300">✦</span>
-            <span>Criar Nova Ficha</span>
+            ✨ Criar Nova Ficha
           </Link>
         </header>
 
         {/* Lista de Fichas */}
         {characters.length === 0 ? (
-          <div className="text-center py-24 bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] max-w-2xl mx-auto backdrop-blur-sm">
-            <div className="text-6xl mb-6 opacity-30">📜</div>
-            <h3 className="text-2xl text-[var(--text-primary)] mb-2 font-serif">
-              O Grimório está vazio...
-            </h3>
-            <p className="text-[var(--text-secondary)] mb-8">
-              Nenhuma alma corajosa foi registrada ainda.
+          <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-[var(--color-sepia-media)]">
+            <p className="text-3xl text-[var(--color-sepia-medium)] mb-4 font-serif">
+              Nenhuma ficha encontrada no Grimório
             </p>
-            <Link
-              href="/character/new"
-              className="text-[var(--color-accent-glow)] hover:text-[var(--color-accent-primary)] font-medium underline underline-offset-4"
-            >
-              Iniciar a primeira investigação
-            </Link>
+            <p className="text-xl text-[var(--color-faded-ink)]">
+              Seja o primeiro a registrar um investigador!
+            </p>
           </div>
         ) : (
-          <div>
-            <div className="flex justify-between items-end mb-8 px-2 border-b border-[var(--border-color)] pb-4">
-              <div>
-                <h2 className="text-2xl font-display text-[var(--text-primary)] m-0 p-0 border-none">
-                  Personagens Recentes
-                </h2>
-                <p className="text-sm text-[var(--text-secondary)] mt-1">
-                  {characters.length} investigadores registrados
-                </p>
-              </div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {characters.map((character: any) => {
+              const data = character.data;
+              return (
+                <Link
+                  key={character.id}
+                  href={`/character/${character.id}`}
+                  className="block group"
+                >
+                  <div className="h-full bg-[var(--color-parchment)] rounded-xl shadow-md border border-[var(--color-sepia-light)] p-6 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:border-[var(--color-eldritch-green)] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                      {/* Ícone de fundo decorativo */}
+                      <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
+                      </svg>
+                    </div>
 
-            <div className="grid-responsive">
-              {characters.map((character: any) => {
-                const data = character.data;
-                const initials = data.basicInfo?.name
-                  ? data.basicInfo.name.substring(0, 2).toUpperCase()
-                  : '??';
+                    <h3 className="text-3xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
+                      {data.basicInfo?.name || 'Sem Nome'}
+                    </h3>
 
-                return (
-                  <Link
-                    key={character.id}
-                    href={`/character/${character.id}`}
-                    className="block h-full no-underline"
-                  >
-                    <article className="modern-card group">
-                      <div className="card-image-placeholder group-hover:text-[var(--color-accent-glow)] transition-colors duration-300">
-                        {initials}
-                      </div>
+                    <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
+                      <p className="flex items-center gap-2">
+                        <span className="text-xl">🕵️</span>
+                        <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
+                      </p>
+                      <p className="flex items-center gap-2">
+                        <span className="text-xl">🎂</span>
+                        <span>{data.basicInfo?.age || '?'} anos</span>
+                      </p>
+                      {data.basicInfo?.residence && (
+                        <p className="flex items-center gap-2">
+                          <span className="text-xl">🏠</span>
+                          <span className="truncate">{data.basicInfo.residence}</span>
+                        </p>
+                      )}
+                    </div>
 
-                      <div className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-2xl font-bold mb-1 text-[var(--text-primary)] group-hover:text-[var(--color-accent-glow)] transition-colors font-display truncate">
-                          {data.basicInfo?.name || 'Sem Nome'}
-                        </h3>
-
-                        <div className="text-[var(--text-accent)] text-sm font-medium tracking-wide mb-4 uppercase">
-                          {data.basicInfo?.occupation || 'Desconhecido'}
-                        </div>
-
-                        <div className="space-y-3 mt-auto text-[var(--text-secondary)] text-sm">
-                          <div className="flex items-center justify-between border-t border-[var(--border-color)] pt-3">
-                            <span className="flex items-center gap-2">
-                              <span>Idade:</span>
-                              <span className="text-[var(--text-primary)]">{data.basicInfo?.age || '?'}</span>
-                            </span>
-                            {data.basicInfo?.residence && (
-                              <span className="truncate max-w-[120px] text-right" title={data.basicInfo.residence}>
-                                🏠 {data.basicInfo.residence}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex justify-between items-center text-xs opacity-70 pt-1">
-                            <span>Atualizado:</span>
-                            <span>{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-                  </Link>
-                );
-              })}
-            </div>
+                    <div className="mt-6 pt-4 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
+                      <span>Atualizado em:</span>
+                      <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
