@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Character, Characteristics, BasicInfo, Backstory } from '@/types/character';
 import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula } from '@/utils/calculations';
@@ -8,7 +9,6 @@ import { skills, getSkillBaseValue } from '@/data/skills';
 import { occupations, searchOccupations, getOccupationByName } from '@/data/occupations';
 import SkillSelectorModal from './SkillSelectorModal';
 import styles from './CharacterSheet.module.css';
-
 
 interface CharacterSheetProps {
     initialData?: Character;
@@ -262,6 +262,9 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
     return (
         <div className={styles.container}>
+            <Link href="/" className={styles.backButton}>
+                ← Voltar para a Seleção
+            </Link>
             <header className={styles.header}>
                 <h1>Ficha de Investigador</h1>
                 <p className={styles.subtitle}>Call of Cthulhu • 7ª Edição</p>
