@@ -43,7 +43,7 @@ export default async function Home() {
                     </p>
                     <Link
                         href="/character/new"
-                        className="inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-xl font-bold rounded-lg shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-[var(--color-gold)]"
+                        className="inline-block px-14 py-6 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-2xl font-extrabold rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-300 border-2 border-[var(--color-gold)]"
                     >
                         ✨ Criar Nova Ficha
                     </Link>
@@ -60,7 +60,7 @@ export default async function Home() {
                         </p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-start">
                         {characters.map((character: any) => {
                             const data = character.data;
                             return (
@@ -69,7 +69,7 @@ export default async function Home() {
                                     href={`/character/${character.id}`}
                                     className="block group"
                                 >
-                                    <div className="h-full bg-[var(--color-parchment)] rounded-xl shadow-md border border-[var(--color-sepia-light)] p-6 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:border-[var(--color-eldritch-green)] relative overflow-hidden">
+                                    <div className="w-96 h-64 mx-auto bg-[var(--color-parchment)] rounded-xl shadow-lg border-4 border-red-500 p-6 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-2xl relative overflow-hidden flex flex-col justify-between">
                                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                                             {/* Ícone de fundo decorativo */}
                                             <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
@@ -77,11 +77,11 @@ export default async function Home() {
                                             </svg>
                                         </div>
 
-                                        <h3 className="text-3xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
+                                        <h3 className="text-4xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
                                             {data.basicInfo?.name || 'Sem Nome'}
                                         </h3>
 
-                                        <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
+                                        <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-xl">
                                             <p className="flex items-center gap-2">
                                                 <span className="text-xl">🕵️</span>
                                                 <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
@@ -98,8 +98,8 @@ export default async function Home() {
                                             )}
                                         </div>
 
-                                        <div className="mt-6 pt-4 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
-                                            <span>Atualizado em:</span>
+                                        <div className="mt-4 pt-2 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
+                                            <span className="text-[var(--color-sepia-medium)]">Atualizado em:</span>
                                             <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
                                         </div>
                                     </div>
