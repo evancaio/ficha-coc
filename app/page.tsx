@@ -33,30 +33,35 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-[var(--color-parchment-light)] p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="text-center mb-12">
-          <h1 className="text-6xl font-bold mb-6 drop-shadow-sm text-[var(--color-eldritch-purple)]" style={{ fontFamily: 'var(--font-display)' }}>
-            📜 Fichas Call of Cthulhu
-          </h1>
-          <p className="text-2xl text-[var(--color-sepia-medium)] mb-8 font-serif italic">
-            Galeria Pública de Personagens
-          </p>
-          <Link
-            href="/character/new"
-            className="inline-block px-10 py-5 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-xl font-bold rounded-lg shadow-xl hover:scale-105 hover:shadow-2xl transition-all duration-300 border border-[var(--color-gold)]"
-          >
-            ✨ Criar Nova Ficha
-          </Link>
+        {/* Header Style */}
+        <header className="text-center mb-16 relative">
+          <div className="absolute top-1/2 left-0 w-full h-px bg-[var(--color-sepia-light)] -z-10"></div>
+          <div className="inline-block bg-[var(--color-parchment-light)] px-8">
+            <h1 className="text-5xl md:text-6xl font-bold text-[var(--color-sepia-dark)] mb-2" style={{ fontFamily: 'var(--font-heading)' }}>
+              Fichas Call of Cthulhu
+            </h1>
+            <p className="text-xl text-[var(--color-sepia-medium)] font-serif italic">
+              Galeria Pública de Personagens
+            </p>
+          </div>
+          <div className="mt-8">
+            <Link
+              href="/character/new"
+              className="inline-block px-8 py-3 bg-[var(--color-sepia-dark)] text-[#f4e8d0] text-lg font-bold rounded shadow-lg hover:bg-[var(--color-sepia-medium)] transition-all hover:-translate-y-1 hover:shadow-xl border border-[#3e3221]"
+            >
+              + Criar Nova Ficha
+            </Link>
+          </div>
         </header>
 
         {/* Lista de Fichas */}
         {characters.length === 0 ? (
-          <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-[var(--color-sepia-media)]">
-            <p className="text-3xl text-[var(--color-sepia-medium)] mb-4 font-serif">
-              Nenhuma ficha encontrada no Grimório
+          <div className="text-center py-20 bg-[rgba(255,255,255,0.4)] rounded-xl border-2 border-dashed border-[var(--color-sepia-light)]">
+            <p className="text-2xl text-[var(--color-sepia-dark)] mb-4 font-serif">
+              O Grimório está vazio...
             </p>
-            <p className="text-xl text-[var(--color-faded-ink)]">
-              Seja o primeiro a registrar um investigador!
+            <p className="text-lg text-[var(--color-sepia-medium)]">
+              Seja o primeiro a registrar um investigador nestas páginas.
             </p>
           </div>
         ) : (
@@ -69,38 +74,48 @@ export default async function Home() {
                   href={`/character/${character.id}`}
                   className="block group"
                 >
-                  <div className="h-full bg-[var(--color-parchment)] rounded-xl shadow-md border border-[var(--color-sepia-light)] p-6 transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-2xl group-hover:border-[var(--color-eldritch-green)] relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                      {/* Ícone de fundo decorativo */}
-                      <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                      </svg>
-                    </div>
+                  <div className="h-full bg-[#faebd7] rounded shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-1px_rgba(0,0,0,0.06)] border border-[#d4c5a9] overflow-hidden transition-all duration-300 group-hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] group-hover:-translate-y-1 group-hover:border-[var(--color-sepia-medium)]">
 
-                    <h3 className="text-3xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
-                      {data.basicInfo?.name || 'Sem Nome'}
-                    </h3>
-
-                    <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
-                      <p className="flex items-center gap-2">
-                        <span className="text-xl">🕵️</span>
-                        <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
-                      </p>
-                      <p className="flex items-center gap-2">
-                        <span className="text-xl">🎂</span>
-                        <span>{data.basicInfo?.age || '?'} anos</span>
-                      </p>
-                      {data.basicInfo?.residence && (
-                        <p className="flex items-center gap-2">
-                          <span className="text-xl">🏠</span>
-                          <span className="truncate">{data.basicInfo.residence}</span>
-                        </p>
+                    {/* Imagem do Personagem (se houver) */}
+                    <div className="h-48 bg-[#e6dcc5] relative flex items-center justify-center overflow-hidden border-b border-[#d4c5a9]">
+                      {data.basicInfo?.imageUrl ? (
+                        <img
+                          src={data.basicInfo.imageUrl}
+                          alt={data.basicInfo.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/400x200?text=Sem+Imagem'; }}
+                        />
+                      ) : (
+                        <span className="text-6xl opacity-20 text-[#5c4b37]">👤</span>
                       )}
+                      <div className="absolute top-2 right-2 bg-[var(--color-sepia-dark)] text-[#faebd7] text-xs font-bold px-2 py-1 rounded opacity-80">
+                        {data.basicInfo?.occupation || 'Desconhecido'}
+                      </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
-                      <span>Atualizado em:</span>
-                      <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
+                    <div className="p-6">
+                      <h3 className="text-2xl font-bold mb-2 text-[#3e3221] group-hover:text-[#5c4b37]" style={{ fontFamily: 'var(--font-heading)' }}>
+                        {data.basicInfo?.name || 'Sem Nome'}
+                      </h3>
+
+                      <div className="space-y-1 text-[#5c4b37] text-sm">
+                        <p>
+                          <span className="font-bold opacity-70">Jogador:</span> {data.basicInfo?.player || '-'}
+                        </p>
+                        <p>
+                          <span className="font-bold opacity-70">Idade:</span> {data.basicInfo?.age || '?'} anos
+                        </p>
+                        {data.basicInfo?.residence && (
+                          <p className="truncate">
+                            <span className="font-bold opacity-70">Residência:</span> {data.basicInfo.residence}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="mt-4 pt-3 border-t border-[#d4c5a9] flex justify-between items-center text-xs text-[#8c7b66]">
+                        <span>Atualizado:</span>
+                        <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
+                      </div>
                     </div>
                   </div>
                 </Link>
