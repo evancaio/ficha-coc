@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 // GET - Buscar ficha específica (público)
 export async function GET(
@@ -9,18 +9,29 @@ export async function GET(
     try {
         const { id } = await context.params;
 
-        const character = await prisma.character.findUnique({
-            where: { id }
-        });
+        const { data, error } = await supabase
+            .from('Character')
+            .select('*')
+            .eq('id', id)
+            .single();
 
-        if (!character) {
-            return NextResponse.json(
-                { error: 'Character not found' },
-                { status: 404 }
-            );
+        if (error) {
+            const { data: retryData, error: retryError } = await supabase
+                .from('character')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (retryError || !retryData) {
+                return NextResponse.json(
+                    { error: 'Character not found' },
+                    { status: 404 }
+                );
+            }
+            return NextResponse.json(retryData);
         }
 
-        return NextResponse.json(character);
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error fetching character:', error);
         return NextResponse.json(
@@ -40,16 +51,36 @@ export async function PUT(
         const body = await request.json();
         const { name, occupation, data } = body;
 
-        const character = await prisma.character.update({
-            where: { id },
-            data: {
+        const { data: updatedCharacter, error } = await supabase
+            .from('Character')
+            .update({
                 name: name || 'Sem Nome',
                 occupation: occupation || null,
-                data: data
-            }
-        });
+                data: data,
+                updatedAt: new Date().toISOString()
+            })
+            .eq('id', id)
+            .select()
+            .single();
 
-        return NextResponse.json(character);
+        if (error) {
+            const { data: retryCharacter, error: retryError } = await supabase
+                .from('character')
+                .update({
+                    name: name || 'Sem Nome',
+                    occupation: occupation || null,
+                    data: data,
+                    updatedAt: new Date().toISOString()
+                })
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (retryError) throw retryError;
+            return NextResponse.json(retryCharacter);
+        }
+
+        return NextResponse.json(updatedCharacter);
     } catch (error) {
         console.error('Error updating character:', error);
         return NextResponse.json(
@@ -67,9 +98,19 @@ export async function DELETE(
     try {
         const { id } = await context.params;
 
-        await prisma.character.delete({
-            where: { id }
-        });
+        const { error } = await supabase
+            .from('Character')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            const { error: retryError } = await supabase
+                .from('character')
+                .delete()
+                .eq('id', id);
+
+            if (retryError) throw retryError;
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

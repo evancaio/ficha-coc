@@ -1,16 +1,34 @@
 import Link from "next/link";
-import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'; // Garante que não é gerado estático
 
 export default async function Home() {
   // Buscar todas as fichas do banco
-  const characters = await prisma.character.findMany({
-    orderBy: {
-      updatedAt: 'desc'
-    },
-    take: 50 // Limitar a 50 fichas mais recentes
-  });
+  let characters = [];
+
+  try {
+    const { data, error } = await supabase
+      .from('Character')
+      .select('*')
+      .order('updatedAt', { ascending: false })
+      .limit(50);
+
+    if (!error && data) {
+      characters = data;
+    } else {
+      // Fallback para tabela minúscula
+      const { data: retryData } = await supabase
+        .from('character')
+        .select('*')
+        .order('updatedAt', { ascending: false })
+        .limit(50);
+
+      if (retryData) characters = retryData;
+    }
+  } catch (e) {
+    console.error("Erro ao buscar fichas:", e);
+  }
 
   return (
     <main className="min-h-screen bg-[var(--color-parchment-light)] p-8">
@@ -35,16 +53,16 @@ export default async function Home() {
         {characters.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-2xl text-[var(--color-sepia-medium)] mb-4">
-              Nenhuma ficha criada ainda
+              Nenhuma ficha encontrada
             </p>
             <p className="text-lg text-[var(--color-faded-ink)]">
-              Seja o primeiro a criar uma ficha!
+              Crie a primeira ficha agora mesmo!
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {characters.map((character) => {
-              const data = character.data as any;
+            {characters.map((character: any) => {
+              const data = character.data;
               return (
                 <Link
                   key={character.id}

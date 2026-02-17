@@ -1,16 +1,26 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 // GET - Listar todas as fichas (público)
 export async function GET() {
     try {
-        const characters = await prisma.character.findMany({
-            orderBy: {
-                updatedAt: 'desc'
-            }
-        });
+        const { data, error } = await supabase
+            .from('Character') // Tenta primeiro com PascalCase que o Prisma cria
+            .select('*')
+            .order('updatedAt', { ascending: false });
 
-        return NextResponse.json(characters);
+        if (error) {
+            // Se falhar, tenta minúsculo (caso o usuário tenha criado tabela manualmente)
+            const { data: retryData, error: retryError } = await supabase
+                .from('character')
+                .select('*')
+                .order('updatedAt', { ascending: false });
+
+            if (retryError) throw retryError;
+            return NextResponse.json(retryData);
+        }
+
+        return NextResponse.json(data);
     } catch (error) {
         console.error('Error fetching characters:', error);
         return NextResponse.json(
@@ -26,15 +36,40 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { name, occupation, data } = body;
 
-        const character = await prisma.character.create({
-            data: {
-                name: name || 'Sem Nome',
-                occupation: occupation || null,
-                data: data
-            }
-        });
+        // Tenta inserir na tabela Character (padrão Prisma)
+        const { data: newCharacter, error } = await supabase
+            .from('Character')
+            .insert([
+                {
+                    name: name || 'Sem Nome',
+                    occupation: occupation || null,
+                    data: data,
+                    updatedAt: new Date().toISOString()
+                }
+            ])
+            .select()
+            .single();
 
-        return NextResponse.json(character);
+        if (error) {
+            // Se der erro (provavelmente tabela minúscula), tenta 'character'
+            const { data: retryCharacter, error: retryError } = await supabase
+                .from('character')
+                .insert([
+                    {
+                        name: name || 'Sem Nome',
+                        occupation: occupation || null,
+                        data: data,
+                        updatedAt: new Date().toISOString()
+                    }
+                ])
+                .select()
+                .single();
+
+            if (retryError) throw retryError;
+            return NextResponse.json(retryCharacter);
+        }
+
+        return NextResponse.json(newCharacter);
     } catch (error) {
         console.error('Error creating character:', error);
         return NextResponse.json(
