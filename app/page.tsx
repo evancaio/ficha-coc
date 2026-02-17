@@ -14,17 +14,17 @@ export default async function Home() {
       .order('updatedAt', { ascending: false })
       .limit(50);
 
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
       characters = data;
     } else {
-      // Fallback para tabela minúscula
+      // Fallback: se 'Character' não retornar nada (ou der erro), tenta 'character'
       const { data: retryData } = await supabase
         .from('character')
         .select('*')
         .order('updatedAt', { ascending: false })
         .limit(50);
 
-      if (retryData) characters = retryData;
+      if (retryData && retryData.length > 0) characters = retryData;
     }
   } catch (e) {
     console.error("Erro ao buscar fichas:", e);
