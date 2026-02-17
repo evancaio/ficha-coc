@@ -1,13 +1,13 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+// import { auth } from "@clerk/nextjs/server"; // TEMPORARIAMENTE DESABILITADO
+// import { redirect } from "next/navigation";
 import Link from "next/link";
 
-export default async function Home() {
-  const { userId } = await auth();
+export default function Home() { // Removido 'async' temporariamente
+  // const { userId } = await auth(); // DESABILITADO PARA TESTES
 
-  if (userId) {
-    redirect("/dashboard");
-  }
+  // if (userId) {
+  //   redirect("/dashboard");
+  // }
 
   return (
     <main className="min-h-screen bg-[var(--color-parchment-light)] flex items-center justify-center p-8">

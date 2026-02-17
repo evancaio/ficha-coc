@@ -406,19 +406,95 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             <div className="grid grid-3">
                                 <div className={styles.statBox}>
                                     <h3>Pontos de Vida</h3>
-                                    <div className={styles.statValue}>{character.derivedStats.HP}</div>
+                                    <div className={styles.editableStat}>
+                                        <input
+                                            type="number"
+                                            value={character.derivedStats.currentHP}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                derivedStats: { ...character.derivedStats, currentHP: parseInt(e.target.value) || 0 }
+                                            })}
+                                            min="0"
+                                            max={character.derivedStats.HP}
+                                            className={styles.currentValue}
+                                        />
+                                        <span className={styles.separator}>/</span>
+                                        <span className={styles.maxValue}>{character.derivedStats.HP}</span>
+                                    </div>
                                 </div>
                                 <div className={styles.statBox}>
                                     <h3>Pontos de Magia</h3>
-                                    <div className={styles.statValue}>{character.derivedStats.MP}</div>
+                                    <div className={styles.editableStat}>
+                                        <input
+                                            type="number"
+                                            value={character.derivedStats.currentMP}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                derivedStats: { ...character.derivedStats, currentMP: parseInt(e.target.value) || 0 }
+                                            })}
+                                            min="0"
+                                            max={character.derivedStats.MP}
+                                            className={styles.currentValue}
+                                        />
+                                        <span className={styles.separator}>/</span>
+                                        <span className={styles.maxValue}>{character.derivedStats.MP}</span>
+                                    </div>
                                 </div>
                                 <div className={styles.statBox}>
                                     <h3>Sanidade</h3>
-                                    <div className={styles.statValue}>{character.derivedStats.SAN}</div>
+                                    <div className={styles.editableStat}>
+                                        <input
+                                            type="number"
+                                            value={character.derivedStats.currentSAN}
+                                            onChange={(e) => setCharacter({
+                                                ...character,
+                                                derivedStats: { ...character.derivedStats, currentSAN: parseInt(e.target.value) || 0 }
+                                            })}
+                                            min="0"
+                                            max={99}
+                                            className={styles.currentValue}
+                                        />
+                                        <span className={styles.separator}>/</span>
+                                        <span className={styles.maxValue}>{character.derivedStats.SAN}</span>
+                                    </div>
                                 </div>
                                 <div className={styles.statBox}>
-                                    <h3>Sorte</h3>
-                                    <div className={styles.statValue}>{character.derivedStats.LUCK || '3d6×5'}</div>
+                                    <h3>🪙 Moedas da Sorte</h3>
+                                    <div className={styles.luckTokens}>
+                                        <button
+                                            type="button"
+                                            onClick={() => setCharacter({
+                                                ...character,
+                                                derivedStats: {
+                                                    ...character.derivedStats,
+                                                    luckTokens: Math.max(0, character.derivedStats.luckTokens - 1)
+                                                }
+                                            })}
+                                            className={styles.tokenButton}
+                                            disabled={character.derivedStats.luckTokens <= 0}
+                                        >
+                                            −
+                                        </button>
+                                        <div className={styles.tokenDisplay}>
+                                            <span className={styles.tokenValue}>{character.derivedStats.luckTokens}</span>
+                                            <span className={styles.separator}>/</span>
+                                            <span className={styles.maxValue}>{character.derivedStats.maxLuckTokens}</span>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => setCharacter({
+                                                ...character,
+                                                derivedStats: {
+                                                    ...character.derivedStats,
+                                                    luckTokens: Math.min(character.derivedStats.maxLuckTokens, character.derivedStats.luckTokens + 1)
+                                                }
+                                            })}
+                                            className={styles.tokenButton}
+                                            disabled={character.derivedStats.luckTokens >= character.derivedStats.maxLuckTokens}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className={styles.statBox}>
                                     <h3>Movimento</h3>

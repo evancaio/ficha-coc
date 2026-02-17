@@ -12,10 +12,15 @@ export interface Characteristics {
 }
 
 export interface DerivedStats {
-  HP: number; // Pontos de Vida
-  MP: number; // Pontos de Magia
-  SAN: number; // Sanidade
-  LUCK: number; // Sorte
+  HP: number; // Pontos de Vida MÁXIMOS
+  currentHP: number; // Pontos de Vida ATUAIS
+  MP: number; // Pontos de Magia MÁXIMOS
+  currentMP: number; // Pontos de Magia ATUAIS
+  SAN: number; // Sanidade MÁXIMA
+  currentSAN: number; // Sanidade ATUAL
+  LUCK: number; // Sorte (não usado mais - substituído por luckTokens)
+  luckTokens: number; // Moedas da Sorte ATUAIS
+  maxLuckTokens: number; // Moedas da Sorte MÁXIMAS (padrão: 5)
   movementRate: number; // Taxa de Movimento
   damageBonus: string; // Bônus de Dano
   build: number; // Corpo

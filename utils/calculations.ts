@@ -5,16 +5,21 @@ export function calculateDerivedStats(chars: Characteristics): DerivedStats {
     const HP = Math.floor((chars.CON + chars.SIZ) / 10);
     const MP = Math.floor(chars.POW / 5);
     const SAN = chars.POW;
-    const LUCK = 0; // Será rolado 3d6 × 5 pelo usuário
+    const LUCK = 0; // Deprecated - usar luckTokens
 
     const movementRate = calculateMovementRate(chars);
     const { damageBonus, build } = calculateDamageBonusAndBuild(chars);
 
     return {
         HP,
+        currentHP: HP, // Inicializa com HP máximo
         MP,
+        currentMP: MP, // Inicializa com MP máximo
         SAN,
+        currentSAN: SAN, // Inicializa com Sanidade máxima
         LUCK,
+        luckTokens: 5, // Moedas da Sorte iniciais
+        maxLuckTokens: 5, // Máximo de Moedas da Sorte
         movementRate,
         damageBonus,
         build
