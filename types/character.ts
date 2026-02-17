@@ -32,6 +32,7 @@ export interface Skill {
   occupationPoints: number;
   personalPoints: number;
   specialization?: string; // Para perícias que precisam de especialização
+  minOccupationPoints?: number; // mínimo obrigatório de pontos ocupacionais (ex: Nível de Crédito)
 }
 
 export interface Weapon {

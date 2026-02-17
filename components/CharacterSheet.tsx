@@ -216,9 +216,11 @@ export default function CharacterSheet() {
         const updatedSkills = character.skills.slice();
         const creditIdx = updatedSkills.findIndex(s => s.name === 'Nível de Crédito');
         if (creditIdx >= 0) {
-            updatedSkills[creditIdx] = { ...updatedSkills[creditIdx], baseValue: minCredit };
+            // Move the minimum credit into occupationPoints so the Ocupacional field shows the value
+            updatedSkills[creditIdx] = { ...updatedSkills[creditIdx], baseValue: 0, occupationPoints: minCredit, personalPoints: 0, minOccupationPoints: minCredit };
         } else {
-            updatedSkills.push({ name: 'Nível de Crédito', baseValue: minCredit, occupationPoints: 0, personalPoints: 0 });
+            // Add as occupational points (base 0) so it appears prefilled in Ocupacional
+            updatedSkills.push({ name: 'Nível de Crédito', baseValue: 0, occupationPoints: minCredit, personalPoints: 0, minOccupationPoints: minCredit });
         }
 
         setCharacter({
@@ -249,10 +251,16 @@ export default function CharacterSheet() {
 
 
     const handleSkillPointChange = (skillName: string, points: number, type: 'occupation' | 'personal') => {
+        // Disallow applying personal interest points to 'Nível de Crédito'
+        if (type === 'personal' && skillName === 'Nível de Crédito') return;
+
         const updatedSkills = character.skills.map(skill => {
             if (skill.name === skillName) {
                 if (type === 'occupation') {
-                    return { ...skill, occupationPoints: points };
+                    // enforce minimum occupation points if defined (for Nível de Crédito)
+                    const minOcc = (skill as any).minOccupationPoints ?? 0;
+                    const newVal = Math.max(points, minOcc);
+                    return { ...skill, occupationPoints: newVal };
                 } else {
                     return { ...skill, personalPoints: points };
                 }
@@ -326,11 +334,13 @@ export default function CharacterSheet() {
     };
 
     const getTotalOccupationPointsUsed = () => {
+        // Sum occupation points for all skills (Nível de Crédito counts as occupational)
         return character.skills.reduce((sum, skill) => sum + skill.occupationPoints, 0);
     };
 
     const getTotalPersonalPointsUsed = () => {
-        return character.skills.reduce((sum, skill) => sum + skill.personalPoints, 0);
+        // Exclude 'Nível de Crédito' from personal points usage
+        return character.skills.reduce((sum, skill) => skill.name === 'Nível de Crédito' ? sum : sum + skill.personalPoints, 0);
     };
 
     const isSpecializationSkill = (skillName: string) => {
@@ -912,7 +922,7 @@ export default function CharacterSheet() {
                                                             <label>Ocupacional:</label>
                                                             <input
                                                                 type="number"
-                                                                min="0"
+                                                                min={typeof (skill as any).minOccupationPoints === 'number' ? (skill as any).minOccupationPoints : 0}
                                                                 max={character.occupationSkillPoints}
                                                                 value={skill.occupationPoints}
                                                                 onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'occupation')}
@@ -924,8 +934,9 @@ export default function CharacterSheet() {
                                                                 type="number"
                                                                 min="0"
                                                                 max={character.personalInterestPoints}
-                                                                value={skill.personalPoints}
+                                                                value={skill.name === 'Nível de Crédito' ? 0 : skill.personalPoints}
                                                                 onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'personal')}
+                                                                disabled={skill.name === 'Nível de Crédito'}
                                                             />
                                                         </div>
                                                     </div>
@@ -1001,13 +1012,14 @@ export default function CharacterSheet() {
                                                 <div className={styles.skillValues}>
                                                     <div className={styles.skillInput}>
                                                         <label>Pontos:</label>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            max={character.personalInterestPoints}
-                                                            value={skill.personalPoints}
-                                                            onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'personal')}
-                                                        />
+                                                            <input
+                                                                type="number"
+                                                                min="0"
+                                                                max={character.personalInterestPoints}
+                                                                value={skill.name === 'Nível de Crédito' ? 0 : skill.personalPoints}
+                                                                onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'personal')}
+                                                                disabled={skill.name === 'Nível de Crédito'}
+                                                            />
                                                     </div>
                                                     <div className={styles.skillTotal}>
                                                         <span className={styles.totalLabel}>Total:</span>
@@ -1253,14 +1265,14 @@ export default function CharacterSheet() {
                 description={`Escolha as perícias relacionadas à sua ocupação para alocar pontos ocupacionais. ${character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)?.skillChoices
                     ? `(Escolhas restantes: ${(
                         (getOccupationByName(character.basicInfo.occupation)?.suggestedSkills.length || 0) +
-                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0)
+                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0) + 1
                     ) - character.selectedOccupationSkills.length})`
                     : ''
                     }`}
                 maxSelections={
                     character.basicInfo.occupation
                         ? (getOccupationByName(character.basicInfo.occupation)?.suggestedSkills.length || 0) +
-                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0)
+                        (getOccupationByName(character.basicInfo.occupation)?.skillChoices?.reduce((acc, curr) => acc + curr.count, 0) || 0) + 1
                         : undefined
                 }
                 lockedSkills={
