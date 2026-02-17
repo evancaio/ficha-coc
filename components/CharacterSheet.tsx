@@ -9,8 +9,17 @@ import { occupations, searchOccupations, getOccupationByName } from '@/data/occu
 import SkillSelectorModal from './SkillSelectorModal';
 import styles from './CharacterSheet.module.css';
 
-export default function CharacterSheet() {
-    const [character, setCharacter] = useState<Character>({
+
+interface CharacterSheetProps {
+    initialData?: Character;
+    characterId?: string;
+}
+
+export default function CharacterSheet({ initialData, characterId: initialCharacterId }: CharacterSheetProps) {
+    const [characterId, setCharacterId] = useState<string | undefined>(initialCharacterId);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const [character, setCharacter] = useState<Character>(initialData || {
         basicInfo: {
             name: '',
             player: '',
@@ -70,11 +79,14 @@ export default function CharacterSheet() {
 
 
     useEffect(() => {
-        const saved = getCurrentCharacter();
-        if (saved) {
-            setCharacter(saved);
+        // Only load from local storage if NO initial data (cloud data) was provided
+        if (!initialData) {
+            const saved = getCurrentCharacter();
+            if (saved) {
+                setCharacter(saved);
+            }
         }
-    }, []);
+    }, [initialData]);
 
     useEffect(() => {
         // Close modal on ESC key
@@ -155,9 +167,47 @@ export default function CharacterSheet() {
         setShowOccupationModal(false);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        // Legacy local save
         saveCharacter(character);
-        alert('Personagem salvo com sucesso!');
+
+        setIsSaving(true);
+        try {
+            const method = characterId ? 'PATCH' : 'POST';
+            const url = characterId ? `/api/characters/${characterId}` : '/api/characters';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: character.basicInfo.name || 'Novo Investigador',
+                    occupation: character.basicInfo.occupation,
+                    data: character
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to save');
+            }
+
+            const savedChar = await response.json();
+
+            if (!characterId && savedChar.id) {
+                setCharacterId(savedChar.id);
+                // Optional: Update URL without reload?
+                // window.history.pushState({}, '', `/character/${savedChar.id}`);
+                // Or just let them continue editing
+            }
+
+            alert('Personagem salvo na nuvem com sucesso!');
+        } catch (error) {
+            console.error('Error saving:', error);
+            alert('Erro ao salvar na nuvem. Mas salvo localmente.');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleSelectOccupationSkills = (skillNames: string[]) => {
