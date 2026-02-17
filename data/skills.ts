@@ -91,9 +91,7 @@ export const skills: SkillDefinition[] = [
     { name: "Ciência (Química)", baseValue: 1, category: "Conhecimento", requiresSpecialization: true },
     { name: "Ciência (Zoologia)", baseValue: 1, category: "Conhecimento", requiresSpecialization: true },
     { name: "Conhecimento", baseValue: 1, category: "Conhecimento", requiresSpecialization: true, uncommon: true },
-    { name: "Arte e Ofício (Atuação)", baseValue: 5, category: "Conhecimento", requiresSpecialization: true },
-    { name: "Arte e Ofício (Belas Artes)", baseValue: 5, category: "Conhecimento", requiresSpecialization: true },
-    { name: "Arte e Ofício (Fotografia)", baseValue: 5, category: "Conhecimento", requiresSpecialization: true },
+    { name: "Arte e Ofício", baseValue: 5, category: "Conhecimento", requiresSpecialization: true },
 
     // Físicas
     { name: "Cavalgar", baseValue: 5, category: "Físicas" },

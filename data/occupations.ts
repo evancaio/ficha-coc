@@ -59,7 +59,7 @@ export const occupations: Occupation[] = [
         name: "Agricultor",
         skillPoints: "EDU × 2 + (DES × 2 ou FOR × 2)",
         creditRating: "9–30",
-        suggestedSkills: ["Arte/Ofício (Agricultura)", "Consertos Mecânicos", "Mundo Natural", "Operar Maquinário Pesado", "Rastrear"],
+        suggestedSkills: ["Arte e Ofício", "Consertos Mecânicos", "Mundo Natural", "Operar Maquinário Pesado", "Rastrear"],
         skillChoices: [
             {
                 count: 1,
@@ -173,7 +173,7 @@ export const occupations: Occupation[] = [
         name: "Apostador",
         skillPoints: "EDU × 2 + (APA × 2 ou DES × 2)",
         creditRating: "8–50",
-        suggestedSkills: ["Arte/Ofício (Atuação)", "Contabilidade", "Encontrar", "Escutar", "Prestidigitação", "Psicologia"],
+        suggestedSkills: ["Arte e Ofício", "Contabilidade", "Encontrar", "Escutar", "Prestidigitação", "Psicologia"],
         skillChoices: [
             {
                 count: 2,
@@ -204,7 +204,7 @@ export const occupations: Occupation[] = [
         name: "Arquiteto",
         skillPoints: "EDU × 4",
         creditRating: "30–70",
-        suggestedSkills: ["Arte/Ofício (Desenho Técnico)", "Ciência (Matemática)", "Contabilidade", "Direito", "Persuasão", "Psicologia"],
+        suggestedSkills: ["Arte e Ofício", "Ciência (Matemática)", "Contabilidade", "Direito", "Persuasão", "Psicologia"],
         skillChoices: [
             {
                 count: 1,
@@ -227,7 +227,7 @@ export const occupations: Occupation[] = [
             {
                 count: 2,
                 options: [],
-                description: "Arte/Ofício x2"
+                description: "Arte e Ofício x2"
             },
             {
                 count: 2,
@@ -245,7 +245,7 @@ export const occupations: Occupation[] = [
             {
                 count: 1,
                 options: [],
-                description: "Arte/Ofício"
+                description: "Arte e Ofício"
             },
             {
                 count: 1,
@@ -285,13 +285,13 @@ export const occupations: Occupation[] = [
         name: "Ator de Teatro",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "9–40",
-        suggestedSkills: ["Arte/Ofício (Atuação)", "Disfarce", "História", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Disfarce", "História", "Psicologia"]
     },
     {
         name: "Estrela de Cinema",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "20–90",
-        suggestedSkills: ["Arte/Ofício (Atuação)", "Dirigir Automóveis", "Disfarce", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Dirigir Automóveis", "Disfarce", "Psicologia"]
     },
     {
         name: "Auxiliar de Laboratório",
@@ -333,7 +333,7 @@ export const occupations: Occupation[] = [
         name: "Cavalheiro/Dama",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "40–90",
-        suggestedSkills: ["Armas de Fogo (Rifles/Espingardas)", "Arte/Ofício", "Cavalgar", "História", "Navegação"]
+        suggestedSkills: ["Armas de Fogo (Rifles/Espingardas)", "Arte e Ofício", "Cavalgar", "História", "Navegação"]
     },
     {
         name: "Cientista",
@@ -393,13 +393,13 @@ export const occupations: Occupation[] = [
         name: "Criminoso - Golpista",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "10–65",
-        suggestedSkills: ["Arte/Ofício (Atuação)", "Avaliação", "Direito", "Escutar", "Prestidigitação", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Avaliação", "Direito", "Escutar", "Prestidigitação", "Psicologia"]
     },
     {
         name: "Criminoso - Falsificador",
         skillPoints: "EDU × 4",
         creditRating: "20–60",
-        suggestedSkills: ["Arte/Ofício (Falsificação)", "Avaliação", "Contabilidade", "Encontrar", "História", "Prestidigitação", "Usar Bibliotecas"]
+        suggestedSkills: ["Arte e Ofício", "Avaliação", "Contabilidade", "Encontrar", "História", "Prestidigitação", "Usar Bibliotecas"]
     },
     {
         name: "Curador de Museu",
@@ -411,7 +411,7 @@ export const occupations: Occupation[] = [
         name: "Designer",
         skillPoints: "EDU × 4",
         creditRating: "10–40",
-        suggestedSkills: ["Arte/Ofício", "Consertos Mecânicos", "Contabilidade", "Encontrar", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Consertos Mecânicos", "Contabilidade", "Encontrar", "Psicologia"]
     },
     {
         name: "Desprogramador",
@@ -430,17 +430,17 @@ export const occupations: Occupation[] = [
         name: "Detetive Particular",
         skillPoints: "EDU × 2 + (DES × 2 ou FOR × 2)",
         creditRating: "9–30",
-        suggestedSkills: ["Arte/Ofício (Fotografia)", "Direito", "Disfarce", "Encontrar", "Psicologia", "Usar Bibliotecas"]
+        suggestedSkills: ["Arte e Ofício", "Direito", "Disfarce", "Encontrar", "Psicologia", "Usar Bibliotecas"]
     },
     {
         name: "Diletante",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "50–99",
-        suggestedSkills: ["Armas de Fogo", "Arte/Ofício", "Cavalgar"], // Mantendo como sugestão geral, mas definindo a escolha abaixo
+        suggestedSkills: ["Armas de Fogo", "Arte e Ofício", "Cavalgar"], // Mantendo como sugestão geral, mas definindo a escolha abaixo
         skillChoices: [
             {
                 count: 1,
-                options: ["Arte/Ofício", "Armas de Fogo", "Cavalgar"], // Opções explícitas
+                options: ["Arte e Ofício", "Armas de Fogo", "Cavalgar"], // Opções explícitas
                 description: "Arte e Ofício (qualquer), Armas de Fogo ou Cavalgar"
             },
             {
@@ -477,7 +477,7 @@ export const occupations: Occupation[] = [
         name: "Engenheiro",
         skillPoints: "EDU × 4",
         creditRating: "30–60",
-        suggestedSkills: ["Arte/Ofício (Desenho Técnico)", "Ciência (Engenharia)", "Ciência (Física)", "Consertos Elétricos", "Consertos Mecânicos", "Operar Maquinário Pesado", "Usar Bibliotecas"]
+        suggestedSkills: ["Arte e Ofício", "Ciência (Engenharia)", "Ciência (Física)", "Consertos Elétricos", "Consertos Mecânicos", "Operar Maquinário Pesado", "Usar Bibliotecas"]
     },
     {
         name: "Escritor",
@@ -489,7 +489,7 @@ export const occupations: Occupation[] = [
         name: "Espião",
         skillPoints: "EDU × 2 + (APA × 2 ou DES × 2)",
         creditRating: "20–60",
-        suggestedSkills: ["Armas de Fogo", "Arte/Ofício (Atuação)", "Disfarce", "Escutar", "Furtividade", "Prestidigitação", "Psicologia"]
+        suggestedSkills: ["Armas de Fogo", "Arte e Ofício", "Disfarce", "Escutar", "Furtividade", "Prestidigitação", "Psicologia"]
     },
     {
         name: "Estudante/Estagiário",
@@ -520,7 +520,7 @@ export const occupations: Occupation[] = [
         name: "Fotógrafo",
         skillPoints: "EDU × 4",
         creditRating: "9–30",
-        suggestedSkills: ["Arte/Ofício (Fotografia)", "Ciência (Química)", "Encontrar", "Furtividade", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Ciência (Química)", "Encontrar", "Furtividade", "Psicologia"]
     },
     {
         name: "Gangster - Chefão",
@@ -538,7 +538,7 @@ export const occupations: Occupation[] = [
         name: "Garçonete/Garçom",
         skillPoints: "EDU × 2 + (APA × 2 ou DES × 2)",
         creditRating: "9–20",
-        suggestedSkills: ["Arte/Ofício", "Contabilidade", "Escutar", "Esquivar", "Psicologia"]
+        suggestedSkills: ["Arte e Ofício", "Contabilidade", "Escutar", "Esquivar", "Psicologia"]
     },
     {
         name: "Vagabundo",
@@ -549,7 +549,7 @@ export const occupations: Occupation[] = [
             {
                 count: 1,
                 options: [],
-                description: "Arte/Ofício (qualquer)"
+                description: "Arte e Ofício (qualquer)"
             },
             {
                 count: 1,
@@ -621,7 +621,7 @@ export const occupations: Occupation[] = [
             {
                 count: 1,
                 options: [],
-                description: "Arte/Ofício (Arte ou Fotografia)"
+                description: "Arte e Ofício"
             },
             {
                 count: 1,
@@ -639,7 +639,7 @@ export const occupations: Occupation[] = [
         name: "Repórter",
         skillPoints: "EDU × 4",
         creditRating: "9–30",
-        suggestedSkills: ["Arte/Ofício (Atuação)", "Encontrar", "Escutar", "Furtividade", "História", "Língua Nativa", "Psicologia"],
+        suggestedSkills: ["Arte e Ofício", "Encontrar", "Escutar", "Furtividade", "História", "Língua Nativa", "Psicologia"],
         skillChoices: [
             {
                 count: 1,
@@ -756,7 +756,7 @@ export const occupations: Occupation[] = [
             {
                 count: 1,
                 options: [],
-                description: "Arte/Ofício (ex.: Carpintaria, Encanamento, Soldagem, etc.)"
+                description: "Arte e Ofício (ex.: Carpintaria, Encanamento, Soldagem, etc.)"
             },
             {
                 count: 2,
