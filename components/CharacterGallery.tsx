@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getAllCharacters } from '@/utils/storage';
+import { getAllCharacters, deleteCharacter } from '@/utils/storage';
 import styles from '@/app/page.module.css';
 
 interface GalleryItem {
@@ -14,6 +14,7 @@ interface GalleryItem {
             occupation?: string;
             age?: number | string;
             residence?: string;
+            photo?: string;
         };
     };
 }
@@ -21,7 +22,7 @@ interface GalleryItem {
 export default function CharacterGallery({ serverCharacters }: { serverCharacters: GalleryItem[] }) {
     const [characters, setCharacters] = useState<GalleryItem[]>(serverCharacters);
 
-    useEffect(() => {
+    const loadAll = () => {
         try {
             const localMap = getAllCharacters();
             const localItems: GalleryItem[] = Object.entries(localMap).map(([id, char]: [string, any]) => ({
@@ -30,27 +31,39 @@ export default function CharacterGallery({ serverCharacters }: { serverCharacter
                 data: char
             }));
 
-            // Merge avoiding duplicates by ID
             const existingIds = new Set(serverCharacters.map(c => String(c.id)));
             const merged = [
                 ...serverCharacters,
                 ...localItems.filter(item => !existingIds.has(String(item.id)))
             ];
 
+            merged.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
             setCharacters(merged);
         } catch (e) {
             console.error('Erro ao ler fichas locais:', e);
         }
+    };
+
+    useEffect(() => {
+        loadAll();
     }, [serverCharacters]);
+
+    const handleDelete = (e: React.MouseEvent, id: string, name?: string) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!confirm(`Deseja apagar a ficha "${name || 'Sem Nome'}" do cache deste navegador?`)) return;
+        deleteCharacter(id);
+        loadAll();
+    };
 
     if (characters.length === 0) {
         return (
             <div className={styles.emptyState}>
                 <p className={styles.emptyTitle}>
-                    Nenhuma ficha encontrada no Grimório
+                    Nenhuma ficha encontrada no Arquivo
                 </p>
                 <p className={styles.emptySubtitle}>
-                    Seja o primeiro a registrar um investigador!
+                    Suas fichas ficam salvas automaticamente no cache deste navegador. Clique em "+ Criar Nova Ficha" para começar!
                 </p>
             </div>
         );
@@ -60,6 +73,7 @@ export default function CharacterGallery({ serverCharacters }: { serverCharacter
         <div className={styles.grid}>
             {characters.map((character) => {
                 const data = character.data || {};
+                const isLocal = String(character.id).startsWith('char_');
                 return (
                     <Link
                         key={character.id}
@@ -67,37 +81,56 @@ export default function CharacterGallery({ serverCharacters }: { serverCharacter
                         className={styles.cardLink}
                     >
                         <div className={styles.card}>
-                            <div className={styles.cardWatermark}>
-                                <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                                </svg>
-                            </div>
-
                             <div>
-                                <h3 className={styles.cardName}>
-                                    {data.basicInfo?.name || 'Sem Nome'}
-                                </h3>
-
-                                <div className={styles.cardDetails}>
-                                    <p className={styles.cardRow}>
-                                        <span>🕵️</span>
-                                        <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
-                                    </p>
-                                    <p className={styles.cardRow}>
-                                        <span>🎂</span>
-                                        <span>{data.basicInfo?.age || '?'} anos</span>
-                                    </p>
-                                    {data.basicInfo?.residence && (
-                                        <p className={styles.cardRow}>
-                                            <span>🏠</span>
-                                            <span>{data.basicInfo.residence}</span>
-                                        </p>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: '6px', marginBottom: '12px' }}>
+                                    <h3 className={styles.cardName} style={{ flex: 1, marginBottom: 0 }}>
+                                        {data.basicInfo?.name || 'Sem Nome'}
+                                    </h3>
+                                    {isLocal && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => handleDelete(e, character.id, data.basicInfo?.name)}
+                                            title="Apagar ficha do cache"
+                                            style={{ background: 'var(--red)', color: 'var(--on-red)', padding: '0 10px', fontSize: '16px' }}
+                                        >
+                                            ×
+                                        </button>
                                     )}
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                                    {data.basicInfo?.photo && (
+                                        <img
+                                            src={data.basicInfo.photo}
+                                            alt={data.basicInfo.name || 'Retrato'}
+                                            style={{
+                                                width: '58px',
+                                                height: '76px',
+                                                objectFit: 'cover',
+                                                border: '1.5px solid var(--ink)',
+                                                filter: 'grayscale(1) contrast(1.1)',
+                                                flexShrink: 0
+                                            }}
+                                        />
+                                    )}
+                                    <div className={styles.cardDetails} style={{ flex: 1 }}>
+                                        <p className={styles.cardRow}>
+                                            <span><strong>Ocup.:</strong> {data.basicInfo?.occupation || 'Desconhecido'}</span>
+                                        </p>
+                                        <p className={styles.cardRow}>
+                                            <span><strong>Idade:</strong> {data.basicInfo?.age || '?'} anos</span>
+                                        </p>
+                                        {data.basicInfo?.residence && (
+                                            <p className={styles.cardRow}>
+                                                <span><strong>Resid.:</strong> {data.basicInfo.residence}</span>
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
                             <div className={styles.cardFooter}>
-                                <span>Atualizado em:</span>
+                                <span>{isLocal ? 'Salvo no Cache' : 'Nuvem'}</span>
                                 <strong>
                                     {character.updatedAt
                                         ? new Date(character.updatedAt).toLocaleDateString('pt-BR')

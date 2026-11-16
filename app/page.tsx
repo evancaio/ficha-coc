@@ -34,19 +34,21 @@ export default async function Home() {
 
     return (
         <main className={styles.main}>
-            <div className={styles.container}>
-                <header className={styles.header}>
-                    <h1 className={styles.title}>
-                        📜 Fichas Call of Cthulhu
-                    </h1>
-                    <p className={styles.subtitle}>
-                        Galeria de Investigadores • 7ª Edição
-                    </p>
-                    <Link href="/character/new" className={styles.createButton}>
-                        ✨ Criar Nova Ficha
-                    </Link>
-                </header>
+            <header className={styles.hero}>
+                <span className={styles.kicker}>Chamado de Cthulhu · 7ª Edição</span>
+                <h1 className={styles.title}>Dossiê de Investigadores</h1>
+                <div>
+                    <span className={styles.subtitle}>Архив следователей · Arquivo de Fichas</span>
+                </div>
+            </header>
 
+            <div className={styles.tools}>
+                <Link href="/character/new" className={styles.createButton}>
+                    + Criar Nova Ficha
+                </Link>
+            </div>
+
+            <div className={styles.container}>
                 <CharacterGallery serverCharacters={characters} />
             </div>
         </main>

@@ -1,178 +1,135 @@
-/* Skill Selector Modal Styles */
 .modalOverlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgba(27, 22, 19, 0.78);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    padding: var(--spacing-lg);
-    animation: fadeIn 0.2s ease-out;
+    padding: 16px;
 }
 
 .modalContent {
-    background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
-    border: 3px solid var(--color-gold);
-    border-radius: 12px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 7px var(--ink), 0 20px 50px rgba(0, 0, 0, 0.6);
     width: 100%;
-    max-width: 1200px;
-    max-height: 90vh;
+    max-width: 1050px;
+    max-height: 88vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    padding: 10px;
 }
 
 .modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 2px solid var(--color-gold);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--paper);
 }
 
 .modalHeader h2 {
     margin: 0;
-    font-family: var(--font-display);
-    color: var(--color-sepia-dark);
+    padding: 0;
+    color: var(--paper);
 }
 
 .description {
-    margin: var(--spacing-xs) 0 0 0;
-    color: var(--color-faded-ink);
-    font-size: 0.9rem;
+    margin: 4px 0 0 0;
+    color: var(--paper2);
+    font-size: 0.85rem;
 }
 
 .modalClose {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--color-sepia-medium);
-    transition: all var(--transition-fast);
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.modalClose:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--color-sepia-dark);
-    transform: rotate(90deg);
+    background: var(--red);
+    color: var(--on-red);
+    font-size: 1.2rem;
+    padding: 4px 10px;
 }
 
 .modalFilters {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--color-sepia-light);
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--ink);
 }
 
 .searchInput {
     width: 100%;
-    font-size: 1.1rem;
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    font-size: 1rem;
+    padding: 8px;
+    margin-bottom: 10px;
 }
 
 .categoryFilters {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 6px;
     flex-wrap: wrap;
 }
 
 .categoryFilters button {
-    padding: var(--spacing-xs) var(--spacing-md);
-    background: rgba(255, 255, 255, 0.6);
-    border: 2px solid var(--color-sepia-light);
-    border-radius: 6px;
-    font-family: var(--font-typewriter);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.categoryFilters button:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--color-gold);
+    padding: 5px 10px;
+    background: var(--field);
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    font-size: 0.8rem;
 }
 
 .categoryActive {
-    background: var(--color-gold) !important;
-    color: white !important;
-    border-color: var(--color-gold) !important;
+    background: var(--red) !important;
+    color: var(--on-red) !important;
+    border-color: var(--ink) !important;
 }
 
 .modalBody {
     flex: 1;
     overflow-y: auto;
-    padding: var(--spacing-xl);
+    padding: 14px;
 }
 
 .skillGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
 }
 
 .skillCard {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid var(--color-sepia-medium);
-    border-radius: 8px;
-    padding: var(--spacing-md);
+    background: var(--field);
+    border: 2px solid var(--ink);
+    padding: 10px 12px;
     cursor: pointer;
-    transition: all var(--transition-medium);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .skillCard:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-color: var(--color-gold);
+    transform: translate(-2px, -2px);
+    border-color: var(--red);
+    box-shadow: 3px 3px 0 var(--ink);
 }
 
 .skillCardSelected {
-    border-color: var(--color-gold);
-    background: rgba(255, 248, 220, 1);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
+    border-color: var(--red);
+    background: rgba(196, 48, 43, 0.1);
+    box-shadow: 3px 3px 0 var(--red);
 }
 
 .skillCardHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 4px;
 }
 
 .skillCardHeader h3 {
     margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    color: var(--color-sepia-dark);
+    font: 700 14px/1.2 "PT Serif", serif;
+    color: var(--ink);
+    text-transform: none;
 }
 
 .checkmark {
-    color: var(--color-gold);
-    font-size: 1.5rem;
+    color: var(--red);
+    font-size: 1.2rem;
     font-weight: bold;
 }
 
@@ -180,36 +137,33 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
 }
 
 .skillCategory {
-    color: var(--color-faded-ink);
+    color: var(--mute);
     font-style: italic;
 }
 
 .skillBase {
-    font-family: var(--font-typewriter);
-    color: var(--color-sepia-dark);
+    color: var(--ink);
     font-weight: bold;
 }
 
 .specializationBadge {
     display: inline-block;
-    margin-top: var(--spacing-xs);
-    padding: 2px 8px;
-    background: var(--color-eldritch-purple);
-    color: white;
-    border-radius: 4px;
-    font-size: 0.7rem;
+    margin-top: 4px;
+    padding: 2px 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 0.65rem;
     text-transform: uppercase;
-    font-family: var(--font-typewriter);
 }
 
 .noResults {
     text-align: center;
-    padding: var(--spacing-2xl);
-    color: var(--color-faded-ink);
+    padding: 24px;
+    color: var(--mute);
     font-style: italic;
 }
 
@@ -217,51 +171,27 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-top: 2px solid var(--color-gold);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0.1) 100%);
+    padding: 10px 14px;
+    border-top: 2px solid var(--ink);
+    background: var(--field);
 }
 
 .selectedCount {
-    font-family: var(--font-typewriter);
-    color: var(--color-sepia-dark);
+    color: var(--ink);
     font-weight: bold;
 }
 
 .modalActions {
     display: flex;
-    gap: var(--spacing-md);
-}
-
-.cancelButton,
-.confirmButton {
-    padding: var(--spacing-sm) var(--spacing-xl);
-    border-radius: 8px;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all var(--transition-medium);
-    border: 2px solid;
+    gap: 8px;
 }
 
 .cancelButton {
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--color-sepia-medium);
-    color: var(--color-sepia-dark);
-}
-
-.cancelButton:hover {
-    background: rgba(255, 255, 255, 1);
-    transform: translateY(-2px);
+    background: var(--ink);
+    color: var(--paper);
 }
 
 .confirmButton {
-    background: linear-gradient(135deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.8) 100%);
-    border-color: var(--color-gold);
-    color: white;
-}
-
-.confirmButton:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+    background: var(--red);
+    color: var(--on-red);
 }

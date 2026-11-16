@@ -92,25 +92,95 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     });
 
     const [activeTab, setActiveTab] = useState<'info' | 'skills' | 'combat' | 'backstory'>('info');
+    const [viewMode, setViewMode] = useState<'dossier' | 'tabs'>('dossier');
     const [occupationSearch, setOccupationSearch] = useState('');
     const [showOccupationModal, setShowOccupationModal] = useState(false);
     const [showOccupationSkillsModal, setShowOccupationSkillsModal] = useState(false);
     const [personalSkillSearch, setPersonalSkillSearch] = useState('');
     const [showWeaponModal, setShowWeaponModal] = useState(false);
+    const [lastCachedAt, setLastCachedAt] = useState<string | null>(null);
+    const [backupText, setBackupText] = useState('');
+    const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+
+    const handleRollAttributes = () => {
+        const roll = (n: number, sides: number) => {
+            let total = 0;
+            for (let i = 0; i < n; i++) total += 1 + Math.floor(Math.random() * sides);
+            return total;
+        };
+        const newChars: Characteristics = {
+            STR: roll(3, 6) * 5,
+            CON: roll(3, 6) * 5,
+            SIZ: (roll(2, 6) + 6) * 5,
+            DEX: roll(3, 6) * 5,
+            APP: roll(3, 6) * 5,
+            INT: (roll(2, 6) + 6) * 5,
+            POW: roll(3, 6) * 5,
+            EDU: (roll(2, 6) + 6) * 5
+        };
+        const newDerived = calculateDerivedStats(newChars);
+        const newPersonalPoints = calculatePersonalInterestPoints(newChars.INT);
+        let newOccPoints = calculateOccupationPoints(newChars.EDU);
+        if (character.basicInfo.occupation) {
+            const occupation = getOccupationByName(character.basicInfo.occupation);
+            if (occupation) {
+                const stripped = occupation.skillPoints.replace(/\([^)]*\bou[^)]*\)/gi, '').trim();
+                newOccPoints = calculateOccupationPointsFromFormula(stripped || occupation.skillPoints, newChars);
+            }
+        }
+        const updatedSkills = character.skills.map(s => ({
+            ...s,
+            baseValue: getSkillBaseValue(s.name, newChars)
+        }));
+        setCharacter(prev => ({
+            ...prev,
+            characteristics: newChars,
+            derivedStats: newDerived,
+            occupationSkillPoints: newOccPoints,
+            personalInterestPoints: newPersonalPoints,
+            skills: updatedSkills
+        }));
+    };
+
+    const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const scale = Math.min(1, 400 / img.width);
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    updateBasicInfo('photo', dataUrl);
+                }
+            };
+            img.src = reader.result as string;
+        };
+        reader.readAsDataURL(file);
+    };
 
 
     useEffect(() => {
         if (initialData) {
             setCharacter(initialData);
+            setHasLoadedInitial(true);
             return;
         }
         if (isNew) {
+            setHasLoadedInitial(true);
             return;
         }
         if (initialCharacterId) {
             const loaded = loadCharacter(initialCharacterId);
             if (loaded) {
                 setCharacter(loaded);
+                setHasLoadedInitial(true);
                 return;
             }
         }
@@ -118,7 +188,26 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         if (saved) {
             setCharacter(saved);
         }
+        setHasLoadedInitial(true);
     }, [initialData, initialCharacterId, isNew]);
+
+    // Auto-save automático no cache do navegador (localStorage)
+    useEffect(() => {
+        if (!hasLoadedInitial) return;
+        // Se for uma ficha recém-aberta em branco em /character/new, só cria no cache quando o usuário preencher algo
+        const isBlankNew = isNew && !characterId && !character.basicInfo.name && !character.basicInfo.occupation;
+        if (isBlankNew) return;
+
+        const timer = setTimeout(() => {
+            const savedId = saveCharacter(character, characterId);
+            if (!characterId) {
+                setCharacterId(savedId);
+            }
+            setLastCachedAt(new Date().toLocaleTimeString('pt-BR'));
+        }, 600);
+
+        return () => clearTimeout(timer);
+    }, [character, characterId, hasLoadedInitial, isNew]);
 
     useEffect(() => {
         // Close modal on ESC key
@@ -450,151 +539,192 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     return (
         <div className={styles.container}>
             <header className={styles.header}>
-                <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">voltar a tela de seleção</Link>
+                <span className={styles.kicker}>Chamado de Cthulhu</span>
                 <h1>Ficha de Investigador</h1>
-                <p className={styles.subtitle}>Call of Cthulhu • 7ª Edição</p>
+                <div>
+                    <span className={styles.subtitle}>Досье следователя · 7ª Edição</span>
+                </div>
             </header>
 
-            <div className={styles.tabs}>
-                <button
-                    className={activeTab === 'info' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('info')}
-                >
-                    Informações
+            <div className={styles.toolbar}>
+                <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">
+                    ← Galeria
+                </Link>
+                <button type="button" className={styles.redButton} onClick={handleRollAttributes}>
+                    Rolar Atributos
                 </button>
                 <button
-                    className={activeTab === 'skills' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('skills')}
+                    type="button"
+                    onClick={() => setViewMode(prev => prev === 'dossier' ? 'tabs' : 'dossier')}
                 >
-                    Perícias
+                    {viewMode === 'dossier' ? 'Modo: Folha Completa' : 'Modo: Em Abas'}
                 </button>
-                <button
-                    className={activeTab === 'combat' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('combat')}
-                >
-                    Combate
+                <button type="button" onClick={() => window.print()}>
+                    Imprimir
                 </button>
-                <button
-                    className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
-                    onClick={() => setActiveTab('backstory')}
-                >
-                    História
+                <button type="button" className={styles.redButton} onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? 'Salvando...' : 'Salvar Ficha'}
                 </button>
+                {lastCachedAt && (
+                    <span style={{ fontSize: '12px', color: 'var(--mute)', fontWeight: 700, padding: '0 6px' }}>
+                        ✓ Cache salvo às {lastCachedAt}
+                    </span>
+                )}
             </div>
 
+            {viewMode === 'tabs' && (
+                <div className={styles.tabs}>
+                    <button
+                        className={activeTab === 'info' ? styles.tabActive : styles.tab}
+                        onClick={() => setActiveTab('info')}
+                    >
+                        Informações
+                    </button>
+                    <button
+                        className={activeTab === 'skills' ? styles.tabActive : styles.tab}
+                        onClick={() => setActiveTab('skills')}
+                    >
+                        Perícias
+                    </button>
+                    <button
+                        className={activeTab === 'combat' ? styles.tabActive : styles.tab}
+                        onClick={() => setActiveTab('combat')}
+                    >
+                        Combate
+                    </button>
+                    <button
+                        className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
+                        onClick={() => setActiveTab('backstory')}
+                    >
+                        História
+                    </button>
+                </div>
+            )}
+
             <div className={styles.content}>
-                {activeTab === 'info' && (
+                {(viewMode === 'dossier' || activeTab === 'info') && (
                     <div className="fade-in">
                         {/* Informações Básicas */}
                         <section className="card">
-                            <h2>Informações Básicas</h2>
-                            <div className="grid grid-2">
-                                <div>
-                                    <label>Nome do Investigador</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.name}
-                                        onChange={(e) => updateBasicInfo('name', e.target.value)}
-                                        placeholder="Nome completo"
-                                    />
-                                </div>
-                                <div>
-                                    <label>Jogador</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.player}
-                                        onChange={(e) => updateBasicInfo('player', e.target.value)}
-                                        placeholder="Seu nome"
-                                    />
-                                </div>
-                                <div className={styles.occupationSelector}>
-                                    <label>Ocupação</label>
-                                    <div className={styles.occupationDisplay}>
+                            <h2>Identificação</h2>
+                            <div className={styles.idLayout}>
+                                <div className="grid grid-2">
+                                    <div>
+                                        <label>Nome do Investigador</label>
                                         <input
                                             type="text"
-                                            value={character.basicInfo.occupation}
-                                            readOnly
-                                            placeholder="Clique para selecionar ocupação..."
-                                            onClick={() => setShowOccupationModal(true)}
-                                            style={{ cursor: 'pointer' }}
+                                            value={character.basicInfo.name}
+                                            onChange={(e) => updateBasicInfo('name', e.target.value)}
+                                            placeholder="Nome completo"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowOccupationModal(true)}
-                                            className={styles.selectButton}
-                                        >
-                                            🔍 Selecionar
-                                        </button>
                                     </div>
-                                    {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation) && (
-                                        <div className={styles.occupationInfo}>
-                                            <div><strong>Pontos de Perícia:</strong> {character.occupationSkillPoints} ({getOccupationByName(character.basicInfo.occupation)!.skillPoints})</div>
-                                            <div><strong>Nível de Crédito:</strong> {getOccupationByName(character.basicInfo.occupation)!.creditRating}</div>
-                                            <div><strong>Perícias Sugeridas:</strong> {[
-                                                ...getOccupationByName(character.basicInfo.occupation)!.suggestedSkills,
-                                                ...(getOccupationByName(character.basicInfo.occupation)!.skillChoices?.map(c => c.description) || [])
-                                            ].join(', ')}</div>
-                                            {occupationHasChoices(getOccupationByName(character.basicInfo.occupation)!.skillPoints) && (
-                                                <div style={{ marginTop: '8px' }}>
-                                                    <div style={{ fontSize: '0.9rem', color: 'var(--color-sepia-medium)', marginBottom: '6px' }}>Escolha qual atributo usar para os pontos adicionais:</div>
-                                                    {extractOccupationChoiceOptions(getOccupationByName(character.basicInfo.occupation)!.skillPoints).map(opt => (
-                                                        <button
-                                                            key={opt}
-                                                            onClick={() => applyOccupationChoice(opt)}
-                                                            className={styles.selectButton}
-                                                            style={{ marginRight: 8, padding: '6px 10px' }}
-                                                        >
-                                                            {opt}
-                                                        </button>
-                                                    ))}
-                                                    {character.occupationPointsChoice && (
-                                                        <button
-                                                            onClick={() => applyOccupationChoice(null)}
-                                                            className={styles.selectButton}
-                                                            style={{ marginLeft: 8, background: 'transparent', borderColor: 'var(--color-sepia-medium)', color: 'var(--color-sepia-dark)' }}
-                                                        >
-                                                            Limpar
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            )}
+                                    <div>
+                                        <label>Jogador</label>
+                                        <input
+                                            type="text"
+                                            value={character.basicInfo.player}
+                                            onChange={(e) => updateBasicInfo('player', e.target.value)}
+                                            placeholder="Seu nome"
+                                        />
+                                    </div>
+                                    <div className={styles.occupationSelector}>
+                                        <label>Ocupação</label>
+                                        <div className={styles.occupationDisplay}>
+                                            <input
+                                                type="text"
+                                                value={character.basicInfo.occupation}
+                                                readOnly
+                                                placeholder="Clique para selecionar ocupação..."
+                                                onClick={() => setShowOccupationModal(true)}
+                                                style={{ cursor: 'pointer' }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowOccupationModal(true)}
+                                                className={styles.selectButton}
+                                            >
+                                                Selecionar
+                                            </button>
                                         </div>
+                                        {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation) && (
+                                            <div className={styles.occupationInfo}>
+                                                <div><strong>Pontos de Perícia:</strong> {character.occupationSkillPoints} ({getOccupationByName(character.basicInfo.occupation)!.skillPoints})</div>
+                                                <div><strong>Nível de Crédito:</strong> {getOccupationByName(character.basicInfo.occupation)!.creditRating}</div>
+                                                <div><strong>Perícias Sugeridas:</strong> {[
+                                                    ...getOccupationByName(character.basicInfo.occupation)!.suggestedSkills,
+                                                    ...(getOccupationByName(character.basicInfo.occupation)!.skillChoices?.map(c => c.description) || [])
+                                                ].join(', ')}</div>
+                                                {occupationHasChoices(getOccupationByName(character.basicInfo.occupation)!.skillPoints) && (
+                                                    <div style={{ marginTop: '8px' }}>
+                                                        <div style={{ fontSize: '0.9rem', color: 'var(--color-sepia-medium)', marginBottom: '6px' }}>Escolha qual atributo usar para os pontos adicionais:</div>
+                                                        {extractOccupationChoiceOptions(getOccupationByName(character.basicInfo.occupation)!.skillPoints).map(opt => (
+                                                            <button
+                                                                key={opt}
+                                                                onClick={() => applyOccupationChoice(opt)}
+                                                                className={styles.selectButton}
+                                                                style={{ marginRight: 8, padding: '6px 10px' }}
+                                                            >
+                                                                {opt}
+                                                            </button>
+                                                        ))}
+                                                        {character.occupationPointsChoice && (
+                                                            <button
+                                                                onClick={() => applyOccupationChoice(null)}
+                                                                className={styles.selectButton}
+                                                                style={{ marginLeft: 8, background: 'transparent', borderColor: 'var(--color-sepia-medium)', color: 'var(--color-sepia-dark)' }}
+                                                            >
+                                                                Limpar
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label>Idade</label>
+                                        <input
+                                            type="number"
+                                            value={character.basicInfo.age}
+                                            onChange={(e) => updateBasicInfo('age', parseInt(e.target.value) || 0)}
+                                            min="15"
+                                            max="90"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Sexo</label>
+                                        <input
+                                            type="text"
+                                            value={character.basicInfo.sex}
+                                            onChange={(e) => updateBasicInfo('sex', e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Residência</label>
+                                        <input
+                                            type="text"
+                                            value={character.basicInfo.residence}
+                                            onChange={(e) => updateBasicInfo('residence', e.target.value)}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Local de Nascimento</label>
+                                        <input
+                                            type="text"
+                                            value={character.basicInfo.birthplace}
+                                            onChange={(e) => updateBasicInfo('birthplace', e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <label className={styles.photoBox} title="Clique para enviar um retrato">
+                                    {character.basicInfo.photo ? (
+                                        <img src={character.basicInfo.photo} alt="Retrato do Investigador" />
+                                    ) : (
+                                        <span>Clique para<br />enviar um retrato</span>
                                     )}
-                                </div>
-                                <div>
-                                    <label>Idade</label>
-                                    <input
-                                        type="number"
-                                        value={character.basicInfo.age}
-                                        onChange={(e) => updateBasicInfo('age', parseInt(e.target.value) || 0)}
-                                        min="15"
-                                        max="90"
-                                    />
-                                </div>
-                                <div>
-                                    <label>Sexo</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.sex}
-                                        onChange={(e) => updateBasicInfo('sex', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Residência</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.residence}
-                                        onChange={(e) => updateBasicInfo('residence', e.target.value)}
-                                    />
-                                </div>
-                                <div>
-                                    <label>Local de Nascimento</label>
-                                    <input
-                                        type="text"
-                                        value={character.basicInfo.birthplace}
-                                        onChange={(e) => updateBasicInfo('birthplace', e.target.value)}
-                                    />
-                                </div>
+                                    <input type="file" accept="image/*" onChange={handlePhotoUpload} />
+                                </label>
                             </div>
                         </section>
 
@@ -855,30 +985,32 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             </div>
                         </section>
 
-                        {/* Pontos de Perícia */}
-                        <section className="card">
-                            <h2>Pontos de Perícia</h2>
-                            <div className="grid grid-2">
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos Ocupacionais</h3>
-                                    <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
-                                    <small>
-                                        {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
-                                            ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
-                                            : 'EDU × 4'}
-                                    </small>
+                        {/* Pontos de Perícia (apenas no modo Abas, pois no modo Dossiê já aparece na seção de Perícias abaixo) */}
+                        {viewMode === 'tabs' && (
+                            <section className="card">
+                                <h2>Pontos de Perícia</h2>
+                                <div className="grid grid-2">
+                                    <div className={styles.skillPoints}>
+                                        <h3>Pontos Ocupacionais</h3>
+                                        <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
+                                        <small>
+                                            {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
+                                                ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
+                                                : 'EDU × 4'}
+                                        </small>
+                                    </div>
+                                    <div className={styles.skillPoints}>
+                                        <h3>Pontos de Interesse Pessoal</h3>
+                                        <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
+                                        <small>INT × 2</small>
+                                    </div>
                                 </div>
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos de Interesse Pessoal</h3>
-                                    <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
-                                    <small>INT × 2</small>
-                                </div>
-                            </div>
-                        </section>
+                            </section>
+                        )}
                     </div>
                 )}
 
-                {activeTab === 'skills' && (
+                {(viewMode === 'dossier' || activeTab === 'skills') && (
                     <div className="fade-in">
                         {/* Pontos de Perícia */}
                         <section className="card">
@@ -1095,7 +1227,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     </div>
                 )}
 
-                {activeTab === 'combat' && (
+                {(viewMode === 'dossier' || activeTab === 'combat') && (
                     <div className="fade-in">
                         <section className="card">
                             <h2>Suas Armas</h2>
@@ -1182,7 +1314,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     </div>
                 )}
 
-                {activeTab === 'backstory' && (
+                {(viewMode === 'dossier' || activeTab === 'backstory') && (
                     <div className="fade-in">
                         <section className="card">
                             <h2>História do Personagem</h2>
@@ -1242,6 +1374,51 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     {isSaving ? '⏳ Salvando...' : '💾 Salvar Personagem'}
                 </button>
             </div>
+
+            <details style={{ maxWidth: '980px', margin: '0 auto 28px', padding: '0 14px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: '14px' }}>
+                    Backup da ficha (copiar / colar texto JSON)
+                </summary>
+                <textarea
+                    value={backupText}
+                    onChange={(e) => setBackupText(e.target.value)}
+                    placeholder="O texto JSON da ficha aparece aqui para copiar ou colar..."
+                    style={{ minHeight: '110px', fontFamily: 'monospace', fontSize: '12px', margin: '8px 0' }}
+                />
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            const json = JSON.stringify(character);
+                            setBackupText(json);
+                            navigator.clipboard?.writeText(json).catch(() => {});
+                        }}
+                    >
+                        Gerar e Copiar Texto
+                    </button>
+                    <button
+                        type="button"
+                        className={styles.redButton}
+                        onClick={() => {
+                            try {
+                                const parsed = JSON.parse(backupText);
+                                if (parsed && parsed.basicInfo && parsed.characteristics) {
+                                    setCharacter(parsed);
+                                    const id = saveCharacter(parsed, characterId);
+                                    if (!characterId) setCharacterId(id);
+                                    alert('Ficha carregada com sucesso!');
+                                } else {
+                                    alert('Formato de ficha inválido.');
+                                }
+                            } catch {
+                                alert('Texto JSON inválido.');
+                            }
+                        }}
+                    >
+                        Carregar do Texto
+                    </button>
+                </div>
+            </details>
 
             {/* Occupation Selection Modal */}
             {showOccupationModal && (

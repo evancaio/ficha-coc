@@ -1,103 +1,124 @@
 .main {
   min-height: 100vh;
-  padding: 3rem 1.5rem;
+  padding-bottom: 3rem;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.header {
+.hero {
+  background: repeating-conic-gradient(from 0deg at 50% 115%, var(--red) 0 6deg, var(--paper) 6deg 12deg);
+  padding: 32px 16px 38px;
   text-align: center;
-  margin-bottom: 3rem;
+  border-bottom: 4px solid var(--ink);
+  margin-bottom: 24px;
+}
+
+.kicker {
+  display: inline-block;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 12px/1 "PT Serif", serif;
+  letter-spacing: 0.35em;
+  padding: 7px 12px;
+  text-transform: uppercase;
 }
 
 .title {
-  font-family: var(--font-display);
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: var(--color-eldritch-purple);
-  margin-bottom: 0.75rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+  margin: 10px 0 0;
+  font: 400 clamp(36px, 8vw, 68px)/1 "Saira Stencil One", Impact, sans-serif;
+  color: var(--ink);
+  text-shadow: 3px 3px 0 var(--paper);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 .subtitle {
-  font-family: var(--font-body);
-  font-size: 1.5rem;
-  font-style: italic;
-  color: var(--color-sepia-medium);
-  margin-bottom: 2rem;
+  font: italic 700 clamp(15px, 3vw, 20px) "PT Serif", serif;
+  color: var(--ink);
+  background: var(--paper);
+  display: inline-block;
+  padding: 3px 14px;
+  margin-top: 8px;
+  border: 1.5px solid var(--ink);
+}
+
+.tools {
+  display: flex;
+  justify-content: center;
+  padding: 8px 16px 22px;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .createButton {
   display: inline-block;
-  padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, var(--color-eldritch-purple) 0%, var(--color-eldritch-green) 100%);
-  color: #fff !important;
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  border-radius: 10px;
-  border: 2px solid var(--color-gold);
-  box-shadow: var(--shadow-medium);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  padding: 12px 24px;
+  background: var(--red);
+  color: var(--on-red) !important;
+  font: 700 15px/1 "PT Serif", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.15s ease, filter 0.15s ease;
   text-decoration: none !important;
 }
 
 .createButton:hover {
-  transform: translateY(-3px) scale(1.03);
-  box-shadow: var(--shadow-strong);
-  color: #fff !important;
-  text-decoration: none !important;
+  filter: brightness(1.12);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
 .emptyState {
   text-align: center;
-  padding: 4rem 2rem;
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 12px;
-  border: 2px dashed var(--color-sepia-light);
-  max-width: 640px;
+  padding: 3.5rem 2rem;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 7px var(--ink);
+  max-width: 680px;
   margin: 0 auto;
 }
 
 .emptyTitle {
-  font-family: var(--font-display);
-  font-size: 1.8rem;
-  color: var(--color-sepia-dark);
-  margin-bottom: 0.75rem;
+  font: 400 28px/1.1 "Saira Stencil One", Impact, sans-serif;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-bottom: 0.5rem;
 }
 
 .emptySubtitle {
-  font-size: 1.15rem;
-  color: var(--color-faded-ink);
+  font-size: 1.05rem;
+  color: var(--mute);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 20px;
   justify-items: center;
 }
 
 .cardLink {
   display: block;
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
   text-decoration: none !important;
   color: inherit;
 }
 
 .card {
   width: 100%;
-  min-height: 230px;
-  background: var(--color-parchment);
-  border-radius: 12px;
-  box-shadow: var(--shadow-medium);
-  border: 2px solid var(--color-sepia-light);
-  padding: 1.5rem;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  min-height: 215px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--ink), 4px 4px 0 rgba(27, 22, 19, 0.25);
+  padding: 18px 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -106,9 +127,8 @@
 }
 
 .cardLink:hover .card {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: var(--shadow-strong);
-  border-color: var(--color-eldritch-purple);
+  transform: translate(-2px, -2px);
+  box-shadow: inset 0 0 0 4px var(--paper), inset 0 0 0 6px var(--red), 6px 6px 0 var(--ink);
 }
 
 .cardWatermark {
@@ -117,55 +137,43 @@
   right: 0.75rem;
   opacity: 0.08;
   pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-
-.cardLink:hover .cardWatermark {
-  opacity: 0.16;
 }
 
 .cardName {
-  font-family: var(--font-display);
-  font-size: 1.85rem;
-  font-weight: 700;
-  color: var(--color-sepia-dark);
-  border-bottom: 2px solid var(--color-sepia-light);
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.75rem;
+  font: 400 22px/1.1 "Saira Stencil One", Impact, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--paper);
+  background: var(--ink);
+  padding: 6px 10px;
+  margin-bottom: 12px;
 }
 
 .cardDetails {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
-  color: var(--color-sepia-dark);
-  font-size: 1.05rem;
+  gap: 6px;
+  color: var(--ink);
+  font-size: 0.98rem;
 }
 
 .cardRow {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  border-bottom: 1px dotted var(--mute);
+  padding-bottom: 3px;
 }
 
 .cardFooter {
-  margin-top: 1rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--color-sepia-light);
+  margin-top: 12px;
+  padding-top: 6px;
+  border-top: 1.5px solid var(--ink);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
-  color: var(--color-faded-ink);
-}
-
-@media (max-width: 600px) {
-  .title {
-    font-size: 2.3rem;
-  }
-
-  .createButton {
-    font-size: 1.15rem;
-    padding: 0.85rem 1.75rem;
-  }
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mute);
 }

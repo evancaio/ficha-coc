@@ -1,230 +1,277 @@
 .container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: var(--spacing-xl);
-    position: relative;
-    z-index: 2;
+    min-height: 100vh;
+    padding-bottom: 40px;
 }
 
 .header {
+    background: repeating-conic-gradient(from 0deg at 50% 115%, var(--red) 0 6deg, var(--paper) 6deg 12deg);
+    padding: 26px 16px 32px;
     text-align: center;
-    margin-bottom: var(--spacing-2xl);
-    padding: var(--spacing-xl);
-    background: rgba(255, 255, 255, 0.6);
-    border: 3px solid var(--color-gold);
-    border-radius: 8px;
-    box-shadow: var(--shadow-strong);
-}
-
-.header {
+    border-bottom: 4px solid var(--ink);
     position: relative;
 }
 
-.backButton {
-    position: absolute;
-    left: var(--spacing-md);
-    top: var(--spacing-md);
-    background: rgba(255,255,255,0.85);
-    border: 2px solid var(--color-sepia-medium);
-    color: var(--color-sepia-dark);
-    padding: 8px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-family: var(--font-display);
-    cursor: pointer;
-    transition: all var(--transition-fast);
+.kicker {
+    display: inline-block;
+    background: var(--ink);
+    color: var(--paper);
+    font: 700 12px/1 "PT Serif", serif;
+    letter-spacing: 0.35em;
+    padding: 7px 12px;
+    text-transform: uppercase;
 }
 
-.backButton:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+.header h1 {
+    margin: 10px 0 0;
+    font: 400 clamp(34px, 7vw, 64px)/1 "Saira Stencil One", Impact, sans-serif;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 var(--paper);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
 }
 
 .subtitle {
-    font-family: var(--font-typewriter);
-    color: var(--color-sepia-medium);
-    font-size: 1.1rem;
-    margin-top: var(--spacing-sm);
-    letter-spacing: 0.1em;
+    font: italic 700 clamp(14px, 2.5vw, 19px) "PT Serif", serif;
+    color: var(--ink);
+    background: var(--paper);
+    display: inline-block;
+    padding: 2px 12px;
+    margin-top: 8px;
+    border: 1.5px solid var(--ink);
 }
 
-.searchInput {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-sepia-dark);
-    border-radius: 4px;
-    font-family: var(--font-typewriter);
-    font-size: 1rem;
-    width: 250px;
-    background: rgba(255, 255, 255, 0.8);
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 12px 4px;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.backButton {
+    display: inline-flex;
+    align-items: center;
+    font: 700 13px/1 "PT Serif", serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper) !important;
+    padding: 10px 14px;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.backButton:hover {
+    filter: brightness(1.18);
+}
+
+.redButton {
+    background: var(--red) !important;
+    color: var(--on-red) !important;
 }
 
 .tabs {
     display: flex;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-lg);
+    gap: 6px;
+    max-width: 980px;
+    margin: 12px auto 0;
+    padding: 0 12px;
     flex-wrap: wrap;
     justify-content: center;
 }
 
 .tab,
 .tabActive {
-    padding: var(--spacing-md) var(--spacing-lg);
-    background: rgba(255, 255, 255, 0.5);
-    border: 2px solid var(--color-sepia-light);
-    border-radius: 8px 8px 0 0;
-    font-family: var(--font-display);
-    font-size: 1.1rem;
+    padding: 9px 18px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    font: 400 17px/1 "Saira Stencil One", Impact, sans-serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all var(--transition-medium);
-    color: var(--color-sepia-dark);
+    color: var(--ink);
+    transition: all 0.15s ease;
 }
 
 .tab:hover {
-    background: rgba(255, 255, 255, 0.7);
-    transform: translateY(-2px);
+    background: var(--field);
 }
 
 .tabActive {
-    background: rgba(255, 255, 255, 0.9);
-    border-bottom-color: transparent;
-    transform: translateY(2px);
-    box-shadow: var(--shadow-medium);
-    color: var(--color-eldritch-purple);
-    border-color: var(--color-gold);
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+    box-shadow: 0 3px 0 var(--red);
 }
 
 .content {
-    min-height: 500px;
+    max-width: 980px;
+    margin: 14px auto 24px;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 7px var(--ink);
+    padding: 26px 24px;
 }
 
-.characteristic {
+/* Identificação + Foto 3x4 */
+.idLayout {
+    display: grid;
+    grid-template-columns: 1fr 175px;
+    gap: 18px;
+    align-items: start;
+}
+
+.photoBox {
+    border: 2px solid var(--ink);
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: var(--spacing-md);
-    background: rgba(212, 175, 55, 0.1);
-    border-radius: 8px;
-    border: 1px solid var(--color-gold);
+    cursor: pointer;
+    overflow: hidden;
+    background: var(--field);
+    color: var(--mute);
+    font: 700 12px/1.35 "PT Serif", serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    position: relative;
+    width: 100%;
+    max-width: 190px;
+    margin: 0 auto;
+}
+
+.photoBox:hover {
+    outline: 2px solid var(--red);
+}
+
+.photoBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1) contrast(1.12);
+}
+
+.photoBox input {
+    display: none;
+}
+
+/* Características estilo Colheita Fria */
+.characteristic {
+    border: 2px solid var(--ink);
+    padding: 8px 10px;
+    background: var(--field);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .characteristic label {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-sepia-dark);
-    font-weight: bold;
+    font: 400 20px/1 "Saira Stencil One", Impact, sans-serif;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+    margin: 0;
 }
 
 .characteristic input {
+    font: 700 24px/1 "PT Serif", serif;
     text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: var(--spacing-sm);
+    border: 0;
+    border-bottom: 1.5px solid var(--ink);
+    background: transparent;
+    padding: 2px 0;
 }
 
 .derivedValues {
     display: flex;
-    justify-content: space-around;
-    font-family: var(--font-typewriter);
-    font-size: 0.85rem;
-    color: var(--color-faded-ink);
-    margin-top: var(--spacing-xs);
+    justify-content: space-between;
+    font: 400 12px/1.2 "PT Serif", serif;
+    color: var(--mute);
+    margin-top: 2px;
 }
 
+/* Atributos Derivados com borda vermelha */
 .statBox {
+    border: 2px solid var(--red);
+    padding: 8px 10px;
+    background: var(--field);
     text-align: center;
-    padding: var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(74, 44, 94, 0.1) 0%, rgba(45, 74, 62, 0.1) 100%);
-    border: 2px solid var(--color-eldritch-purple);
-    border-radius: 8px;
-    transition: all var(--transition-medium);
-}
-
-.statBox:hover {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-medium);
 }
 
 .statBox h3 {
-    font-size: 0.9rem;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-eldritch-purple);
+    font: 700 11px/1.2 "PT Serif", serif;
+    letter-spacing: 0.1em;
+    color: var(--mute);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    margin-bottom: 6px;
 }
 
 .statValue {
-    font-family: var(--font-typewriter);
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--color-sepia-dark);
+    font: 700 20px/1.1 "PT Serif", serif;
+    color: var(--ink);
 }
 
+/* Pontos de Perícia */
 .skillPoints {
+    border: 2px solid var(--ink);
+    padding: 12px 14px;
+    background: var(--field);
     text-align: center;
-    padding: var(--spacing-xl);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.05) 100%);
-    border: 3px solid var(--color-gold);
-    border-radius: 8px;
 }
 
 .skillPoints h3 {
-    font-size: 1.1rem;
-    margin-bottom: var(--spacing-md);
+    font: 400 18px/1 "Saira Stencil One", Impact, sans-serif;
+    color: var(--ink);
+    margin-bottom: 6px;
 }
 
 .pointsValue {
-    font-family: var(--font-typewriter);
-    font-size: 3rem;
-    font-weight: bold;
-    color: var(--color-sepia-dark);
-    margin-bottom: var(--spacing-sm);
+    font: 700 28px/1 "PT Serif", serif;
+    color: var(--red);
+    margin-bottom: 4px;
 }
 
 .skillPoints small {
-    color: var(--color-faded-ink);
-    font-family: var(--font-body);
+    color: var(--mute);
+    font-size: 0.85rem;
 }
 
-.backstoryGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
+.pointsProgress {
+    margin-top: 8px;
 }
 
-.backstoryGrid label {
-    display: block;
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    margin-bottom: var(--spacing-sm);
-    color: var(--color-sepia-dark);
+.progressBar {
+    width: 100%;
+    height: 10px;
+    background: rgba(27, 22, 19, 0.15);
+    border: 1px solid var(--ink);
+    overflow: hidden;
+    margin-bottom: 4px;
 }
 
-.actions {
-    margin-top: var(--spacing-2xl);
-    text-align: center;
-    padding: var(--spacing-xl);
+.progressFill {
+    height: 100%;
+    background: var(--red);
+    transition: width 0.25s ease;
 }
 
-.saveButton {
-    font-size: 1.2rem;
-    padding: var(--spacing-md) var(--spacing-2xl);
-    background: linear-gradient(135deg, var(--color-eldritch-purple) 0%, var(--color-eldritch-green) 100%);
-    border-color: var(--color-gold);
+.pointsUsed {
+    font: 700 12px/1.2 "PT Serif", serif;
+    color: var(--ink);
 }
 
-.saveButton:hover {
-    transform: translateY(-4px) scale(1.05);
-    box-shadow: 0 8px 24px rgba(74, 44, 94, 0.4);
-}
-
+/* Ocupação */
 .occupationSelector {
     position: relative;
-    grid-column: span 2;
+    grid-column: 1 / -1;
 }
 
 .occupationDisplay {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 8px;
 }
 
 .occupationDisplay input {
@@ -232,523 +279,239 @@
 }
 
 .selectButton {
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background: linear-gradient(135deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.7) 100%);
-    border: 2px solid var(--color-gold);
-    border-radius: 8px;
-    font-family: var(--font-display);
-    font-size: 1rem;
+    padding: 7px 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 0;
+    font: 700 12px/1 "PT Serif", serif;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all var(--transition-medium);
     white-space: nowrap;
 }
 
 .selectButton:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
+    background: var(--red);
+    color: var(--on-red);
 }
 
 .occupationInfo {
-    margin-top: var(--spacing-md);
-    padding: var(--spacing-md);
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid var(--color-gold);
-    border-radius: 8px;
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    border-left: 4px solid var(--red);
     font-size: 0.9rem;
 }
 
-.occupationInfo>div {
-    margin-bottom: var(--spacing-xs);
+.occupationInfo > div {
+    margin-bottom: 4px;
 }
 
-.occupationInfo>div:last-child {
+.occupationInfo > div:last-child {
     margin-bottom: 0;
 }
 
-.occupationInfo strong {
-    color: var(--color-sepia-dark);
-}
-
-/* Modal Styles */
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    padding: var(--spacing-lg);
-    animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-.modalContent {
-    background: linear-gradient(135deg, #f5f0e8 0%, #ebe4d8 100%);
-    border: 3px solid var(--color-gold);
-    border-radius: 12px;
-    width: 100%;
-    max-width: 1200px;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.modalHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 2px solid var(--color-gold);
-    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
-}
-
-.modalHeader h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    color: var(--color-sepia-dark);
-}
-
-.modalClose {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--color-sepia-medium);
-    transition: all var(--transition-fast);
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-}
-
-.modalClose:hover {
-    background: rgba(212, 175, 55, 0.2);
-    color: var(--color-sepia-dark);
-    transform: rotate(90deg);
-}
-
-.modalSearch {
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--color-sepia-light);
-}
-
-.modalSearch input {
-    width: 100%;
-    font-size: 1.1rem;
-    padding: var(--spacing-md);
-}
-
-.modalBody {
-    flex: 1;
-    overflow-y: auto;
-    padding: var(--spacing-xl);
-}
-
-.occupationGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-lg);
-}
-
-.occupationCard {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid var(--color-sepia-medium);
-    border-radius: 8px;
-    padding: var(--spacing-lg);
-    cursor: pointer;
-    transition: all var(--transition-medium);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.occupationCard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    border-color: var(--color-gold);
-    background: rgba(255, 255, 255, 1);
-}
-
-.occupationCardSelected {
-    border-color: var(--color-gold);
-    background: rgba(255, 248, 220, 1);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3);
-}
-
-.occupationCardTitle {
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    margin: 0 0 var(--spacing-md) 0;
-    color: var(--color-sepia-dark);
-}
-
-.occupationCardDetails {
-    margin-bottom: var(--spacing-md);
-}
-
-.occupationCardRow {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: var(--spacing-xs);
-    font-size: 0.9rem;
-}
-
-.occupationCardLabel {
-    color: var(--color-sepia-medium);
-    font-weight: 500;
-}
-
-.occupationCardValue {
-    font-family: var(--font-typewriter);
-    font-weight: bold;
-    color: var(--color-sepia-dark);
-}
-
-.occupationCardTags {
-    display: flex;
-    gap: var(--spacing-xs);
-    margin-top: var(--spacing-sm);
-}
-
-.occupationCardTag {
-    background: var(--color-eldritch-purple);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    font-family: var(--font-typewriter);
-}
-
-.occupationCardSkills {
-    border-top: 1px solid var(--color-sepia-light);
-    padding-top: var(--spacing-sm);
-    font-size: 0.85rem;
-}
-
-.occupationCardSkills strong {
-    color: var(--color-sepia-dark);
-    display: block;
-    margin-bottom: var(--spacing-xs);
-}
-
-.occupationCardSkills p {
-    margin: 0;
-    color: var(--color-faded-ink);
-    line-height: 1.4;
-}
-
-.noResults {
-    text-align: center;
-    padding: var(--spacing-2xl);
-    color: var(--color-faded-ink);
-    font-style: italic;
-}
-
-/* Skills Tab Styles */
+/* Cabeçalho de seção com botão/busca */
 .sectionHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-lg);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 6px 10px;
+    margin: 22px 0 10px;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
-.pointsProgress {
-    margin-top: var(--spacing-md);
+.sectionHeader h2 {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: var(--paper);
 }
 
-.progressBar {
-    width: 100%;
-    height: 20px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: var(--spacing-xs);
+.sectionHeader .selectButton {
+    background: var(--red);
+    color: var(--on-red);
+    padding: 6px 12px;
 }
 
-.progressFill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-gold) 0%, rgba(212, 175, 55, 0.7) 100%);
-    transition: width var(--transition-medium);
+.searchInput {
+    padding: 4px 8px !important;
+    border: 1px solid var(--paper) !important;
+    font-size: 0.9rem !important;
+    width: 220px !important;
+    background: var(--paper) !important;
+    color: var(--ink) !important;
 }
 
-.pointsUsed {
-    text-align: center;
-    font-family: var(--font-typewriter);
-    font-size: 0.9rem;
-    color: var(--color-sepia-dark);
-}
-
-.emptyState {
-    text-align: center;
-    padding: var(--spacing-xl);
-    color: var(--color-faded-ink);
-    font-style: italic;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 8px;
-}
-
-.skillsList {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-    gap: var(--spacing-md);
-}
-
+/* Lista de Perícias compacta em 2 colunas estilo Colheita Fria */
+.skillsList,
 .personalSkillsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-md);
-}
-
-
-
-.personalSkillsGrid .skillRow {
-    display: flex;
-    flex-direction: column;
-}
-
-.personalSkillsGrid .skillValues {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-sm);
-}
-
-.personalSkillsGrid .skillInput,
-.personalSkillsGrid .skillTotal {
-    justify-content: space-between;
-    width: 100%;
-}
-
-.personalSkillsGrid .skillTotal {
-    border-top: 1px solid var(--color-sepia-light);
-    padding-top: var(--spacing-sm);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 24px;
 }
 
 .skillRow {
-    background: rgba(255, 255, 255, 0.6);
-    border: 2px solid var(--color-sepia-light);
-    border-radius: 8px;
-    padding: var(--spacing-md);
-    transition: all var(--transition-fast);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--mute);
+    background: transparent;
+    font-size: 14px;
 }
 
 .skillRow:hover {
-    border-color: var(--color-gold);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 250, 235, 0.55);
 }
 
 .skillInfo {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-sm);
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
 }
 
 .skillName {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    color: var(--color-sepia-dark);
-    font-weight: bold;
+    font: 700 14px/1.2 "PT Serif", serif;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .skillBadge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    color: white;
-    font-size: 0.75rem;
-    font-family: var(--font-typewriter);
-    text-transform: uppercase;
-    font-weight: bold;
+    display: none;
 }
 
 .skillValues {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-lg);
-    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
 }
 
 .skillInputGroup {
     display: flex;
-    gap: var(--spacing-md);
+    gap: 6px;
     align-items: center;
-    flex-wrap: wrap;
 }
 
 .skillInput {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 3px;
 }
 
 .skillInput label {
-    font-family: var(--font-typewriter);
-    color: var(--color-sepia-medium);
-    font-weight: 500;
+    font: 700 10px/1 "PT Serif", serif;
+    color: var(--mute);
+    margin: 0;
 }
 
 .skillInput input {
-    width: 80px;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-family: var(--font-typewriter);
-    font-size: 1rem;
-    font-weight: bold;
+    width: 48px !important;
+    padding: 2px 3px !important;
+    text-align: center;
+    font-size: 14px !important;
+    font-weight: 700;
 }
 
 .skillTotal {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 5px;
 }
 
 .totalLabel {
-    font-family: var(--font-typewriter);
-    color: var(--color-sepia-medium);
-    font-weight: 500;
+    display: none;
 }
 
 .totalValue {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    color: var(--color-sepia-dark);
-    font-weight: bold;
+    font: 700 15px/1 "PT Serif", serif;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 3px 6px;
+    min-width: 38px;
+    text-align: center;
 }
 
-.derivedValues {
-    font-family: var(--font-typewriter);
-    color: var(--color-faded-ink);
-    font-size: 0.9rem;
+.emptyState {
+    text-align: center;
+    padding: 18px;
+    color: var(--mute);
+    font-style: italic;
+    border: 1.5px dashed var(--mute);
 }
 
-@media (max-width: 768px) {
-    .container {
-        padding: var(--spacing-md);
-    }
-
-    .tabs {
-        flex-direction: column;
-    }
-
-    .tab,
-    .tabActive {
-        border-radius: 8px;
-    }
-
-    .backstoryGrid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Combat Section Styles */
+/* Combate / Armas */
 .weaponsList {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 8px;
 }
 
 .weaponCard {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid var(--color-sepia-medium);
-    border-radius: 8px;
-    padding: var(--spacing-md);
-    transition: all var(--transition-normal);
-}
-
-.weaponCard:hover {
-    border-color: var(--color-gold);
-    box-shadow: var(--shadow-medium);
-    transform: translateY(-2px);
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    padding: 8px 12px;
 }
 
 .unarmedCard {
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid var(--color-sepia-dark);
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--red);
 }
 
 .weaponHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px dotted var(--mute);
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
 .weaponName {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: var(--text-primary);
+    font: 400 18px/1 "Saira Stencil One", Impact, sans-serif;
+    color: var(--ink);
     margin: 0;
-}
-
-.unarmedCard .weaponName {
-    color: var(--color-sepia-dark);
-    text-shadow: none;
-    font-weight: bold;
-    border-bottom: 1px solid var(--color-sepia-media);
-    padding-bottom: 4px;
-    margin-bottom: 8px;
-    display: inline-block;
+    text-transform: uppercase;
 }
 
 .weaponSkill {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: 6px;
     align-items: center;
-    font-family: var(--font-typewriter);
     font-size: 0.9rem;
 }
 
 .weaponSkillLabel {
-    color: var(--text-secondary);
+    color: var(--mute);
 }
 
 .weaponSkillValue {
-    color: var(--text-primary);
-    font-weight: bold;
-    font-size: 1.1rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 700;
+    padding: 2px 6px;
 }
 
 .weaponSkillSuccess {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
+    color: var(--mute);
+    font-size: 0.85rem;
 }
 
 .weaponStats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
 }
 
 .weaponStat {
@@ -756,22 +519,231 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    background: rgba(255, 255, 255, 0.6);
-    padding: var(--spacing-sm);
-    border-radius: 4px;
-    border: 1px solid rgba(0,0,0,0.04);
+    background: rgba(255, 255, 255, 0.45);
+    padding: 4px 6px;
+    border: 1px solid rgba(27, 22, 19, 0.2);
 }
 
 .weaponStat label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
+    font-size: 10px;
+    margin-bottom: 2px;
 }
 
 .weaponStat span {
-    font-family: var(--font-typewriter);
-    color: var(--text-primary);
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+/* Antecedentes */
+.backstoryGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+/* Barra inferior de ações */
+.actions {
+    max-width: 980px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 8px 16px 24px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.saveButton {
+    font-size: 15px;
+    padding: 12px 28px;
+    background: var(--red);
+    color: var(--on-red);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.saveButton:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* Modal de Ocupação estilo Dossiê */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(27, 22, 19, 0.78);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+}
+
+.modalContent {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 7px var(--ink), 0 20px 50px rgba(0, 0, 0, 0.6);
+    width: 100%;
+    max-width: 1050px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.modalHeader h2 {
+    margin: 0;
+    padding: 0;
+    color: var(--paper);
+}
+
+.modalClose {
+    background: var(--red);
+    color: var(--on-red);
+    font-size: 1.2rem;
+    padding: 4px 10px;
+}
+
+.modalSearch {
+    padding: 12px 14px;
+    border-bottom: 2px solid var(--ink);
+}
+
+.modalBody {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+}
+
+.occupationGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.occupationCard {
+    background: var(--field);
+    border: 2px solid var(--ink);
+    padding: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.occupationCard:hover {
+    transform: translate(-2px, -2px);
+    border-color: var(--red);
+    box-shadow: 3px 3px 0 var(--ink);
+}
+
+.occupationCardSelected {
+    border-color: var(--red);
+    background: rgba(196, 48, 43, 0.08);
+    box-shadow: 3px 3px 0 var(--red);
+}
+
+.occupationCardTitle {
+    font: 400 18px/1.1 "Saira Stencil One", Impact, sans-serif;
+    text-transform: uppercase;
+    margin: 0 0 8px 0;
+    color: var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 4px;
+}
+
+.occupationCardDetails {
+    margin-bottom: 8px;
+}
+
+.occupationCardRow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+}
+
+.occupationCardLabel {
+    color: var(--mute);
+}
+
+.occupationCardValue {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.occupationCardTags {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.occupationCardTag {
+    background: var(--red);
+    color: var(--on-red);
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.occupationCardSkills {
+    border-top: 1px dotted var(--mute);
+    padding-top: 6px;
+    font-size: 0.8rem;
+}
+
+.occupationCardSkills p {
+    margin: 2px 0 0;
+    color: var(--mute);
+}
+
+.noResults {
+    text-align: center;
+    padding: 24px;
+    color: var(--mute);
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .idLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .skillsList,
+    .personalSkillsGrid,
+    .backstoryGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .weaponStats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .content {
+        margin: 10px 8px 20px;
+        padding: 18px 14px;
+    }
+}
+
+@media print {
+    .header,
+    .toolbar,
+    .tabs,
+    .actions,
+    .selectButton {
+        display: none !important;
+    }
+
+    .content {
+        margin: 0;
+        box-shadow: none;
+        border: 0;
+        max-width: 100%;
+    }
 }

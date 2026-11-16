@@ -1,132 +1,106 @@
 .overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.8);
+    inset: 0;
+    background: rgba(27, 22, 19, 0.78);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999;
+    padding: 16px;
 }
 
 .modal {
-    background: linear-gradient(135deg, #fdfbf7 0%, #f4e4bc 100%);
-    width: 90%;
-    max-width: 800px;
-    max-height: 85vh;
-    border-radius: 8px;
-    border: 3px solid var(--color-gold);
+    background: var(--paper);
+    width: 100%;
+    max-width: 850px;
+    max-height: 86vh;
+    border: 2px solid var(--ink);
+    box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 7px var(--ink), 0 20px 50px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    animation: slideUp 0.3s ease-out;
+    padding: 10px;
 }
 
 .header {
-    padding: var(--spacing-lg);
-    border-bottom: 2px solid var(--color-gold);
-    background: rgba(255, 255, 255, 0.5);
+    padding: 10px 14px;
+    background: var(--ink);
+    color: var(--paper);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .header h2 {
-    font-family: var(--font-display);
-    color: var(--color-sepia-dark);
-    font-size: 1.8rem;
+    color: var(--paper);
     margin: 0;
+    padding: 0;
 }
 
 .closeButton {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--color-sepia-dark);
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.closeButton:hover {
-    color: var(--color-blood-red);
+    background: var(--red);
+    color: var(--on-red);
+    font-size: 1.1rem;
+    padding: 4px 10px;
 }
 
 .content {
-    padding: var(--spacing-lg);
+    padding: 14px;
     overflow-y: auto;
     flex: 1;
 }
 
 .categoryGroup {
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: 18px;
 }
 
 .categoryTitle {
-    font-family: var(--font-display);
-    color: var(--color-sepia-dark);
-    font-size: 1.4rem;
-    margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid var(--color-sepia-medium);
+    font: 400 18px/1 "Saira Stencil One", Impact, sans-serif;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid var(--ink);
 }
 
 .weaponsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
 }
 
 .weaponItem {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid var(--color-sepia-light);
-    border-radius: 4px;
-    padding: var(--spacing-md);
+    background: var(--field);
+    border: 2px solid var(--ink);
+    padding: 10px 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.15s ease, border-color 0.15s ease;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: 4px;
 }
 
 .weaponItem:hover {
-    background: rgba(255, 255, 255, 0.9);
-    border-color: var(--color-gold);
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translate(-2px, -2px);
+    border-color: var(--red);
+    box-shadow: 3px 3px 0 var(--ink);
 }
 
 .weaponName {
-    font-family: var(--font-display);
     font-weight: bold;
-    color: var(--color-sepia-dark);
-    font-size: 1.1rem;
+    color: var(--ink);
+    font-size: 1rem;
 }
 
 .weaponDetails {
-    font-family: var(--font-typewriter);
-    font-size: 0.85rem;
-    color: var(--color-sepia-medium);
+    font-size: 0.8rem;
+    color: var(--mute);
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .detailTag {
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(27, 22, 19, 0.08);
     padding: 2px 6px;
-    border-radius: 4px;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    border: 1px solid rgba(27, 22, 19, 0.2);
 }

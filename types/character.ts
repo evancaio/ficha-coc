@@ -53,6 +53,7 @@ export interface BasicInfo {
   sex: string;
   residence: string;
   birthplace: string;
+  photo?: string;
 }
 
 export interface Backstory {
