@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 // GET - Buscar ficha específica (público)
 export async function GET(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
+    if (!isSupabaseConfigured) {
+        return NextResponse.json(
+            { error: 'Supabase not configured' },
+            { status: 503 }
+        );
+    }
+
     try {
         const { id } = await context.params;
 
@@ -41,11 +48,17 @@ export async function GET(
     }
 }
 
-// PUT - Atualizar ficha (público - qualquer um pode editar)
-export async function PUT(
+async function updateCharacterHandler(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
+    if (!isSupabaseConfigured) {
+        return NextResponse.json(
+            { error: 'Supabase not configured' },
+            { status: 503 }
+        );
+    }
+
     try {
         const { id } = await context.params;
         const body = await request.json();
@@ -90,11 +103,33 @@ export async function PUT(
     }
 }
 
-// DELETE - Deletar ficha (público - qualquer um pode deletar)
+// PUT e PATCH - Atualizar ficha (público)
+export async function PUT(
+    request: NextRequest,
+    context: { params: Promise<{ id: string }> }
+) {
+    return updateCharacterHandler(request, context);
+}
+
+export async function PATCH(
+    request: NextRequest,
+    context: { params: Promise<{ id: string }> }
+) {
+    return updateCharacterHandler(request, context);
+}
+
+// DELETE - Deletar ficha (público)
 export async function DELETE(
     request: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
+    if (!isSupabaseConfigured) {
+        return NextResponse.json(
+            { error: 'Supabase not configured' },
+            { status: 503 }
+        );
+    }
+
     try {
         const { id } = await context.params;
 

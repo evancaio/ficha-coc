@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 // GET - Listar todas as fichas (público)
 export async function GET() {
+    if (!isSupabaseConfigured) {
+        return NextResponse.json([]);
+    }
+
     try {
         const { data, error } = await supabase
             .from('Character') // Tenta primeiro com PascalCase que o Prisma cria
@@ -32,6 +36,13 @@ export async function GET() {
 
 // POST - Criar nova ficha (público)
 export async function POST(request: Request) {
+    if (!isSupabaseConfigured) {
+        return NextResponse.json(
+            { error: 'Supabase not configured; saved locally only' },
+            { status: 503 }
+        );
+    }
+
     try {
         const body = await request.json();
         const { name, occupation, data } = body;

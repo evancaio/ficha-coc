@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Character, Characteristics, BasicInfo, Backstory, DerivedStats } from '@/types/character';
 import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula } from '@/utils/calculations';
-import { saveCharacter, getCurrentCharacter } from '@/utils/storage';
+import { saveCharacter, getCurrentCharacter, loadCharacter } from '@/utils/storage';
 import { skills, getSkillBaseValue } from '@/data/skills';
 import { occupations, searchOccupations, getOccupationByName } from '@/data/occupations';
 import SkillSelectorModal from './SkillSelectorModal';
@@ -11,8 +11,17 @@ import WeaponSelectorModal from './WeaponSelectorModal';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
-export default function CharacterSheet() {
-    const [character, setCharacter] = useState<Character>({
+interface CharacterSheetProps {
+    initialData?: Character;
+    characterId?: string;
+    isNew?: boolean;
+}
+
+export default function CharacterSheet({ initialData, characterId: initialCharacterId, isNew = false }: CharacterSheetProps) {
+    const [characterId, setCharacterId] = useState<string | undefined>(initialCharacterId);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const [character, setCharacter] = useState<Character>(initialData || {
         basicInfo: {
             name: '',
             player: '',
@@ -91,11 +100,25 @@ export default function CharacterSheet() {
 
 
     useEffect(() => {
+        if (initialData) {
+            setCharacter(initialData);
+            return;
+        }
+        if (isNew) {
+            return;
+        }
+        if (initialCharacterId) {
+            const loaded = loadCharacter(initialCharacterId);
+            if (loaded) {
+                setCharacter(loaded);
+                return;
+            }
+        }
         const saved = getCurrentCharacter();
         if (saved) {
             setCharacter(saved);
         }
-    }, []);
+    }, [initialData, initialCharacterId, isNew]);
 
     useEffect(() => {
         // Close modal on ESC key
@@ -236,9 +259,44 @@ export default function CharacterSheet() {
         setShowOccupationModal(false);
     };
 
-    const handleSave = () => {
-        saveCharacter(character);
-        alert('Personagem salvo com sucesso!');
+    const handleSave = async () => {
+        setIsSaving(true);
+        const localId = saveCharacter(character, characterId);
+        if (!characterId) {
+            setCharacterId(localId);
+        }
+
+        try {
+            const isCloudId = characterId && !characterId.startsWith('char_');
+            const method = isCloudId ? 'PUT' : 'POST';
+            const url = isCloudId ? `/api/characters/${characterId}` : '/api/characters';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: character.basicInfo.name || 'Sem Nome',
+                    occupation: character.basicInfo.occupation,
+                    data: character
+                }),
+            });
+
+            if (response.ok) {
+                const savedChar = await response.json();
+                if (savedChar?.id) {
+                    setCharacterId(String(savedChar.id));
+                }
+                alert('Personagem salvo na nuvem e localmente com sucesso!');
+            } else {
+                alert('Personagem salvo localmente no navegador!');
+            }
+        } catch {
+            alert('Personagem salvo localmente no navegador!');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleSelectOccupationSkills = (skillNames: string[]) => {
@@ -1180,8 +1238,8 @@ export default function CharacterSheet() {
             </div>
 
             <div className={styles.actions}>
-                <button onClick={handleSave} className={styles.saveButton}>
-                    💾 Salvar Personagem
+                <button onClick={handleSave} className={styles.saveButton} disabled={isSaving}>
+                    {isSaving ? '⏳ Salvando...' : '💾 Salvar Personagem'}
                 </button>
             </div>
 

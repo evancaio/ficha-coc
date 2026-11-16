@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import CharacterSheet from "@/components/CharacterSheet";
 
 export const dynamic = 'force-dynamic';
@@ -8,34 +8,41 @@ export default async function CharacterPage({ params }: { params: Promise<{ id: 
     const { id } = await params;
 
     if (id === "new") {
-        // Nova ficha - sem dados iniciais
-        return <CharacterSheet />;
+        return <CharacterSheet isNew />;
     }
 
-    // Carregar ficha existente
+    // Se for ID salvo no localStorage ou se o Supabase não estiver configurado, carrega no cliente
+    if (id.startsWith("char_") || !isSupabaseConfigured) {
+        return <CharacterSheet characterId={id} />;
+    }
+
+    // Carregar ficha existente do Supabase
     let character = null;
 
-    const { data, error } = await supabase
-        .from('Character')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-    if (!error && data) {
-        character = data;
-    } else {
-        // Fallback
-        const { data: retryData } = await supabase
-            .from('character')
+    try {
+        const { data, error } = await supabase
+            .from('Character')
             .select('*')
             .eq('id', id)
             .single();
-        character = retryData;
+
+        if (!error && data) {
+            character = data;
+        } else {
+            const { data: retryData } = await supabase
+                .from('character')
+                .select('*')
+                .eq('id', id)
+                .single();
+            character = retryData;
+        }
+    } catch (e) {
+        console.error("Erro ao carregar ficha:", e);
     }
 
     if (!character) {
         redirect("/");
     }
 
-    return <CharacterSheet initialData={character.data as any} characterId={character.id} />;
+    return <CharacterSheet initialData={character.data as any} characterId={String(character.id)} />;
 }

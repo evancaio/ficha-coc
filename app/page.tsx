@@ -1,113 +1,53 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import CharacterGallery from "@/components/CharacterGallery";
+import styles from "./page.module.css";
 
-export const dynamic = 'force-dynamic'; // Garante que não é gerado estático
+export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-    // Buscar todas as fichas do banco
-    let characters = [];
+    let characters: any[] = [];
 
-    try {
-        const { data, error } = await supabase
-            .from('Character')
-            .select('*')
-            .order('updatedAt', { ascending: false })
-            .limit(50);
-
-        if (!error && data && data.length > 0) {
-            characters = data;
-        } else {
-            // Fallback: se 'Character' não retornar nada (ou der erro), tenta 'character'
-            const { data: retryData } = await supabase
-                .from('character')
+    if (isSupabaseConfigured) {
+        try {
+            const { data, error } = await supabase
+                .from('Character')
                 .select('*')
                 .order('updatedAt', { ascending: false })
                 .limit(50);
 
-            if (retryData && retryData.length > 0) characters = retryData;
+            if (!error && data && data.length > 0) {
+                characters = data;
+            } else {
+                const { data: retryData } = await supabase
+                    .from('character')
+                    .select('*')
+                    .order('updatedAt', { ascending: false })
+                    .limit(50);
+
+                if (retryData && retryData.length > 0) characters = retryData;
+            }
+        } catch (e) {
+            console.error("Erro ao buscar fichas:", e);
         }
-    } catch (e) {
-        console.error("Erro ao buscar fichas:", e);
     }
 
     return (
-        <main className="min-h-screen bg-[var(--color-parchment-light)] p-8">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <header className="text-center mb-12">
-                    <h1 className="text-6xl font-bold mb-6 drop-shadow-sm text-[var(--color-eldritch-purple)]" style={{ fontFamily: 'var(--font-display)' }}>
+        <main className={styles.main}>
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    <h1 className={styles.title}>
                         📜 Fichas Call of Cthulhu
                     </h1>
-                    <p className="text-2xl text-[var(--color-sepia-medium)] mb-8 font-serif italic">
-                        Galeria Pública de Personagens
+                    <p className={styles.subtitle}>
+                        Galeria de Investigadores • 7ª Edição
                     </p>
-                    <Link
-                        href="/character/new"
-                        className="inline-block px-14 py-6 bg-gradient-to-r from-[var(--color-eldritch-purple)] to-[var(--color-eldritch-green)] text-white text-2xl font-extrabold rounded-xl shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-300 border-2 border-[var(--color-gold)]"
-                    >
+                    <Link href="/character/new" className={styles.createButton}>
                         ✨ Criar Nova Ficha
                     </Link>
                 </header>
 
-                {/* Lista de Fichas */}
-                {characters.length === 0 ? (
-                    <div className="text-center py-20 bg-white/50 rounded-xl border-2 border-dashed border-[var(--color-sepia-media)]">
-                        <p className="text-3xl text-[var(--color-sepia-medium)] mb-4 font-serif">
-                            Nenhuma ficha encontrada no Grimório
-                        </p>
-                        <p className="text-xl text-[var(--color-faded-ink)]">
-                            Seja o primeiro a registrar um investigador!
-                        </p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center items-start justify-items-center">
-                        {characters.map((character: any) => {
-                            const data = character.data;
-                            return (
-                                <Link
-                                    key={character.id}
-                                    href={`/character/${character.id}`}
-                                    className="block group"
-                                >
-                                    <div className="w-full max-w-sm h-64 mx-auto bg-[var(--color-parchment)] rounded-xl shadow-lg border-2 border-[var(--border-color)] p-6 transition-all duration-300 group-hover:scale-[1.03] group-hover:shadow-2xl relative overflow-hidden flex flex-col justify-between">
-                                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                                            {/* Ícone de fundo decorativo */}
-                                            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-                                            </svg>
-                                        </div>
-
-                                        <h3 className="text-4xl font-bold mb-3 text-[var(--color-eldritch-dark)] border-b-2 border-[var(--color-sepia-light)] pb-2" style={{ fontFamily: 'var(--font-display)' }}>
-                                            {data.basicInfo?.name || 'Sem Nome'}
-                                        </h3>
-
-                                        <div className="space-y-2 text-[var(--color-sepia-dark)] font-serif text-lg">
-                                            <p className="flex items-center gap-2">
-                                                <span className="text-xl">🕵️</span>
-                                                <span>{data.basicInfo?.occupation || 'Desconhecido'}</span>
-                                            </p>
-                                            <p className="flex items-center gap-2">
-                                                <span className="text-xl">🎂</span>
-                                                <span>{data.basicInfo?.age || '?'} anos</span>
-                                            </p>
-                                            {data.basicInfo?.residence && (
-                                                <p className="flex items-center gap-2">
-                                                    <span className="text-xl">🏠</span>
-                                                    <span className="truncate">{data.basicInfo.residence}</span>
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <div className="mt-4 pt-2 border-t border-[var(--color-sepia-light)] flex justify-between items-center text-sm text-[var(--color-faded-ink)]">
-                                            <span className="text-[var(--color-sepia-medium)]">Atualizado em:</span>
-                                            <span className="font-semibold">{new Date(character.updatedAt).toLocaleDateString('pt-BR')}</span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
-                )}
+                <CharacterGallery serverCharacters={characters} />
             </div>
         </main>
     );
