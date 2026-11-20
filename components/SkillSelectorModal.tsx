@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Lock, Check } from 'lucide-react';
 import { skills, SkillDefinition, skillCategories } from '@/data/skills';
 import styles from './SkillSelectorModal.module.css';
 
@@ -148,8 +149,8 @@ export default function SkillSelectorModal({
                                     >
                                         <div className={styles.skillCardHeader}>
                                             <h3>{skill.name}</h3>
-                                            {isSelected && <span className={styles.checkmark}>✓</span>}
-                                            {isLocked && <span className={styles.lockIcon} title="Perícia fixa da ocupação">🔒</span>}
+                                            {isSelected && <Check size={16} className={styles.checkmark} />}
+                                            {isLocked && <span title="Perícia fixa da ocupação"><Lock size={14} className={styles.lockIcon} /></span>}
                                         </div>
                                         <div className={styles.skillCardDetails}>
                                             <span className={styles.skillCategory}>{skill.category}</span>

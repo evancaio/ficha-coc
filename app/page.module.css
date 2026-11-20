@@ -43,6 +43,9 @@
 .tools {
   display: flex;
   justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
   padding: 8px 16px 22px;
   max-width: 960px;
   margin: 0 auto;
@@ -64,6 +67,52 @@
 
 .createButton:hover {
   filter: brightness(1.12);
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.createButtonClassic {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: #d8cdba;
+  color: #1a1614 !important;
+  font: 700 14px/1 "PT Serif", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.createButtonClassic:hover {
+  background: #eae0cf;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.createButtonPulp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: #a11d20;
+  color: #ffffff !important;
+  font: 700 14px/1 "PT Serif", serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.createButtonPulp:hover {
+  filter: brightness(1.15);
   transform: translate(-1px, -1px);
   box-shadow: 4px 4px 0 var(--ink);
 }

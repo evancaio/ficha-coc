@@ -1,11 +1,12 @@
-// Funções de cálculo para Call of Cthulhu 7ª Edição
-import { Characteristics, DerivedStats } from '@/types/character';
+// Funções de cálculo para Call of Cthulhu 7ª Edição e Pulp Cthulhu
+import { Characteristics, DerivedStats, GameMode } from '@/types/character';
 
-export function calculateDerivedStats(chars: Characteristics): DerivedStats {
-    const HP = Math.floor((chars.CON + chars.SIZ) / 10);
+export function calculateDerivedStats(chars: Characteristics, gameMode: GameMode = 'classic'): DerivedStats {
+    const divisor = gameMode === 'pulp' ? 5 : 10;
+    const HP = Math.floor((chars.CON + chars.SIZ) / divisor);
     const MP = Math.floor(chars.POW / 5);
     const SAN = chars.POW;
-    const LUCK = 0; // Deprecated - usar luckTokens
+    const LUCK = 50; // Valor padrão de Sorte (pode ser rolado ou ajustado)
 
     const movementRate = calculateMovementRate(chars);
     const { damageBonus, build } = calculateDamageBonusAndBuild(chars);
@@ -18,12 +19,17 @@ export function calculateDerivedStats(chars: Characteristics): DerivedStats {
         SAN,
         currentSAN: SAN, // Inicializa com Sanidade máxima
         LUCK,
+        currentLUCK: LUCK,
         luckTokens: 5, // Moedas da Sorte iniciais
         maxLuckTokens: 5, // Máximo de Moedas da Sorte
         movementRate,
         damageBonus,
         build
     };
+}
+
+export function calculateArchetypePoints(gameMode: GameMode = 'classic'): number {
+    return gameMode === 'pulp' ? 100 : 0;
 }
 
 function calculateMovementRate(chars: Characteristics): number {

@@ -1,0 +1,169 @@
+.panel {
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 16px 18px;
+    margin-top: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 8px;
+}
+
+.titleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.title {
+    font: 400 18px/1 "Saira Stencil One", Impact, sans-serif !important;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.luckBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    padding: 4px 10px;
+}
+
+.luckLabel {
+    font: 700 11px/1 "PT Serif", Georgia, serif !important;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mute);
+    margin: 0 !important;
+}
+
+.luckInput {
+    width: 44px;
+    font: 700 18px/1 "PT Serif", Georgia, serif !important;
+    color: var(--red) !important;
+    text-align: center;
+    border: 0 !important;
+    border-bottom: 1.5px solid var(--ink) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    outline: none;
+}
+
+.luckMax {
+    font: 700 12px/1 "PT Serif", Georgia, serif;
+    color: var(--mute);
+}
+
+.description {
+    font: italic 13px/1.4 "PT Serif", Georgia, serif;
+    color: var(--mute);
+    margin: 0 0 14px 0;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 680px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.optionButton {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    text-align: left !important;
+    background: var(--field) !important;
+    color: var(--ink) !important;
+    border: 1.5px solid var(--ink) !important;
+    box-shadow: 2px 2px 0 var(--ink) !important;
+    padding: 10px 12px !important;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
+    text-transform: none !important;
+    width: 100% !important;
+}
+
+.optionButton:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--ink) !important;
+    filter: brightness(1.05);
+}
+
+.optionButton:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, 0.05) !important;
+    box-shadow: none !important;
+}
+
+.optionDeath {
+    background: rgba(196, 48, 43, 0.1) !important;
+    border-color: var(--red) !important;
+}
+
+.optionDeath:hover:not(:disabled) {
+    background: rgba(196, 48, 43, 0.18) !important;
+}
+
+.optionTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    width: 100%;
+}
+
+.optionName {
+    font: 700 13px/1.2 "PT Serif", Georgia, serif !important;
+    color: var(--ink) !important;
+    text-transform: none !important;
+}
+
+.costBadge {
+    display: inline-block;
+    font: 700 11px/1 "PT Serif", Georgia, serif !important;
+    padding: 3px 7px;
+    background: var(--ink);
+    color: var(--paper) !important;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.costBadgeDeath {
+    background: var(--red) !important;
+    color: var(--on-red) !important;
+}
+
+.optionDesc {
+    font: 400 12px/1.35 "PT Serif", Georgia, serif !important;
+    color: var(--mute) !important;
+    margin: 0 !important;
+    text-transform: none !important;
+}
+
+.feedback {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: var(--ink);
+    color: var(--paper);
+    font: 700 12px/1 "PT Serif", Georgia, serif;
+    text-align: center;
+    letter-spacing: 0.05em;
+}

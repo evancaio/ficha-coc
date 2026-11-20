@@ -1,13 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Character, Characteristics, BasicInfo, Backstory, DerivedStats } from '@/types/character';
-import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula } from '@/utils/calculations';
+import { Character, Characteristics, BasicInfo, Backstory, DerivedStats, GameMode, Archetype } from '@/types/character';
+import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula, calculateArchetypePoints } from '@/utils/calculations';
 import { saveCharacter, getCurrentCharacter, loadCharacter } from '@/utils/storage';
 import { skills, getSkillBaseValue } from '@/data/skills';
 import { occupations, searchOccupations, getOccupationByName } from '@/data/occupations';
+import { archetypes, getArchetypeById } from '@/data/archetypes';
+import { pulpTalents, getTalentById } from '@/data/pulpTalents';
 import SkillSelectorModal from './SkillSelectorModal';
 import WeaponSelectorModal from './WeaponSelectorModal';
+import BookSheetModal from './BookSheetModal';
+import ArchetypeSelectorModal from './ArchetypeSelectorModal';
+import PulpTalentsModal from './PulpTalentsModal';
+import PulpLuckPanel from './PulpLuckPanel';
+import SkillDetailModal from './SkillDetailModal';
+import PointExplanationModal from './PointExplanationModal';
+import { downloadBookStylePdf } from '@/utils/pdfExport';
+import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
@@ -15,11 +25,14 @@ interface CharacterSheetProps {
     initialData?: Character;
     characterId?: string;
     isNew?: boolean;
+    initialMode?: GameMode;
 }
 
-export default function CharacterSheet({ initialData, characterId: initialCharacterId, isNew = false }: CharacterSheetProps) {
+export default function CharacterSheet({ initialData, characterId: initialCharacterId, isNew = false, initialMode = 'classic' }: CharacterSheetProps) {
     const [characterId, setCharacterId] = useState<string | undefined>(initialCharacterId);
     const [isSaving, setIsSaving] = useState(false);
+
+    const defaultMode: GameMode = initialData?.gameMode || initialMode || 'classic';
 
     const [character, setCharacter] = useState<Character>(initialData || {
         basicInfo: {
@@ -50,7 +63,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             INT: 50,
             POW: 50,
             EDU: 50
-        }),
+        }, defaultMode),
         skills: skills.map(skill => ({
             name: skill.name,
             baseValue: getSkillBaseValue(skill.name, {
@@ -64,7 +77,8 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 EDU: 50
             }),
             occupationPoints: 0,
-            personalPoints: 0
+            personalPoints: 0,
+            archetypePoints: 0
         })),
         weapons: [],
         status: {
@@ -88,18 +102,28 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         },
         occupationSkillPoints: 200,
         personalInterestPoints: 100,
-        selectedOccupationSkills: []
+        selectedOccupationSkills: [],
+        gameMode: defaultMode,
+        archetype: '',
+        pulpTalents: [],
+        archetypeSkillPoints: defaultMode === 'pulp' ? 100 : 0,
+        selectedArchetypeSkills: []
     });
 
     const [activeTab, setActiveTab] = useState<'info' | 'skills' | 'combat' | 'backstory'>('info');
-    const [viewMode, setViewMode] = useState<'dossier' | 'tabs'>('dossier');
     const [occupationSearch, setOccupationSearch] = useState('');
     const [showOccupationModal, setShowOccupationModal] = useState(false);
     const [showOccupationSkillsModal, setShowOccupationSkillsModal] = useState(false);
+    const [showArchetypeModal, setShowArchetypeModal] = useState(false);
+    const [showPulpTalentsModal, setShowPulpTalentsModal] = useState(false);
     const [personalSkillSearch, setPersonalSkillSearch] = useState('');
+    const [personalSkillSort, setPersonalSkillSort] = useState<'name' | 'value'>('name');
     const [showWeaponModal, setShowWeaponModal] = useState(false);
+    const [showBookSheetModal, setShowBookSheetModal] = useState(false);
     const [lastCachedAt, setLastCachedAt] = useState<string | null>(null);
     const [backupText, setBackupText] = useState('');
+    const [selectedSkillForDetail, setSelectedSkillForDetail] = useState<string | null>(null);
+    const [pointExplanation, setPointExplanation] = useState<'archetype' | 'personal' | 'occupation' | null>(null);
     const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
 
     const handleRollAttributes = () => {
@@ -118,7 +142,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             POW: roll(3, 6) * 5,
             EDU: (roll(2, 6) + 6) * 5
         };
-        const newDerived = calculateDerivedStats(newChars);
+        const newDerived = calculateDerivedStats(newChars, character.gameMode || 'classic');
         const newPersonalPoints = calculatePersonalInterestPoints(newChars.INT);
         let newOccPoints = calculateOccupationPoints(newChars.EDU);
         if (character.basicInfo.occupation) {
@@ -230,7 +254,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
     const updateCharacteristics = (key: keyof Characteristics, value: number) => {
         const newChars = { ...character.characteristics, [key]: value };
-        const newDerived = calculateDerivedStats(newChars);
+        const newDerived = calculateDerivedStats(newChars, character.gameMode || 'classic');
         const newPersonalPoints = calculatePersonalInterestPoints(newChars.INT);
 
         // Calculate occupation points based on the occupation's formula
@@ -397,7 +421,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
 
 
-    const handleSkillPointChange = (skillName: string, points: number, type: 'occupation' | 'personal') => {
+    const handleSkillPointChange = (skillName: string, points: number, type: 'occupation' | 'personal' | 'archetype') => {
         // Disallow applying personal interest points to 'Nível de Crédito'
         if (type === 'personal' && skillName === 'Nível de Crédito') return;
 
@@ -408,6 +432,8 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     const minOcc = (skill as any).minOccupationPoints ?? 0;
                     const newVal = Math.max(points, minOcc);
                     return { ...skill, occupationPoints: newVal };
+                } else if (type === 'archetype') {
+                    return { ...skill, archetypePoints: points };
                 } else {
                     return { ...skill, personalPoints: points };
                 }
@@ -415,10 +441,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
             return skill;
         });
 
-        setCharacter({
-            ...character,
+        setCharacter(prev => ({
+            ...prev,
             skills: updatedSkills
-        });
+        }));
     };
 
     const handleSelectWeapon = (weapon: any) => {
@@ -490,8 +516,61 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         return character.skills.reduce((sum, skill) => skill.name === 'Nível de Crédito' ? sum : sum + skill.personalPoints, 0);
     };
 
+    const getTotalArchetypePointsUsed = () => {
+        return character.skills.reduce((sum, skill) => sum + (skill.archetypePoints || 0), 0);
+    };
+
+    const isArchetypeSkill = (skillName: string): boolean => {
+        if (character.gameMode !== 'pulp' || !character.archetype) return false;
+        const arch = archetypes.find(a => 
+            a.name.toLowerCase() === character.archetype?.toLowerCase() ||
+            a.id.toLowerCase() === character.archetype?.toLowerCase()
+        );
+        if (!arch) return false;
+        const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const nSkill = norm(skillName);
+        return arch.skills.some(archSkill => {
+            const aSkill = norm(archSkill);
+            return nSkill === aSkill || nSkill.startsWith(aSkill) || aSkill.startsWith(nSkill);
+        });
+    };
+
+    const handleToggleGameMode = () => {
+        const nextMode: GameMode = character.gameMode === 'pulp' ? 'classic' : 'pulp';
+        const newDerived = calculateDerivedStats(character.characteristics, nextMode);
+        setCharacter(prev => ({
+            ...prev,
+            gameMode: nextMode,
+            derivedStats: {
+                ...prev.derivedStats,
+                HP: newDerived.HP,
+                currentHP: nextMode === 'pulp'
+                    ? Math.max(prev.derivedStats.currentHP, newDerived.HP)
+                    : Math.min(prev.derivedStats.currentHP, newDerived.HP),
+                currentLUCK: prev.derivedStats.currentLUCK ?? 50
+            },
+            archetypeSkillPoints: nextMode === 'pulp' ? 100 : 0
+        }));
+    };
+
+    const handleSelectArchetype = (arch: Archetype) => {
+        setCharacter(prev => ({
+            ...prev,
+            archetype: arch.name,
+            archetypeSkillPoints: 100
+        }));
+    };
+
+    const handleSaveTalents = (talents: string[]) => {
+        setCharacter(prev => ({
+            ...prev,
+            pulpTalents: talents
+        }));
+    };
+
     const isSpecializationSkill = (skillName: string) => {
-        return skillName.includes('Arte e Ofício');
+        const def = skills.find(s => s.name === skillName);
+        return Boolean(def?.requiresSpecialization) || skillName.includes('Arte e Ofício') || skillName.includes('Língua');
     };
 
     const updateDerivedStats = (field: keyof DerivedStats, value: number) => {
@@ -520,18 +599,18 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
         // always try exact match first
         const exact = character.skills.find(s => s.name === skillName);
-        if (exact) return (typeof exact.baseValue === 'number' ? exact.baseValue : 0) + exact.occupationPoints + exact.personalPoints;
+        if (exact) return (typeof exact.baseValue === 'number' ? exact.baseValue : 0) + exact.occupationPoints + exact.personalPoints + (exact.archetypePoints || 0);
 
         // try canonical candidates
         for (const cand of canonicalCandidates) {
             const found = character.skills.find(s => s.name === cand);
-            if (found) return (typeof found.baseValue === 'number' ? found.baseValue : 0) + found.occupationPoints + found.personalPoints;
+            if (found) return (typeof found.baseValue === 'number' ? found.baseValue : 0) + found.occupationPoints + found.personalPoints + (found.archetypePoints || 0);
         }
 
         // fallback: fuzzy match by normalized name substring
         const targetNorm = normalize(skillName);
         const fuzzy = character.skills.find(s => normalize(s.name).includes(targetNorm) || targetNorm.includes(normalize(s.name)));
-        if (fuzzy) return (typeof fuzzy.baseValue === 'number' ? fuzzy.baseValue : 0) + fuzzy.occupationPoints + fuzzy.personalPoints;
+        if (fuzzy) return (typeof fuzzy.baseValue === 'number' ? fuzzy.baseValue : 0) + fuzzy.occupationPoints + fuzzy.personalPoints + (fuzzy.archetypePoints || 0);
 
         return 0;
     };
@@ -540,9 +619,15 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         <div className={styles.container}>
             <header className={styles.header}>
                 <span className={styles.kicker}>Chamado de Cthulhu</span>
-                <h1>Ficha de Investigador</h1>
+                <h1>{character.gameMode === 'pulp' ? 'Ficha de Herói Pulp' : 'Ficha de Investigador'}</h1>
                 <div>
-                    <span className={styles.subtitle}>Досье следователя · 7ª Edição</span>
+                    <span className={styles.subtitle}>
+                        {character.gameMode === 'pulp' ? (
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                                <Zap size={14} /> Pulp Cthulhu · Heróis de Ação
+                            </span>
+                        ) : 'Досье следователя · 7ª Edição'}
+                    </span>
                 </div>
             </header>
 
@@ -550,17 +635,20 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">
                     ← Galeria
                 </Link>
-                <button type="button" className={styles.redButton} onClick={handleRollAttributes}>
-                    Rolar Atributos
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setViewMode(prev => prev === 'dossier' ? 'tabs' : 'dossier')}
+                <button 
+                    type="button" 
+                    onClick={() => setShowBookSheetModal(true)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
-                    {viewMode === 'dossier' ? 'Modo: Folha Completa' : 'Modo: Em Abas'}
+                    <BookOpen size={15} /> Ficha (Estilo Livro)
                 </button>
-                <button type="button" onClick={() => window.print()}>
-                    Imprimir
+                <button 
+                    type="button" 
+                    className={styles.redButton} 
+                    onClick={() => downloadBookStylePdf(character)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                    <Download size={15} /> Baixar PDF
                 </button>
                 <button type="button" className={styles.redButton} onClick={handleSave} disabled={isSaving}>
                     {isSaving ? 'Salvando...' : 'Salvar Ficha'}
@@ -572,37 +660,35 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 )}
             </div>
 
-            {viewMode === 'tabs' && (
-                <div className={styles.tabs}>
-                    <button
-                        className={activeTab === 'info' ? styles.tabActive : styles.tab}
-                        onClick={() => setActiveTab('info')}
-                    >
-                        Informações
-                    </button>
-                    <button
-                        className={activeTab === 'skills' ? styles.tabActive : styles.tab}
-                        onClick={() => setActiveTab('skills')}
-                    >
-                        Perícias
-                    </button>
-                    <button
-                        className={activeTab === 'combat' ? styles.tabActive : styles.tab}
-                        onClick={() => setActiveTab('combat')}
-                    >
-                        Combate
-                    </button>
-                    <button
-                        className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
-                        onClick={() => setActiveTab('backstory')}
-                    >
-                        História
-                    </button>
-                </div>
-            )}
+            <div className={styles.tabs}>
+                <button
+                    className={activeTab === 'info' ? styles.tabActive : styles.tab}
+                    onClick={() => setActiveTab('info')}
+                >
+                    Informações
+                </button>
+                <button
+                    className={activeTab === 'skills' ? styles.tabActive : styles.tab}
+                    onClick={() => setActiveTab('skills')}
+                >
+                    Perícias
+                </button>
+                <button
+                    className={activeTab === 'combat' ? styles.tabActive : styles.tab}
+                    onClick={() => setActiveTab('combat')}
+                >
+                    Combate
+                </button>
+                <button
+                    className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
+                    onClick={() => setActiveTab('backstory')}
+                >
+                    História
+                </button>
+            </div>
 
             <div className={styles.content}>
-                {(viewMode === 'dossier' || activeTab === 'info') && (
+                {activeTab === 'info' && (
                     <div className="fade-in">
                         {/* Informações Básicas */}
                         <section className="card">
@@ -681,6 +767,86 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                             </div>
                                         )}
                                     </div>
+
+                                    {character.gameMode === 'pulp' && (
+                                        <>
+                                            <div className={styles.occupationSelector}>
+                                                <label className="text-red-800 dark:text-red-400 font-bold flex items-center gap-1.5">
+                                                    <Zap size={15} /> Arquétipo Pulp
+                                                </label>
+                                                <div className={styles.occupationDisplay}>
+                                                    <input
+                                                        type="text"
+                                                        value={character.archetype || ''}
+                                                        readOnly
+                                                        placeholder="Clique para selecionar arquétipo..."
+                                                        onClick={() => setShowArchetypeModal(true)}
+                                                        style={{ cursor: 'pointer', borderColor: character.archetype ? '#b91c1c' : undefined }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowArchetypeModal(true)}
+                                                        className={styles.selectButton}
+                                                        style={{ backgroundColor: '#b91c1c', borderColor: '#991b1b', color: '#fff' }}
+                                                    >
+                                                        Selecionar
+                                                    </button>
+                                                </div>
+                                                {character.archetype && (
+                                                    <div className={styles.occupationInfo} style={{ borderLeft: '3px solid #b91c1c' }}>
+                                                        <div><strong>Pontos do Arquétipo:</strong> 100 pontos para distribuir</div>
+                                                        {(() => {
+                                                            const found = archetypes.find(a => a.name === character.archetype);
+                                                            if (!found) return null;
+                                                            return (
+                                                                <>
+                                                                    <div><strong>Atributo Núcleo:</strong> {found.coreCharacteristic.join(' ou ')}</div>
+                                                                    <div><strong>Perícias do Arquétipo:</strong> {found.skills.join(', ')}</div>
+                                                                </>
+                                                            );
+                                                        })()}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className={styles.occupationSelector} style={{ gridColumn: '1 / -1' }}>
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <label className="text-red-800 dark:text-red-400 font-bold flex items-center gap-1.5">
+                                                        <Award size={15} /> Talentos Pulp ({character.pulpTalents?.length || 0}/2)
+                                                    </label>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPulpTalentsModal(true)}
+                                                        className={styles.selectButton}
+                                                        style={{ backgroundColor: '#b91c1c', borderColor: '#991b1b', color: '#fff', fontSize: '11px', padding: '3px 8px' }}
+                                                    >
+                                                        {character.pulpTalents && character.pulpTalents.length > 0 ? 'Editar Talentos' : '+ Escolher Talentos'}
+                                                    </button>
+                                                </div>
+                                                {character.pulpTalents && character.pulpTalents.length > 0 ? (
+                                                    <div className="flex flex-wrap gap-2 mt-1">
+                                                        {character.pulpTalents.map(tId => {
+                                                            const t = getTalentById(tId);
+                                                            if (!t) return null;
+                                                            return (
+                                                                <div key={tId} className="bg-red-50/80 dark:bg-zinc-800/80 border border-red-200 dark:border-zinc-700 rounded p-2 text-xs flex-1 min-w-[200px]">
+                                                                    <div className="flex items-center justify-between mb-0.5">
+                                                                        <span className="font-bold text-red-900 dark:text-red-300">{t.name}</span>
+                                                                        <span className="text-[10px] bg-red-100 dark:bg-zinc-700 text-red-800 dark:text-zinc-300 px-1 rounded font-semibold">{t.category}</span>
+                                                                    </div>
+                                                                    <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-tight">{t.description}</p>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-xs text-gray-500 italic p-2 bg-gray-50 dark:bg-zinc-900/50 rounded border border-dashed border-gray-300">
+                                                        Nenhum talento selecionado. Clique em &quot;+ Escolher Talentos&quot; para adicionar até 2 talentos heróicos.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
                                     <div>
                                         <label>Idade</label>
                                         <input
@@ -730,7 +896,18 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
                         {/* Características */}
                         <section className="card">
-                            <h2>Características</h2>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                                <h2 style={{ margin: 0 }}>Características</h2>
+                                <button
+                                    type="button"
+                                    className={styles.redButton}
+                                    onClick={handleRollAttributes}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+                                    title="Rolar aleatoriamente os atributos e a Sorte do personagem"
+                                >
+                                    <Dices size={15} /> Rolar Atributos
+                                </button>
+                            </div>
                             <div className="grid grid-4">
                                 {Object.entries(character.characteristics).map(([key, value]) => {
                                     const labelMap = {
@@ -914,6 +1091,14 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             </div>
                         </section>
 
+                        {character.gameMode === 'pulp' && (
+                            <PulpLuckPanel
+                                currentLuck={character.derivedStats.currentLUCK ?? character.derivedStats.LUCK ?? 50}
+                                hasNineLivesTalent={character.pulpTalents?.includes('vida-de-gato')}
+                                onUpdateLuck={(val) => updateDerivedStats('currentLUCK', val)}
+                            />
+                        )}
+
                         {/* Status Section (moved out of backstory) */}
                         <section className="card">
                             <h2>Status</h2>
@@ -985,37 +1170,35 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             </div>
                         </section>
 
-                        {/* Pontos de Perícia (apenas no modo Abas, pois no modo Dossiê já aparece na seção de Perícias abaixo) */}
-                        {viewMode === 'tabs' && (
-                            <section className="card">
-                                <h2>Pontos de Perícia</h2>
-                                <div className="grid grid-2">
-                                    <div className={styles.skillPoints}>
-                                        <h3>Pontos Ocupacionais</h3>
-                                        <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
-                                        <small>
-                                            {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
-                                                ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
-                                                : 'EDU × 4'}
-                                        </small>
-                                    </div>
-                                    <div className={styles.skillPoints}>
-                                        <h3>Pontos de Interesse Pessoal</h3>
-                                        <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
-                                        <small>INT × 2</small>
-                                    </div>
-                                </div>
-                            </section>
-                        )}
-                    </div>
-                )}
-
-                {(viewMode === 'dossier' || activeTab === 'skills') && (
-                    <div className="fade-in">
                         {/* Pontos de Perícia */}
                         <section className="card">
                             <h2>Pontos de Perícia</h2>
                             <div className="grid grid-2">
+                                <div className={styles.skillPoints}>
+                                    <h3>Pontos Ocupacionais</h3>
+                                    <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
+                                    <small>
+                                        {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
+                                            ? getOccupationByName(character.basicInfo.occupation)!.skillPoints
+                                            : 'EDU × 4'}
+                                    </small>
+                                </div>
+                                <div className={styles.skillPoints}>
+                                    <h3>Pontos de Interesse Pessoal</h3>
+                                    <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
+                                    <small>INT × 2</small>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                )}
+
+                {activeTab === 'skills' && (
+                    <div className="fade-in">
+                        {/* Pontos de Perícia */}
+                        <section className="card">
+                            <h2>Pontos de Perícia</h2>
+                            <div className={`grid ${character.gameMode === 'pulp' ? 'grid-3' : 'grid-2'}`}>
                                 <div className={styles.skillPoints}>
                                     <h3>Pontos Ocupacionais</h3>
                                     <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
@@ -1036,6 +1219,29 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         </div>
                                     </div>
                                 </div>
+
+                                {character.gameMode === 'pulp' && (
+                                    <div className={styles.skillPoints} style={{ borderLeft: '4px solid #b91c1c' }}>
+                                        <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
+                                        <div className={styles.pointsValue} style={{ color: '#b91c1c' }}>100</div>
+                                        <small>{character.archetype ? `Arquétipo: ${character.archetype}` : 'Bônus Pulp (+100)'}</small>
+                                        <div className={styles.pointsProgress}>
+                                            <div className={styles.progressBar}>
+                                                <div
+                                                    className={styles.progressFill}
+                                                    style={{
+                                                        width: `${Math.min(100, (getTotalArchetypePointsUsed() / 100) * 100)}%`,
+                                                        backgroundColor: '#b91c1c'
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className={styles.pointsUsed}>
+                                                {getTotalArchetypePointsUsed()} / 100 usados
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className={styles.skillPoints}>
                                     <h3>Pontos de Interesse Pessoal</h3>
                                     <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
@@ -1055,23 +1261,86 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             </div>
                         </section>
 
+                        {character.gameMode === 'pulp' && (
+                            <div style={{ 
+                                background: 'var(--paper)', 
+                                border: '1.5px solid var(--ink)', 
+                                boxShadow: '2px 2px 0 var(--ink)',
+                                padding: '8px 12px', 
+                                marginBottom: '16px', 
+                                fontSize: '12px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                flexWrap: 'wrap',
+                                gap: '8px'
+                            }}>
+                                <div>
+                                    <strong style={{ color: '#b91c1c' }}>Regra Pulp:</strong>{' '}
+                                    {character.archetype ? (
+                                        <span>
+                                            Arquétipo <strong>{character.archetype}</strong> ativo. Perícias marcadas com <strong style={{ color: '#b91c1c' }}>Arq</strong> recebem os 100 pontos.
+                                        </span>
+                                    ) : (
+                                        <span style={{ color: 'var(--mute)' }}>
+                                            Nenhum arquétipo selecionado. Selecione um na aba <em>Informações</em> para habilitar os 100 pontos.
+                                        </span>
+                                    )}
+                                </div>
+                                <span style={{ fontWeight: 700, color: '#b91c1c', fontSize: '11px' }}>
+                                    {getTotalArchetypePointsUsed()} / 100 Arq Usados
+                                </span>
+                            </div>
+                        )}
+
                         {/* Perícias Ocupacionais */}
                         <section className="card">
                             <div className={styles.sectionHeader}>
-                                <h2>Perícias Ocupacionais</h2>
+                                <h2>
+                                    Perícias Ocupacionais
+                                    {character.basicInfo.occupation && (
+                                        <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
+                                            — {character.basicInfo.occupation}
+                                        </span>
+                                    )}
+                                </h2>
                                 {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)?.skillChoices && getOccupationByName(character.basicInfo.occupation)!.skillChoices!.length > 0 && (
                                     <button
+                                        type="button"
                                         className={styles.selectButton}
                                         onClick={() => setShowOccupationSkillsModal(true)}
                                     >
-                                        + Selecionar Perícias
+                                        + Escolher Perícias Opcionais
                                     </button>
                                 )}
                             </div>
-                            {character.selectedOccupationSkills.length === 0 ? (
-                                <p className={styles.emptyState}>
-                                    Nenhuma perícia ocupacional selecionada. Clique em "Selecionar Perícias" para adicionar.
-                                </p>
+                            {!character.basicInfo.occupation ? (
+                                <div style={{ textAlign: 'center', padding: '24px 16px', background: 'var(--field)', border: '1.5px dashed var(--ink)' }}>
+                                    <p style={{ fontStyle: 'italic', color: 'var(--mute)', marginBottom: '12px', fontSize: '14px' }}>
+                                        As <strong>Perícias Ocupacionais</strong> são definidas pela profissão do seu personagem (ex: Médico, Detetive, Soldado, etc.).
+                                    </p>
+                                    <button
+                                        type="button"
+                                        className={styles.redButton}
+                                        onClick={() => setShowOccupationModal(true)}
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 16px' }}
+                                    >
+                                        <Briefcase size={16} /> Selecionar Ocupação
+                                    </button>
+                                </div>
+                            ) : character.selectedOccupationSkills.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: '20px 16px', background: 'var(--field)', border: '1.5px dashed var(--ink)' }}>
+                                    <p style={{ fontStyle: 'italic', color: 'var(--mute)', marginBottom: '10px' }}>
+                                        Sua ocupação ({character.basicInfo.occupation}) requer que você selecione suas opções de perícia.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        className={styles.redButton}
+                                        onClick={() => setShowOccupationSkillsModal(true)}
+                                    >
+                                        + Escolher Perícias da Ocupação
+                                    </button>
+                                </div>
                             ) : (
                                 <div className={styles.skillsList}>
                                     {character.selectedOccupationSkills.map(skillName => {
@@ -1080,11 +1349,25 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         const totalValue = getSkillTotalValue(skillName);
                                         const needsSpec = isSpecializationSkill(skillName);
 
+                                        const isArch = isArchetypeSkill(skillName) || ((skill.archetypePoints || 0) > 0);
+
                                         return (
                                             <div key={skillName} className={styles.skillRow}>
                                                 <div className={styles.skillInfo}>
-                                                    <div className="flex flex-col">
-                                                        <span className={styles.skillName}>{skillName}</span>
+                                                    <div style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto' }}>
+                                                        <span 
+                                                            className={styles.skillName} 
+                                                            title={`Clique para ler detalhes de ${skillName}`}
+                                                            onClick={() => setSelectedSkillForDetail(skillName)}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                color: isArch ? '#a11d20' : undefined,
+                                                                textDecoration: 'underline dotted',
+                                                                textUnderlineOffset: '2px'
+                                                            }}
+                                                        >
+                                                            {skillName}
+                                                        </span>
                                                         {needsSpec && (
                                                             <input
                                                                 type="text"
@@ -1104,12 +1387,17 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                             />
                                                         )}
                                                     </div>
-                                                    <span className={styles.skillBadge} style={{ background: '#2a9d8f' }}>Ocupacional</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
                                                     <div className={styles.skillInputGroup}>
                                                         <div className={styles.skillInput}>
-                                                            <label>Ocupacional:</label>
+                                                            <label
+                                                                onClick={() => setPointExplanation('occupation')}
+                                                                style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px' }}
+                                                                title="Clique para entender os Pontos Ocupacionais"
+                                                            >
+                                                                Ocup:
+                                                            </label>
                                                             <input
                                                                 type="number"
                                                                 min={typeof (skill as any).minOccupationPoints === 'number' ? (skill as any).minOccupationPoints : 0}
@@ -1118,8 +1406,43 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                 onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'occupation')}
                                                             />
                                                         </div>
+                                                        {character.gameMode === 'pulp' && (
+                                                            <div className={styles.skillInput}>
+                                                                <label 
+                                                                    onClick={() => setPointExplanation('archetype')}
+                                                                    style={{ 
+                                                                        color: '#c4302b', 
+                                                                        fontWeight: 700,
+                                                                        cursor: 'pointer',
+                                                                        textDecoration: 'underline dotted',
+                                                                        textUnderlineOffset: '2px'
+                                                                    }} 
+                                                                    title="Clique para entender o Bônus de Arquétipo (+100 pts)"
+                                                                >
+                                                                    Arq:
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    max={100}
+                                                                    value={skill.archetypePoints || 0}
+                                                                    onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'archetype')}
+                                                                    style={{ 
+                                                                        borderColor: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
+                                                                        color: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
+                                                                        fontWeight: (skill.archetypePoints || 0) > 0 ? 700 : undefined
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
                                                         <div className={styles.skillInput}>
-                                                            <label>Pessoal:</label>
+                                                            <label
+                                                                onClick={() => setPointExplanation('personal')}
+                                                                style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px' }}
+                                                                title="Clique para entender os Pontos de Interesse Pessoal"
+                                                            >
+                                                                Pess:
+                                                            </label>
                                                             <input
                                                                 type="number"
                                                                 min="0"
@@ -1131,7 +1454,6 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                         </div>
                                                     </div>
                                                     <div className={styles.skillTotal}>
-                                                        <span className={styles.totalLabel}>Total:</span>
                                                         <span className={styles.totalValue}>{totalValue}%</span>
                                                         <span className={styles.derivedValues}>
                                                             ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
@@ -1149,13 +1471,43 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div className={styles.sectionHeader}>
                                 <h2>Perícias de Interesse Pessoal</h2>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar perícia..."
-                                    value={personalSkillSearch}
-                                    onChange={(e) => setPersonalSkillSearch(e.target.value)}
-                                    className={styles.searchInput}
-                                />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPersonalSkillSort(prev => prev === 'name' ? 'value' : 'name')}
+                                        style={{
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px',
+                                            fontSize: '11px',
+                                            padding: '4px 10px',
+                                            background: 'var(--field)',
+                                            border: '1.5px solid var(--ink)',
+                                            cursor: 'pointer',
+                                            fontWeight: 700,
+                                            color: 'var(--ink)',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                        title={personalSkillSort === 'name' ? 'Clique para ordenar por maior valor' : 'Clique para ordenar em ordem alfabética (A-Z)'}
+                                    >
+                                        {personalSkillSort === 'name' ? (
+                                            <>
+                                                <ArrowDownAZ size={14} /> Ordem: A-Z
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ArrowUpDown size={14} /> Ordem: Maior Valor
+                                            </>
+                                        )}
+                                    </button>
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar perícia..."
+                                        value={personalSkillSearch}
+                                        onChange={(e) => setPersonalSkillSearch(e.target.value)}
+                                        className={styles.searchInput}
+                                    />
+                                </div>
                             </div>
                             <div className={styles.personalSkillsGrid}>
                                 {character.skills
@@ -1164,20 +1516,38 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         skill.name.toLowerCase().includes(personalSkillSearch.toLowerCase())
                                     )
                                     .sort((a, b) => {
-                                        const totalA = a.baseValue + a.occupationPoints + a.personalPoints;
-                                        const totalB = b.baseValue + b.occupationPoints + b.personalPoints;
-                                        return totalB - totalA;
+                                        if (personalSkillSort === 'name') {
+                                            return a.name.localeCompare(b.name, 'pt-BR');
+                                        }
+                                        const totalA = a.baseValue + a.occupationPoints + a.personalPoints + (a.archetypePoints || 0);
+                                        const totalB = b.baseValue + b.occupationPoints + b.personalPoints + (b.archetypePoints || 0);
+                                        if (totalB !== totalA) return totalB - totalA;
+                                        return a.name.localeCompare(b.name, 'pt-BR');
                                     })
                                     .map(skill => {
 
                                         const totalValue = getSkillTotalValue(skill.name);
                                         const needsSpec = isSpecializationSkill(skill.name);
 
+                                        const isArch = isArchetypeSkill(skill.name) || ((skill.archetypePoints || 0) > 0);
+
                                         return (
                                             <div key={skill.name} className={styles.skillRow}>
                                                 <div className={styles.skillInfo}>
-                                                    <div className="flex flex-col">
-                                                        <span className={styles.skillName}>{skill.name}</span>
+                                                    <div style={{ minWidth: 0, overflow: 'hidden', flex: '1 1 auto' }}>
+                                                        <span 
+                                                            className={styles.skillName} 
+                                                            title={`Clique para ler detalhes de ${skill.name}`}
+                                                            onClick={() => setSelectedSkillForDetail(skill.name)}
+                                                            style={{
+                                                                cursor: 'pointer',
+                                                                color: isArch ? '#a11d20' : undefined,
+                                                                textDecoration: 'underline dotted',
+                                                                textUnderlineOffset: '2px'
+                                                            }}
+                                                        >
+                                                            {skill.name}
+                                                        </span>
                                                         {needsSpec && (
                                                             <input
                                                                 type="text"
@@ -1197,11 +1567,50 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                             />
                                                         )}
                                                     </div>
-                                                    <span className={styles.skillBadge} style={{ background: '#457b9d' }}>Pessoal</span>
                                                 </div>
                                                 <div className={styles.skillValues}>
-                                                    <div className={styles.skillInput}>
-                                                        <label>Pontos:</label>
+                                                    <div className={styles.skillInputGroup}>
+                                                        {character.gameMode === 'pulp' && (
+                                                            <div className={styles.skillInput}>
+                                                                <label 
+                                                                    onClick={() => setPointExplanation('archetype')}
+                                                                    style={{ 
+                                                                        color: '#c4302b', 
+                                                                        fontWeight: 700, 
+                                                                        cursor: 'pointer',
+                                                                        textDecoration: 'underline dotted',
+                                                                        textUnderlineOffset: '2px'
+                                                                    }} 
+                                                                    title="Clique para entender o Bônus de Arquétipo (+100 pts)"
+                                                                >
+                                                                    Arq:
+                                                                </label>
+                                                                <input
+                                                                    type="number"
+                                                                    min="0"
+                                                                    max={100}
+                                                                    value={skill.archetypePoints || 0}
+                                                                    onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'archetype')}
+                                                                    style={{ 
+                                                                        borderColor: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
+                                                                        color: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
+                                                                        fontWeight: (skill.archetypePoints || 0) > 0 ? 700 : undefined
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        <div className={styles.skillInput}>
+                                                            <label
+                                                                onClick={() => setPointExplanation('personal')}
+                                                                style={{ 
+                                                                    cursor: 'pointer', 
+                                                                    textDecoration: 'underline dotted', 
+                                                                    textUnderlineOffset: '2px' 
+                                                                }}
+                                                                title="Clique para entender os Pontos de Interesse Pessoal"
+                                                            >
+                                                                Pess:
+                                                            </label>
                                                             <input
                                                                 type="number"
                                                                 min="0"
@@ -1210,9 +1619,9 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                 onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'personal')}
                                                                 disabled={skill.name === 'Nível de Crédito'}
                                                             />
+                                                        </div>
                                                     </div>
                                                     <div className={styles.skillTotal}>
-                                                        <span className={styles.totalLabel}>Total:</span>
                                                         <span className={styles.totalValue}>{totalValue}%</span>
                                                         <span className={styles.derivedValues}>
                                                             ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
@@ -1227,7 +1636,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     </div>
                 )}
 
-                {(viewMode === 'dossier' || activeTab === 'combat') && (
+                {activeTab === 'combat' && (
                     <div className="fade-in">
                         <section className="card">
                             <h2>Suas Armas</h2>
@@ -1314,7 +1723,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     </div>
                 )}
 
-                {(viewMode === 'dossier' || activeTab === 'backstory') && (
+                {activeTab === 'backstory' && (
                     <div className="fade-in">
                         <section className="card">
                             <h2>História do Personagem</h2>
@@ -1362,6 +1771,22 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         onChange={(e) => updateBackstory('traits', e.target.value)}
                                     />
                                 </div>
+                                <div>
+                                    <label>Equipamento</label>
+                                    <textarea
+                                        value={character.backstory.equipment || ''}
+                                        onChange={(e) => updateBackstory('equipment', e.target.value)}
+                                        placeholder="Itens, trajes, documentos, dinheiro..."
+                                    />
+                                </div>
+                                <div>
+                                    <label>História / Background (Texto para o PDF)</label>
+                                    <textarea
+                                        value={character.backstory.narrative || ''}
+                                        onChange={(e) => updateBackstory('narrative', e.target.value)}
+                                        placeholder="Parágrafos narrando a trajetória do investigador..."
+                                    />
+                                </div>
                                 {/* Ferimentos & Fobias moved to Status section */}
                             </div>
                         </section>
@@ -1371,7 +1796,21 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
             <div className={styles.actions}>
                 <button onClick={handleSave} className={styles.saveButton} disabled={isSaving}>
-                    {isSaving ? '⏳ Salvando...' : '💾 Salvar Personagem'}
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <Save size={16} />
+                        {isSaving ? 'Salvando...' : 'Salvar Personagem'}
+                    </span>
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setShowBookSheetModal(true)}
+                    className={styles.saveButton}
+                    style={{ background: 'var(--ink)', color: 'var(--paper)' }}
+                >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <BookOpen size={16} />
+                        Ver / Baixar PDF (Estilo Livro)
+                    </span>
                 </button>
             </div>
 
@@ -1429,8 +1868,9 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                             <button
                                 className={styles.modalClose}
                                 onClick={() => setShowOccupationModal(false)}
+                                aria-label="Fechar"
                             >
-                                ✕
+                                <X size={18} />
                             </button>
                         </div>
 
@@ -1439,7 +1879,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 type="text"
                                 value={occupationSearch}
                                 onChange={(e) => setOccupationSearch(e.target.value)}
-                                placeholder="🔍 Buscar ocupação..."
+                                placeholder="Buscar ocupação..."
                                 autoFocus
                             />
                         </div>
@@ -1523,7 +1963,39 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 onSelect={handleSelectWeapon}
             />
 
+            <BookSheetModal
+                isOpen={showBookSheetModal}
+                onClose={() => setShowBookSheetModal(false)}
+                character={character}
+            />
 
+            <ArchetypeSelectorModal
+                isOpen={showArchetypeModal}
+                onClose={() => setShowArchetypeModal(false)}
+                onSelect={handleSelectArchetype}
+                currentArchetypeId={archetypes.find(a => a.name === character.archetype)?.id}
+            />
+
+            <PulpTalentsModal
+                isOpen={showPulpTalentsModal}
+                onClose={() => setShowPulpTalentsModal(false)}
+                selectedTalents={character.pulpTalents || []}
+                onSave={handleSaveTalents}
+                maxSelections={2}
+            />
+
+            <SkillDetailModal
+                isOpen={!!selectedSkillForDetail}
+                onClose={() => setSelectedSkillForDetail(null)}
+                skillName={selectedSkillForDetail}
+                totalValue={selectedSkillForDetail ? getSkillTotalValue(selectedSkillForDetail) : undefined}
+                isArchetypeSkill={selectedSkillForDetail ? isArchetypeSkill(selectedSkillForDetail) : false}
+            />
+
+            <PointExplanationModal
+                type={pointExplanation}
+                onClose={() => setPointExplanation(null)}
+            />
         </div>
     );
 }

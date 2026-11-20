@@ -19,6 +19,7 @@ export interface DerivedStats {
   SAN: number; // Sanidade MÁXIMA
   currentSAN: number; // Sanidade ATUAL
   LUCK: number; // Valor de Sorte original (atributo), mantido para referência
+  currentLUCK?: number; // Sorte atual para gasto ponto a ponto (Pulp Cthulhu)
   luckTokens: number; // Moedas da Sorte ATUAIS
   maxLuckTokens: number; // Moedas da Sorte MÁXIMAS (padrão: 5)
   movementRate: number; // Taxa de Movimento
@@ -31,6 +32,7 @@ export interface Skill {
   baseValue: number;
   occupationPoints: number;
   personalPoints: number;
+  archetypePoints?: number; // Pontos do Arquétipo no Pulp Cthulhu (+100 pts)
   specialization?: string; // Para perícias que precisam de especialização
   minOccupationPoints?: number; // mínimo obrigatório de pontos ocupacionais (ex: Nível de Crédito)
 }
@@ -65,6 +67,8 @@ export interface Backstory {
   traits: string;
   injuriesScars: string;
   phobiasManias: string;
+  equipment?: string;
+  narrative?: string;
 }
 
 export interface CharacterStatus {
@@ -75,6 +79,25 @@ export interface CharacterStatus {
   woundsAndScars: string; // Ferimentos & Cicatrizes
   maniasAndPhobias: string; // Mania & Fobia
   strangeEncounters: string; // Encontro com Entidades Estranhas
+}
+
+export type GameMode = 'classic' | 'pulp';
+
+export interface Archetype {
+  id: string;
+  name: string;
+  description: string;
+  coreCharacteristic: string[]; // e.g. ['DES', 'FOR']
+  suggestedOccupations: string[];
+  suggestedTalents: string[];
+  skills: string[]; // Perícias do Arquétipo (+100 pontos para gastar)
+}
+
+export interface PulpTalent {
+  id: string;
+  name: string;
+  category: 'Físico' | 'Mental' | 'Combate' | 'Diversos';
+  description: string;
 }
 
 export interface Character {
@@ -89,4 +112,11 @@ export interface Character {
   personalInterestPoints: number;
   selectedOccupationSkills: string[]; // Nomes das perícias ocupacionais selecionadas
   occupationPointsChoice?: string | null; // e.g. 'DES' or 'FOR' when occupation formula has alternatives
+  
+  // Pulp Cthulhu expansions
+  gameMode?: GameMode;
+  archetype?: string;
+  pulpTalents?: string[];
+  archetypeSkillPoints?: number;
+  selectedArchetypeSkills?: string[];
 }

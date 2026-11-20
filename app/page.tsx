@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FileText, Zap } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import CharacterGallery from "@/components/CharacterGallery";
 import styles from "./page.module.css";
@@ -43,8 +44,13 @@ export default async function Home() {
             </header>
 
             <div className={styles.tools}>
-                <Link href="/character/new" className={styles.createButton}>
-                    + Criar Nova Ficha
+                <Link href="/character/new?mode=classic" className={styles.createButtonClassic}>
+                    <FileText size={16} />
+                    <span>+ Nova Ficha Clássica</span>
+                </Link>
+                <Link href="/character/new?mode=pulp" className={styles.createButtonPulp}>
+                    <Zap size={16} />
+                    <span>+ Nova Ficha Pulp</span>
                 </Link>
             </div>
 

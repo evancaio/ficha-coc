@@ -7,6 +7,7 @@ export interface SkillDefinition {
     requiresSpecialization?: boolean;
     uncommon?: boolean;
     modern?: boolean;
+    isPulp?: boolean;
 }
 
 export const skillCategories = [
@@ -65,6 +66,7 @@ export const skills: SkillDefinition[] = [
     { name: "Fotografia", baseValue: 5, category: "Manipulação" },
     { name: "Operar Maquinário Pesado", baseValue: 1, category: "Manipulação" },
     { name: "Prestidigitação", baseValue: 10, category: "Manipulação" },
+    { name: "Ciência Estranha", baseValue: 1, category: "Manipulação", isPulp: true, requiresSpecialization: true },
     { name: "Usar Computadores", baseValue: 5, category: "Manipulação", modern: true },
 
     // Conhecimento
@@ -113,6 +115,10 @@ export const skills: SkillDefinition[] = [
     // Especiais
     { name: "Nível de Crédito", baseValue: 0, category: "Especiais" },
     { name: "Mythos de Cthulhu", baseValue: 0, category: "Mythos" },
+    { name: "Clarividência", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
+    { name: "Psicometria", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
+    { name: "Telecinese", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
+    { name: "Telepatia", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
 ];
 
 // Função auxiliar para obter o valor base de uma perícia

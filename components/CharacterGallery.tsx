@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Zap } from 'lucide-react';
 import { getAllCharacters, deleteCharacter } from '@/utils/storage';
 import styles from '@/app/page.module.css';
 
@@ -9,6 +10,8 @@ interface GalleryItem {
     id: string;
     updatedAt: string;
     data: {
+        gameMode?: 'classic' | 'pulp';
+        archetype?: string;
         basicInfo?: {
             name?: string;
             occupation?: string;
@@ -83,9 +86,16 @@ export default function CharacterGallery({ serverCharacters }: { serverCharacter
                         <div className={styles.card}>
                             <div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'stretch', gap: '6px', marginBottom: '12px' }}>
-                                    <h3 className={styles.cardName} style={{ flex: 1, marginBottom: 0 }}>
-                                        {data.basicInfo?.name || 'Sem Nome'}
-                                    </h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: 1 }}>
+                                        <h3 className={styles.cardName} style={{ marginBottom: 0 }}>
+                                            {data.basicInfo?.name || 'Sem Nome'}
+                                        </h3>
+                                        {data.gameMode === 'pulp' && (
+                                            <span style={{ fontSize: '10px', background: '#b91c1c', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                                <Zap size={10} /> PULP
+                                            </span>
+                                        )}
+                                    </div>
                                     {isLocal && (
                                         <button
                                             type="button"
@@ -114,6 +124,11 @@ export default function CharacterGallery({ serverCharacters }: { serverCharacter
                                         />
                                     )}
                                     <div className={styles.cardDetails} style={{ flex: 1 }}>
+                                        {data.gameMode === 'pulp' && data.archetype && (
+                                            <p className={styles.cardRow}>
+                                                <span style={{ color: '#b91c1c' }}><strong>Arq.:</strong> {data.archetype}</span>
+                                            </p>
+                                        )}
                                         <p className={styles.cardRow}>
                                             <span><strong>Ocup.:</strong> {data.basicInfo?.occupation || 'Desconhecido'}</span>
                                         </p>

@@ -4,11 +4,19 @@ import CharacterSheet from "@/components/CharacterSheet";
 
 export const dynamic = 'force-dynamic';
 
-export default async function CharacterPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function CharacterPage({
+    params,
+    searchParams
+}: {
+    params: Promise<{ id: string }>;
+    searchParams?: Promise<{ mode?: string }>;
+}) {
     const { id } = await params;
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+    const mode = resolvedSearchParams?.mode === 'pulp' ? 'pulp' : 'classic';
 
     if (id === "new") {
-        return <CharacterSheet isNew />;
+        return <CharacterSheet isNew initialMode={mode} />;
     }
 
     // Se for ID salvo no localStorage ou se o Supabase não estiver configurado, carrega no cliente

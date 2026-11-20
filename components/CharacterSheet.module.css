@@ -351,19 +351,22 @@
 .skillsList,
 .personalSkillsGrid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2px 24px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 20px;
+    width: 100%;
 }
 
 .skillRow {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    padding: 4px 0;
+    gap: 6px;
+    padding: 3px 2px;
     border-bottom: 1px dotted var(--mute);
     background: transparent;
-    font-size: 14px;
+    font-size: 13px;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .skillRow:hover {
@@ -373,17 +376,19 @@
 .skillInfo {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     min-width: 0;
-    flex: 1;
+    flex: 1 1 0;
+    overflow: hidden;
 }
 
 .skillName {
-    font: 700 14px/1.2 "PT Serif", serif;
+    font: 700 13px/1.2 "PT Serif", serif;
     color: var(--ink);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
 }
 
 .skillBadge {
@@ -393,40 +398,42 @@
 .skillValues {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     flex-shrink: 0;
 }
 
 .skillInputGroup {
     display: flex;
-    gap: 6px;
+    gap: 4px;
     align-items: center;
 }
 
 .skillInput {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
 }
 
 .skillInput label {
-    font: 700 10px/1 "PT Serif", serif;
+    font: 700 9px/1 "PT Serif", serif;
     color: var(--mute);
     margin: 0;
+    white-space: nowrap;
 }
 
 .skillInput input {
-    width: 48px !important;
-    padding: 2px 3px !important;
+    width: 36px !important;
+    padding: 2px 2px !important;
     text-align: center;
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 700;
 }
 
 .skillTotal {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
+    flex-shrink: 0;
 }
 
 .totalLabel {
@@ -434,12 +441,19 @@
 }
 
 .totalValue {
-    font: 700 15px/1 "PT Serif", serif;
+    font: 700 13px/1 "PT Serif", serif;
     background: var(--ink);
     color: var(--paper);
-    padding: 3px 6px;
-    min-width: 38px;
+    padding: 2px 5px;
+    min-width: 32px;
     text-align: center;
+    line-height: 1.1;
+}
+
+.derivedValues {
+    font: 400 11px/1 "PT Serif", serif;
+    color: var(--mute);
+    white-space: nowrap;
 }
 
 .emptyState {
