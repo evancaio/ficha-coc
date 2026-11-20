@@ -17,7 +17,7 @@ import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
 import PointExplanationModal, { ExplanationType } from './PointExplanationModal';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
-import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
+import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle, HelpCircle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
@@ -955,7 +955,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     title="Clique para entender o que são as Características e como rolar seus testes"
                                 >
                                     <span>Características</span>
-                                    <span className={styles.headerHelpBadge}>?</span>
+                                    <HelpCircle size={16} className={styles.helpIcon} />
                                 </h2>
                                 <button
                                     type="button"
@@ -1083,7 +1083,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender as regras de Sanidade"
                                     >
                                         Sanidade (SAN)
-                                        <span className={styles.statHelpBadge}>?</span>
+                                        <HelpCircle size={13} className={styles.statHelpIcon} />
                                     </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
@@ -1124,7 +1124,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender as regras de Sorte"
                                     >
                                         Moedas da Sorte
-                                        <span className={styles.statHelpBadge}>?</span>
+                                        <HelpCircle size={13} className={styles.statHelpIcon} />
                                     </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
@@ -1300,7 +1300,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('occupation')}
                                     title="Clique para entender os Pontos Ocupacionais e regras de rolagem"
                                 >
-                                    <span className={styles.cardHelpBadge} title="Clique para ajuda">?</span>
+                                    <HelpCircle size={15} className={styles.cardHelpIcon} />
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos Ocupacionais</h3>
                                     </div>
@@ -1330,7 +1330,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         style={{ borderLeft: '4px solid #b91c1c' }}
                                         title="Clique para entender o Bônus de Arquétipo (+100 pontos)"
                                     >
-                                        <span className={styles.cardHelpBadge} style={{ color: '#b91c1c' }} title="Clique para ajuda">?</span>
+                                        <HelpCircle size={15} className={styles.cardHelpIcon} style={{ color: '#b91c1c' }} />
                                         <div className={styles.cardHeaderArea}>
                                             <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
                                         </div>
@@ -1358,7 +1358,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('personal')}
                                     title="Clique para entender os Pontos de Interesse Pessoal"
                                 >
-                                    <span className={styles.cardHelpBadge} title="Clique para ajuda">?</span>
+                                    <HelpCircle size={15} className={styles.cardHelpIcon} />
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos de Interesse Pessoal</h3>
                                     </div>
@@ -1421,7 +1421,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender o que são Perícias Ocupacionais e como funcionam as rolagens"
                                     >
                                         <span>Perícias Ocupacionais</span>
-                                        <span className={styles.headerHelpBadge}>?</span>
+                                        <HelpCircle size={16} className={styles.helpIcon} />
                                     </span>
                                     {character.basicInfo.occupation && (
                                         <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
@@ -1613,7 +1613,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender o que são Perícias de Interesse Pessoal e como funcionam as rolagens"
                                     >
                                         <span>Perícias de Interesse Pessoal</span>
-                                        <span className={styles.headerHelpBadge}>?</span>
+                                        <HelpCircle size={16} className={styles.helpIcon} />
                                     </span>
                                 </h2>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1801,7 +1801,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     title="Clique para entender como funcionam o combate, iniciativa, esquiva e revide"
                                 >
                                     <span>Suas Armas & Combate</span>
-                                    <span className={styles.headerHelpBadge}>?</span>
+                                    <HelpCircle size={16} className={styles.helpIcon} />
                                 </h2>
                                 <button
                                     type="button"
