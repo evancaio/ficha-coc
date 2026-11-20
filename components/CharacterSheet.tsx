@@ -604,24 +604,6 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         });
     };
 
-    const handleToggleGameMode = () => {
-        const nextMode: GameMode = character.gameMode === 'pulp' ? 'classic' : 'pulp';
-        const newDerived = calculateDerivedStats(character.characteristics, nextMode);
-        setCharacter(prev => ({
-            ...prev,
-            gameMode: nextMode,
-            derivedStats: {
-                ...prev.derivedStats,
-                HP: newDerived.HP,
-                currentHP: nextMode === 'pulp'
-                    ? Math.max(prev.derivedStats.currentHP, newDerived.HP)
-                    : Math.min(prev.derivedStats.currentHP, newDerived.HP),
-                currentLUCK: prev.derivedStats.currentLUCK ?? 50
-            },
-            archetypeSkillPoints: nextMode === 'pulp' ? 100 : 0
-        }));
-    };
-
     const handleSelectArchetype = (arch: Archetype) => {
         setCharacter(prev => ({
             ...prev,
@@ -704,31 +686,6 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">
                     ← Galeria
                 </Link>
-                <button
-                    type="button"
-                    onClick={() => {
-                        const nextMode = character.gameMode === 'pulp' ? 'classic' : 'pulp';
-                        setCharacter(prev => ({
-                            ...prev,
-                            gameMode: nextMode,
-                            archetypeSkillPoints: nextMode === 'pulp' ? (prev.archetypeSkillPoints || 100) : 0,
-                            derivedStats: calculateDerivedStats(prev.characteristics, nextMode)
-                        }));
-                    }}
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: character.gameMode === 'pulp' ? '#991b1b' : 'var(--field)',
-                        color: character.gameMode === 'pulp' ? '#ffffff' : 'var(--ink)',
-                        borderColor: character.gameMode === 'pulp' ? '#7f1d1d' : 'var(--ink)',
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                    }}
-                    title="Alternar entre Chamado de Cthulhu Clássico e Regras Pulp Cthulhu"
-                >
-                    <Zap size={14} /> Modo: {character.gameMode === 'pulp' ? 'Pulp Cthulhu' : 'Clássico'}
-                </button>
                 <button 
                     type="button" 
                     onClick={() => setShowBookSheetModal(true)}
