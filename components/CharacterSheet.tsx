@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { Character, Characteristics, BasicInfo, Backstory, DerivedStats, GameMode, Archetype } from '@/types/character';
@@ -1349,11 +1349,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('occupation')}
                                     title="Clique para entender os Pontos Ocupacionais e regras de rolagem"
                                 >
+                                    <span className={styles.cardHelpBadge} title="Clique para ajuda">
+                                        <HelpCircle size={13} />
+                                    </span>
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos Ocupacionais</h3>
-                                        <span className={styles.cardHelpBadge}>
-                                            <HelpCircle size={13} />
-                                        </span>
                                     </div>
                                     <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
                                     <small>
@@ -1381,11 +1381,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         style={{ borderLeft: '4px solid #b91c1c' }}
                                         title="Clique para entender o Bônus de Arquétipo (+100 pontos)"
                                     >
+                                        <span className={styles.cardHelpBadge} style={{ borderColor: '#b91c1c' }} title="Clique para ajuda">
+                                            <HelpCircle size={13} style={{ color: '#b91c1c' }} />
+                                        </span>
                                         <div className={styles.cardHeaderArea}>
                                             <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
-                                            <span className={styles.cardHelpBadge} style={{ borderColor: '#b91c1c' }}>
-                                                <HelpCircle size={13} style={{ color: '#b91c1c' }} />
-                                            </span>
                                         </div>
                                         <div className={styles.pointsValue} style={{ color: '#b91c1c' }}>100</div>
                                         <small>{character.archetype ? `Arquétipo: ${character.archetype}` : 'Bônus Pulp (+100)'}</small>
@@ -1411,11 +1411,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('personal')}
                                     title="Clique para entender os Pontos de Interesse Pessoal"
                                 >
+                                    <span className={styles.cardHelpBadge} title="Clique para ajuda">
+                                        <HelpCircle size={13} />
+                                    </span>
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos de Interesse Pessoal</h3>
-                                        <span className={styles.cardHelpBadge}>
-                                            <HelpCircle size={13} />
-                                        </span>
                                     </div>
                                     <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
                                     <small>INT × 2</small>

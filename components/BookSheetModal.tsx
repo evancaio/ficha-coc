@@ -101,9 +101,44 @@ export default function BookSheetModal({ isOpen, onClose, character }: BookSheet
                     {title}
                 </h1>
 
-                {/* Bloco de Conteúdo */}
-                <div className={styles.contentWrapper}>
-                    {/* Retrato */}
+                {/* Bloco Superior (Atributos + Combate na esquerda, Retrato na direita) */}
+                <div className={styles.topSection}>
+                    <div className={styles.statsAndCombatColumn}>
+                        {/* Atributos (2 linhas x 5 colunas) */}
+                        <div className={styles.characteristicsBlock}>
+                            <div className={styles.characteristicsGrid}>
+                                <span className={styles.characteristicItem}>FOR {c.STR}</span>
+                                <span className={styles.characteristicItem}>CON {c.CON}</span>
+                                <span className={styles.characteristicItem}>TAM {c.SIZ}</span>
+                                <span className={styles.characteristicItem}>DES {c.DEX}</span>
+                                <span className={styles.characteristicItem}>INT {c.INT}</span>
+                                <span className={styles.characteristicItem}>APA {c.APP}</span>
+                                <span className={styles.characteristicItem}>POD {c.POW}</span>
+                                <span className={styles.characteristicItem}>EDU {c.EDU}</span>
+                                <span className={styles.characteristicItem}>SAN {d.SAN}</span>
+                                <span className={styles.characteristicItem}>PVs {d.HP}</span>
+                            </div>
+                            <div className={styles.derivedStatsRow}>
+                                <span>DX: {d.damageBonus}</span>
+                                <span>Corpo: {d.build}</span>
+                                <span>Movimento: {d.movementRate}</span>
+                                <span>Sorte: {luck}</span>
+                                <span>Pontos de Magia: {d.MP}</span>
+                            </div>
+                        </div>
+
+                        {/* Combate e Armas */}
+                        <div className={styles.combatBlock}>
+                            {combatLines.map((line, i) => (
+                                <div key={i} className={styles.combatLine}>
+                                    <span className={styles.combatSkillName}>{line.name}</span>{' '}
+                                    <span>{line.detail}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Retrato à direita */}
                     <div className={styles.portraitWrapper}>
                         <div className={styles.portraitOuterBox}>
                             <div className={styles.portraitInnerBox}>
@@ -122,40 +157,10 @@ export default function BookSheetModal({ isOpen, onClose, character }: BookSheet
                             {portraitCaption}
                         </div>
                     </div>
+                </div>
 
-                    {/* Atributos (3 linhas) */}
-                    <div className={styles.characteristicsBlock}>
-                        <div className={styles.characteristicsGrid}>
-                            <span className={styles.characteristicItem}>FOR {c.STR}</span>
-                            <span className={styles.characteristicItem}>CON {c.CON}</span>
-                            <span className={styles.characteristicItem}>TAM {c.SIZ}</span>
-                            <span className={styles.characteristicItem}>DES {c.DEX}</span>
-                            <span className={styles.characteristicItem}>INT {c.INT}</span>
-                            <span className={styles.characteristicItem}>APA {c.APP}</span>
-                            <span className={styles.characteristicItem}>POD {c.POW}</span>
-                            <span className={styles.characteristicItem}>EDU {c.EDU}</span>
-                            <span className={styles.characteristicItem}>SAN {d.SAN}</span>
-                            <span className={styles.characteristicItem}>PVs {d.HP}</span>
-                        </div>
-                        <div className={styles.derivedStatsRow}>
-                            <span>DX: {d.damageBonus}</span>
-                            <span>Corpo: {d.build}</span>
-                            <span>Movimento: {d.movementRate}</span>
-                            <span>Sorte: {luck}</span>
-                            <span>Pontos de Magia: {d.MP}</span>
-                        </div>
-                    </div>
-
-                    {/* Combate e Armas */}
-                    <div className={styles.combatBlock}>
-                        {combatLines.map((line, i) => (
-                            <div key={i} className={styles.combatLine}>
-                                <span className={styles.combatSkillName}>{line.name}</span>{' '}
-                                <span>{line.detail}</span>
-                            </div>
-                        ))}
-                    </div>
-
+                {/* Perícias e restante do conteúdo em largura total */}
+                <div className={styles.lowerSection}>
                     {/* Perícias (> 20%) */}
                     <p className={styles.skillsParagraph}>
                         <span className={styles.skillsLabel}>Perícias: </span>

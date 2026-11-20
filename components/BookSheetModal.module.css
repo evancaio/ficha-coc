@@ -107,16 +107,22 @@
     line-height: 1.25;
 }
 
-/* Estrutura de Retrato e Texto */
-.contentWrapper {
-    position: relative;
+/* Estrutura de Retrato e Texto em Duas Colunas Imunes a Colisão */
+.topSection {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.statsAndCombatColumn {
+    flex: 1 1 0;
+    min-width: 0;
 }
 
 .portraitWrapper {
-    float: right;
-    width: 215px;
-    margin-left: 22px;
-    margin-bottom: 12px;
+    flex: 0 0 205px;
+    width: 205px;
     text-align: center;
 }
 
@@ -159,31 +165,32 @@
 
 /* Atributos e Estatísticas */
 .characteristicsBlock {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .characteristicsGrid {
     display: grid;
-    grid-template-columns: repeat(5, minmax(68px, 95px));
-    gap: 3px 8px;
-    margin-bottom: 4px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px 6px;
+    margin-bottom: 6px;
 }
 
 .characteristicItem {
     font-weight: 500;
     white-space: nowrap;
+    font-size: 14px;
 }
 
 .derivedStatsRow {
     display: flex;
     flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 4px;
-    font-size: 14px;
+    gap: 6px 12px;
+    margin-top: 6px;
+    font-size: 13.5px;
 }
 
 .combatBlock {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 
 .combatLine {
@@ -194,6 +201,10 @@
     display: inline-block;
     min-width: 82px;
     font-weight: 600;
+}
+
+.lowerSection {
+    width: 100%;
 }
 
 .skillsParagraph {
@@ -229,7 +240,6 @@
 
 .narrativeBlock {
     margin-bottom: 16px;
-    clear: both;
 }
 
 .narrativeParagraph {
@@ -238,13 +248,12 @@
 }
 
 .playerNotes {
-    clear: both;
     padding-top: 8px;
     font-weight: 600;
 }
 
 /* =========================================================
-   ADAPTAÇÃO RESPONSIVA PARA MOBILE (Telhas < 680px)
+   ADAPTAÇÃO RESPONSIVA PARA MOBILE (Telas < 680px)
    ========================================================= */
 @media (max-width: 680px) {
     .modalOverlay {
@@ -296,12 +305,17 @@
         padding: 0 4px;
     }
 
-    /* No mobile, o retrato não flutua: ele fica centralizado e elegante */
+    .topSection {
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
     .portraitWrapper {
-        float: none;
-        width: 160px;
-        margin: 0 auto 16px auto;
-        text-align: center;
+        flex: 0 0 auto;
+        width: 150px;
+        margin: 0 auto;
     }
 
     .portraitCaption {
@@ -309,12 +323,15 @@
         margin-top: 4px;
     }
 
-    /* Grid de atributos responsivo e sem colisão */
+    .statsAndCombatColumn {
+        width: 100%;
+    }
+
     .characteristicsGrid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 4px 4px;
+        gap: 4px 3px;
         text-align: center;
-        font-size: 12.5px;
+        font-size: 12px;
         background: #f9f8f4;
         padding: 8px 4px;
         border: 1px dashed #cccccc;
@@ -326,15 +343,15 @@
     }
 
     .derivedStatsRow {
-        gap: 6px 10px;
-        font-size: 12.5px;
+        gap: 4px 8px;
+        font-size: 12px;
         justify-content: center;
         text-align: center;
-        padding: 4px;
+        padding: 2px;
     }
 
     .combatBlock {
-        margin-top: 10px;
+        margin-top: 8px;
         font-size: 13px;
     }
 
