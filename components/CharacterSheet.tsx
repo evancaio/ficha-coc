@@ -32,7 +32,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     const [characterId, setCharacterId] = useState<string | undefined>(initialCharacterId);
     const [isSaving, setIsSaving] = useState(false);
 
-    const defaultMode: GameMode = initialData?.gameMode || initialMode || 'classic';
+    const defaultMode: GameMode = initialData?.gameMode || (initialData?.archetype ? 'pulp' : initialMode) || 'classic';
 
     const [character, setCharacter] = useState<Character>(initialData || {
         basicInfo: {
@@ -192,7 +192,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
     useEffect(() => {
         if (initialData) {
-            setCharacter(initialData);
+            setCharacter({
+                ...initialData,
+                gameMode: initialData.gameMode || (initialData.archetype ? 'pulp' : defaultMode)
+            });
             setHasLoadedInitial(true);
             return;
         }
@@ -203,17 +206,23 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         if (initialCharacterId) {
             const loaded = loadCharacter(initialCharacterId);
             if (loaded) {
-                setCharacter(loaded);
+                setCharacter({
+                    ...loaded,
+                    gameMode: loaded.gameMode || (loaded.archetype ? 'pulp' : 'classic')
+                });
                 setHasLoadedInitial(true);
                 return;
             }
         }
         const saved = getCurrentCharacter();
         if (saved) {
-            setCharacter(saved);
+            setCharacter({
+                ...saved,
+                gameMode: saved.gameMode || (saved.archetype ? 'pulp' : 'classic')
+            });
         }
         setHasLoadedInitial(true);
-    }, [initialData, initialCharacterId, isNew]);
+    }, [initialData, initialCharacterId, isNew, defaultMode]);
 
     // Auto-save automático no cache do navegador (localStorage)
     useEffect(() => {
@@ -635,6 +644,31 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 <Link href="/" className={styles.backButton} aria-label="Voltar para seleção">
                     ← Galeria
                 </Link>
+                <button
+                    type="button"
+                    onClick={() => {
+                        const nextMode = character.gameMode === 'pulp' ? 'classic' : 'pulp';
+                        setCharacter(prev => ({
+                            ...prev,
+                            gameMode: nextMode,
+                            archetypeSkillPoints: nextMode === 'pulp' ? (prev.archetypeSkillPoints || 100) : 0,
+                            derivedStats: calculateDerivedStats(prev.characteristics, nextMode)
+                        }));
+                    }}
+                    style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: character.gameMode === 'pulp' ? '#991b1b' : 'var(--field)',
+                        color: character.gameMode === 'pulp' ? '#ffffff' : 'var(--ink)',
+                        borderColor: character.gameMode === 'pulp' ? '#7f1d1d' : 'var(--ink)',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                    }}
+                    title="Alternar entre Chamado de Cthulhu Clássico e Regras Pulp Cthulhu"
+                >
+                    <Zap size={14} /> Modo: {character.gameMode === 'pulp' ? 'Pulp Cthulhu' : 'Clássico'}
+                </button>
                 <button 
                     type="button" 
                     onClick={() => setShowBookSheetModal(true)}
@@ -771,7 +805,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     {character.gameMode === 'pulp' && (
                                         <>
                                             <div className={styles.occupationSelector}>
-                                                <label className="text-red-800 dark:text-red-400 font-bold flex items-center gap-1.5">
+                                                <label style={{ color: '#991b1b', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                     <Zap size={15} /> Arquétipo Pulp
                                                 </label>
                                                 <div className={styles.occupationDisplay}>
@@ -810,8 +844,8 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                             </div>
 
                                             <div className={styles.occupationSelector} style={{ gridColumn: '1 / -1' }}>
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <label className="text-red-800 dark:text-red-400 font-bold flex items-center gap-1.5">
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                                    <label style={{ color: '#991b1b', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
                                                         <Award size={15} /> Talentos Pulp ({character.pulpTalents?.length || 0}/2)
                                                     </label>
                                                     <button

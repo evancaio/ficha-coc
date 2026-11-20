@@ -6,6 +6,7 @@ export interface SkillDetail {
   examples?: string[];
   pushConsequence?: string;
   pulpNote?: string;
+  isPulp?: boolean;
 }
 
 export const skillDescriptions: Record<string, SkillDetail> = {
