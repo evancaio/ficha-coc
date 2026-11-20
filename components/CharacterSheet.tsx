@@ -17,7 +17,7 @@ import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
 import PointExplanationModal, { ExplanationType } from './PointExplanationModal';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
-import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
+import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle, HelpCircle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
@@ -992,14 +992,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                                 <h2 
-                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                     onClick={() => setPointExplanation('characteristics')}
                                     title="Clique para entender o que são as Características e como rolar seus testes"
                                 >
                                     Características
-                                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
-                                        (?) O que são
-                                    </span>
+                                    <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
                                 </h2>
                                 <button
                                     type="button"
@@ -1121,7 +1119,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     </div>
                                 </div>
                                 <div className={styles.statBox}>
-                                    <h3>Sanidade (SAN)</h3>
+                                    <h3 
+                                        onClick={() => setPointExplanation('sanity')} 
+                                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                                        title="Clique para entender as regras de Sanidade"
+                                    >
+                                        Sanidade (SAN) <HelpCircle size={13} style={{ color: 'var(--mute)' }} />
+                                    </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
                                             className="w-6 h-6 rounded bg-blue-900 text-white flex items-center justify-center hover:bg-blue-800"
@@ -1155,7 +1159,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     </div>
                                 </div>
                                 <div className={styles.statBox}>
-                                    <h3>Moedas da Sorte</h3>
+                                    <h3 
+                                        onClick={() => setPointExplanation('luck')} 
+                                        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                                        title="Clique para entender as regras de Sorte"
+                                    >
+                                        Moedas da Sorte <HelpCircle size={13} style={{ color: 'var(--mute)' }} />
+                                    </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
                                             className="w-6 h-6 rounded bg-yellow-700 text-white flex items-center justify-center hover:bg-yellow-600"
@@ -1333,7 +1343,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <h3>Pontos Ocupacionais</h3>
-                                        <span style={{ fontSize: '10px', color: 'var(--mute)', fontWeight: 700 }}>(?) Saiba mais</span>
+                                        <HelpCircle size={14} style={{ color: 'var(--mute)' }} />
                                     </div>
                                     <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
                                     <small>
@@ -1363,7 +1373,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     >
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
-                                            <span style={{ fontSize: '10px', color: '#b91c1c', fontWeight: 700 }}>(?) Saiba mais</span>
+                                            <HelpCircle size={14} style={{ color: '#b91c1c' }} />
                                         </div>
                                         <div className={styles.pointsValue} style={{ color: '#b91c1c' }}>100</div>
                                         <small>{character.archetype ? `Arquétipo: ${character.archetype}` : 'Bônus Pulp (+100)'}</small>
@@ -1392,7 +1402,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                         <h3>Pontos de Interesse Pessoal</h3>
-                                        <span style={{ fontSize: '10px', color: 'var(--mute)', fontWeight: 700 }}>(?) Saiba mais</span>
+                                        <HelpCircle size={14} style={{ color: 'var(--mute)' }} />
                                     </div>
                                     <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
                                     <small>INT × 2</small>
@@ -1449,13 +1459,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <h2>
                                     <span
                                         onClick={() => setPointExplanation('occupation')}
-                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                         title="Clique para entender o que são Perícias Ocupacionais e como funcionam as rolagens"
                                     >
                                         Perícias Ocupacionais
-                                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
-                                            (?) Como funciona
-                                        </span>
+                                        <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
                                     </span>
                                     {character.basicInfo.occupation && (
                                         <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
@@ -1643,13 +1651,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <h2>
                                     <span
                                         onClick={() => setPointExplanation('personal')}
-                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                         title="Clique para entender o que são Perícias de Interesse Pessoal e como funcionam as rolagens"
                                     >
                                         Perícias de Interesse Pessoal
-                                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
-                                            (?) O que é
-                                        </span>
+                                        <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
                                     </span>
                                 </h2>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1831,14 +1837,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                                 <h2 
-                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                     onClick={() => setPointExplanation('combat')}
                                     title="Clique para entender como funcionam o combate, iniciativa, esquiva e revide"
                                 >
                                     Suas Armas & Combate
-                                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
-                                        (?) Regras de Combate
-                                    </span>
+                                    <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
                                 </h2>
                                 <button
                                     type="button"
