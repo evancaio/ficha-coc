@@ -21,6 +21,44 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.titleGroup:hover .title {
+    color: var(--red);
+}
+
+.luckHelpBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: #ffffff;
+    color: var(--ink);
+    transition: all 0.18s ease;
+    margin-left: 6px;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.luckHelpBadge svg {
+    color: var(--ink) !important;
+    opacity: 0.85 !important;
+}
+
+.titleGroup:hover .luckHelpBadge {
+    background: #b91c1c;
+    border-color: #7f1d1d;
+    transform: scale(1.18);
+    box-shadow: 0 2px 6px rgba(185, 28, 28, 0.4);
+}
+
+.titleGroup:hover .luckHelpBadge svg {
+    color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 .title {

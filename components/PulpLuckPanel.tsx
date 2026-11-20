@@ -55,7 +55,9 @@ export default function PulpLuckPanel({
           >
             Mecânicas de Sorte Pulp
             {onExplainLuck && (
-              <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
+              <span className={styles.luckHelpBadge} title="Clique para ver explicação da Sorte Pulp">
+                <HelpCircle size={14} />
+              </span>
             )}
           </h3>
         </div>

@@ -251,20 +251,39 @@
     color: var(--red);
 }
 
-.cardHelpIcon {
+.cardHelpBadge {
     position: absolute;
     right: 0;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--mute);
-    opacity: 0.35;
-    transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink);
+    background: #ffffff;
+    color: var(--ink);
+    transition: all 0.18s ease;
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-.skillPoints:hover .cardHelpIcon {
-    opacity: 1;
-    color: var(--red);
-    transform: translateY(-50%) scale(1.2);
+.cardHelpBadge svg {
+    color: var(--ink) !important;
+    opacity: 0.85 !important;
+}
+
+.skillPoints:hover .cardHelpBadge {
+    background: #b91c1c;
+    border-color: #7f1d1d;
+    transform: translateY(-50%) scale(1.18);
+    box-shadow: 0 2px 6px rgba(185, 28, 28, 0.4);
+}
+
+.skillPoints:hover .cardHelpBadge svg {
+    color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 .interactiveTitle {
@@ -274,22 +293,77 @@
     gap: 8px;
     transition: color 0.15s ease;
     user-select: none;
+    color: var(--paper);
 }
 
 .interactiveTitle:hover {
-    color: var(--red);
+    color: #fca5a5;
 }
 
-.interactiveTitle svg {
-    color: var(--mute);
-    opacity: 0.35;
-    transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+.headerHelpBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--paper);
+    background: rgba(239, 226, 195, 0.2);
+    color: var(--paper);
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+    margin-left: 6px;
 }
 
-.interactiveTitle:hover svg {
-    color: var(--red);
-    opacity: 1;
-    transform: scale(1.2);
+.headerHelpBadge svg {
+    color: var(--paper) !important;
+    opacity: 0.95 !important;
+}
+
+.interactiveTitle:hover .headerHelpBadge {
+    background: #b91c1c;
+    border-color: #ef4444;
+    color: #ffffff;
+    transform: scale(1.18);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.7);
+}
+
+.interactiveTitle:hover .headerHelpBadge svg {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.statHelpBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.2px solid var(--ink);
+    background: #ffffff;
+    color: var(--ink);
+    transition: all 0.15s ease;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.statHelpBadge svg {
+    color: var(--ink) !important;
+    opacity: 0.8 !important;
+}
+
+.statBox:hover .statHelpBadge,
+h3:hover .statHelpBadge {
+    background: #b91c1c;
+    border-color: #7f1d1d;
+    transform: scale(1.15);
+}
+
+.statBox:hover .statHelpBadge svg,
+h3:hover .statHelpBadge svg {
+    color: #ffffff !important;
+    opacity: 1 !important;
 }
 
 .pointsValue {
