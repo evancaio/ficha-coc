@@ -10,13 +10,15 @@ interface PulpLuckPanelProps {
   maxLuck?: number;
   hasNineLivesTalent?: boolean;
   onUpdateLuck: (newLuck: number) => void;
+  onExplainLuck?: () => void;
 }
 
 export default function PulpLuckPanel({
   currentLuck,
   maxLuck = 99,
   hasNineLivesTalent = false,
-  onUpdateLuck
+  onUpdateLuck,
+  onExplainLuck
 }: PulpLuckPanelProps) {
   const [feedback, setFeedback] = useState<string | null>(null);
 
@@ -45,8 +47,18 @@ export default function PulpLuckPanel({
       <div className={styles.header}>
         <div className={styles.titleGroup}>
           <Clover size={20} color="var(--red)" />
-          <h3 className={styles.title}>
+          <h3 
+            className={styles.title} 
+            onClick={onExplainLuck} 
+            style={{ cursor: onExplainLuck ? 'pointer' : 'default' }}
+            title="Clique para entender as regras de Sorte Pulp"
+          >
             Mecânicas de Sorte Pulp
+            {onExplainLuck && (
+              <span style={{ fontSize: '10px', color: 'var(--mute)', fontWeight: 600, marginLeft: '6px' }}>
+                (?) Como funciona
+              </span>
+            )}
           </h3>
         </div>
         <div className={styles.luckBadge}>

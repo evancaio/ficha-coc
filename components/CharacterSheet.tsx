@@ -15,7 +15,7 @@ import ArchetypeSelectorModal from './ArchetypeSelectorModal';
 import PulpTalentsModal from './PulpTalentsModal';
 import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
-import PointExplanationModal from './PointExplanationModal';
+import PointExplanationModal, { ExplanationType } from './PointExplanationModal';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
 import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
@@ -123,7 +123,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     const [lastCachedAt, setLastCachedAt] = useState<string | null>(null);
     const [backupText, setBackupText] = useState('');
     const [selectedSkillForDetail, setSelectedSkillForDetail] = useState<string | null>(null);
-    const [pointExplanation, setPointExplanation] = useState<'archetype' | 'personal' | 'occupation' | null>(null);
+    const [pointExplanation, setPointExplanation] = useState<ExplanationType>(null);
     const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
     const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
     const [pointWarning, setPointWarning] = useState<{
@@ -991,7 +991,16 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         {/* Características */}
                         <section className="card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
-                                <h2 style={{ margin: 0 }}>Características</h2>
+                                <h2 
+                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    onClick={() => setPointExplanation('characteristics')}
+                                    title="Clique para entender o que são as Características e como rolar seus testes"
+                                >
+                                    Características
+                                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
+                                        (?) O que são
+                                    </span>
+                                </h2>
                                 <button
                                     type="button"
                                     className={styles.redButton}
@@ -1010,7 +1019,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     const displayLabel = (labelMap as any)[key] || key;
                                     return (
                                         <div key={key} className={styles.characteristic}>
-                                            <label>{displayLabel}</label>
+                                            <label 
+                                                onClick={() => setPointExplanation('characteristics')}
+                                                style={{ cursor: 'pointer', textDecoration: 'underline dotted', textUnderlineOffset: '2px' }}
+                                                title={`Clique para entender o atributo ${displayLabel}`}
+                                            >
+                                                {displayLabel}
+                                            </label>
                                             <input
                                                 type="number"
                                                 value={value}
@@ -1018,7 +1033,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                 min="0"
                                                 max="100"
                                             />
-                                            <div className={styles.derivedValues}>
+                                            <div 
+                                                className={styles.derivedValues}
+                                                onClick={() => setPointExplanation('rolls')}
+                                                style={{ cursor: 'pointer' }}
+                                                title="Clique para entender ½ (Metade) e ⅕ (Quinto)"
+                                            >
                                                 <span>½: {Math.floor(value / 2)}</span>
                                                 <span>⅕: {Math.floor(value / 5)}</span>
                                             </div>
@@ -1190,6 +1210,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 currentLuck={character.derivedStats.currentLUCK ?? character.derivedStats.LUCK ?? 50}
                                 hasNineLivesTalent={character.pulpTalents?.includes('vida-de-gato')}
                                 onUpdateLuck={(val) => updateDerivedStats('currentLUCK', val)}
+                                onExplainLuck={() => setPointExplanation('luck')}
                             />
                         )}
 
@@ -1291,10 +1312,29 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     <div className="fade-in">
                         {/* Pontos de Perícia */}
                         <section className="card">
-                            <h2>Pontos de Perícia</h2>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
+                                <h2 style={{ margin: 0 }}>Pontos de Perícia</h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setPointExplanation('rolls')}
+                                    className={styles.selectButton}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '11px', padding: '5px 12px' }}
+                                    title="Clique para entender como funcionam as rolagens no Chamado de Cthulhu (d100)"
+                                >
+                                    <Dices size={14} /> Como funcionam as Rolagens?
+                                </button>
+                            </div>
                             <div className={`grid ${character.gameMode === 'pulp' ? 'grid-3' : 'grid-2'}`}>
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos Ocupacionais</h3>
+                                <div 
+                                    className={styles.skillPoints}
+                                    onClick={() => setPointExplanation('occupation')}
+                                    style={{ cursor: 'pointer' }}
+                                    title="Clique para entender os Pontos Ocupacionais e regras de rolagem"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <h3>Pontos Ocupacionais</h3>
+                                        <span style={{ fontSize: '10px', color: 'var(--mute)', fontWeight: 700 }}>(?) Saiba mais</span>
+                                    </div>
                                     <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
                                     <small>
                                         {character.basicInfo.occupation && getOccupationByName(character.basicInfo.occupation)
@@ -1315,8 +1355,16 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 </div>
 
                                 {character.gameMode === 'pulp' && (
-                                    <div className={styles.skillPoints} style={{ borderLeft: '4px solid #b91c1c' }}>
-                                        <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
+                                    <div 
+                                        className={styles.skillPoints} 
+                                        onClick={() => setPointExplanation('archetype')}
+                                        style={{ borderLeft: '4px solid #b91c1c', cursor: 'pointer' }}
+                                        title="Clique para entender o Bônus de Arquétipo (+100 pontos)"
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
+                                            <span style={{ fontSize: '10px', color: '#b91c1c', fontWeight: 700 }}>(?) Saiba mais</span>
+                                        </div>
                                         <div className={styles.pointsValue} style={{ color: '#b91c1c' }}>100</div>
                                         <small>{character.archetype ? `Arquétipo: ${character.archetype}` : 'Bônus Pulp (+100)'}</small>
                                         <div className={styles.pointsProgress}>
@@ -1336,8 +1384,16 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     </div>
                                 )}
 
-                                <div className={styles.skillPoints}>
-                                    <h3>Pontos de Interesse Pessoal</h3>
+                                <div 
+                                    className={styles.skillPoints}
+                                    onClick={() => setPointExplanation('personal')}
+                                    style={{ cursor: 'pointer' }}
+                                    title="Clique para entender os Pontos de Interesse Pessoal"
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <h3>Pontos de Interesse Pessoal</h3>
+                                        <span style={{ fontSize: '10px', color: 'var(--mute)', fontWeight: 700 }}>(?) Saiba mais</span>
+                                    </div>
                                     <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
                                     <small>INT × 2</small>
                                     <div className={styles.pointsProgress}>
@@ -1391,7 +1447,16 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div className={styles.sectionHeader}>
                                 <h2>
-                                    Perícias Ocupacionais
+                                    <span
+                                        onClick={() => setPointExplanation('occupation')}
+                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                        title="Clique para entender o que são Perícias Ocupacionais e como funcionam as rolagens"
+                                    >
+                                        Perícias Ocupacionais
+                                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
+                                            (?) Como funciona
+                                        </span>
+                                    </span>
                                     {character.basicInfo.occupation && (
                                         <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
                                             — {character.basicInfo.occupation}
@@ -1553,7 +1618,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                             />
                                                         </div>
                                                     </div>
-                                                    <div className={styles.skillTotal}>
+                                                    <div 
+                                                        className={styles.skillTotal}
+                                                        onClick={() => setPointExplanation('rolls')}
+                                                        style={{ cursor: 'pointer' }}
+                                                        title="Clique para entender os 3 valores: Normal (Total) / Bom (Metade) / Extremo (1/5)"
+                                                    >
                                                         <span className={styles.totalValue}>{totalValue}%</span>
                                                         <span className={styles.derivedValues}>
                                                             ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
@@ -1570,7 +1640,18 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         {/* Perícias de Interesse Pessoal */}
                         <section className="card">
                             <div className={styles.sectionHeader}>
-                                <h2>Perícias de Interesse Pessoal</h2>
+                                <h2>
+                                    <span
+                                        onClick={() => setPointExplanation('personal')}
+                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                        title="Clique para entender o que são Perícias de Interesse Pessoal e como funcionam as rolagens"
+                                    >
+                                        Perícias de Interesse Pessoal
+                                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
+                                            (?) O que é
+                                        </span>
+                                    </span>
+                                </h2>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     <button
                                         type="button"
@@ -1725,7 +1806,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                             />
                                                         </div>
                                                     </div>
-                                                    <div className={styles.skillTotal}>
+                                                    <div 
+                                                        className={styles.skillTotal}
+                                                        onClick={() => setPointExplanation('rolls')}
+                                                        style={{ cursor: 'pointer' }}
+                                                        title="Clique para entender os 3 valores: Normal (Total) / Bom (Metade) / Extremo (1/5)"
+                                                    >
                                                         <span className={styles.totalValue}>{totalValue}%</span>
                                                         <span className={styles.derivedValues}>
                                                             ({Math.floor(totalValue / 2)}% / {Math.floor(totalValue / 5)}%)
@@ -1743,7 +1829,26 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 {activeTab === 'combat' && (
                     <div className="fade-in">
                         <section className="card">
-                            <h2>Suas Armas</h2>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                                <h2 
+                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    onClick={() => setPointExplanation('combat')}
+                                    title="Clique para entender como funcionam o combate, iniciativa, esquiva e revide"
+                                >
+                                    Suas Armas & Combate
+                                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--mute)', background: 'var(--field)', border: '1px solid var(--ink)', padding: '2px 6px', textTransform: 'none', letterSpacing: 'normal' }}>
+                                        (?) Regras de Combate
+                                    </span>
+                                </h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setPointExplanation('rolls')}
+                                    className={styles.selectButton}
+                                    style={{ fontSize: '11px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                >
+                                    <Dices size={14} /> Como funcionam os Ataques (d100)
+                                </button>
+                            </div>
 
                             <div className="grid grid-2 mb-6">
                                 <div className={styles.statBox}>
