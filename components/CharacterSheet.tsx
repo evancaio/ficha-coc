@@ -992,12 +992,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                                 <h2 
-                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    className={styles.interactiveTitle}
+                                    style={{ margin: 0 }}
                                     onClick={() => setPointExplanation('characteristics')}
                                     title="Clique para entender o que são as Características e como rolar seus testes"
                                 >
                                     Características
-                                    <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
+                                    <HelpCircle size={16} />
                                 </h2>
                                 <button
                                     type="button"
@@ -1338,12 +1339,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <div 
                                     className={styles.skillPoints}
                                     onClick={() => setPointExplanation('occupation')}
-                                    style={{ cursor: 'pointer' }}
                                     title="Clique para entender os Pontos Ocupacionais e regras de rolagem"
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div className={styles.cardHeaderArea}>
                                         <h3>Pontos Ocupacionais</h3>
-                                        <HelpCircle size={14} style={{ color: 'var(--mute)' }} />
+                                        <HelpCircle size={15} className={styles.cardHelpIcon} />
                                     </div>
                                     <div className={styles.pointsValue}>{character.occupationSkillPoints}</div>
                                     <small>
@@ -1368,12 +1368,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     <div 
                                         className={styles.skillPoints} 
                                         onClick={() => setPointExplanation('archetype')}
-                                        style={{ borderLeft: '4px solid #b91c1c', cursor: 'pointer' }}
+                                        style={{ borderLeft: '4px solid #b91c1c' }}
                                         title="Clique para entender o Bônus de Arquétipo (+100 pontos)"
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div className={styles.cardHeaderArea}>
                                             <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
-                                            <HelpCircle size={14} style={{ color: '#b91c1c' }} />
+                                            <HelpCircle size={15} className={styles.cardHelpIcon} style={{ color: '#b91c1c' }} />
                                         </div>
                                         <div className={styles.pointsValue} style={{ color: '#b91c1c' }}>100</div>
                                         <small>{character.archetype ? `Arquétipo: ${character.archetype}` : 'Bônus Pulp (+100)'}</small>
@@ -1397,12 +1397,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <div 
                                     className={styles.skillPoints}
                                     onClick={() => setPointExplanation('personal')}
-                                    style={{ cursor: 'pointer' }}
                                     title="Clique para entender os Pontos de Interesse Pessoal"
                                 >
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div className={styles.cardHeaderArea}>
                                         <h3>Pontos de Interesse Pessoal</h3>
-                                        <HelpCircle size={14} style={{ color: 'var(--mute)' }} />
+                                        <HelpCircle size={15} className={styles.cardHelpIcon} />
                                     </div>
                                     <div className={styles.pointsValue}>{character.personalInterestPoints}</div>
                                     <small>INT × 2</small>
@@ -1459,11 +1458,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <h2>
                                     <span
                                         onClick={() => setPointExplanation('occupation')}
-                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                        className={styles.interactiveTitle}
                                         title="Clique para entender o que são Perícias Ocupacionais e como funcionam as rolagens"
                                     >
                                         Perícias Ocupacionais
-                                        <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
+                                        <HelpCircle size={16} />
                                     </span>
                                     {character.basicInfo.occupation && (
                                         <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
@@ -1651,11 +1650,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                 <h2>
                                     <span
                                         onClick={() => setPointExplanation('personal')}
-                                        style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                        className={styles.interactiveTitle}
                                         title="Clique para entender o que são Perícias de Interesse Pessoal e como funcionam as rolagens"
                                     >
                                         Perícias de Interesse Pessoal
-                                        <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
+                                        <HelpCircle size={16} />
                                     </span>
                                 </h2>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1837,12 +1836,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         <section className="card">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
                                 <h2 
-                                    style={{ margin: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    className={styles.interactiveTitle}
+                                    style={{ margin: 0 }}
                                     onClick={() => setPointExplanation('combat')}
                                     title="Clique para entender como funcionam o combate, iniciativa, esquiva e revide"
                                 >
                                     Suas Armas & Combate
-                                    <HelpCircle size={15} style={{ color: 'var(--mute)' }} />
+                                    <HelpCircle size={16} />
                                 </h2>
                                 <button
                                     type="button"
