@@ -422,11 +422,17 @@
 }
 
 .skillInput input {
-    width: 36px !important;
+    width: 38px !important;
     padding: 2px 2px !important;
     text-align: center;
     font-size: 13px !important;
     font-weight: 700;
+}
+
+.skillInput input::placeholder {
+    color: var(--mute);
+    opacity: 0.65;
+    font-weight: 400;
 }
 
 .skillTotal {

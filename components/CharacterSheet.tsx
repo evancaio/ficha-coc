@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Character, Characteristics, BasicInfo, Backstory, DerivedStats, GameMode, Archetype } from '@/types/character';
 import { calculateDerivedStats, calculateOccupationPoints, calculatePersonalInterestPoints, calculateOccupationPointsFromFormula, calculateArchetypePoints } from '@/utils/calculations';
 import { saveCharacter, getCurrentCharacter, loadCharacter } from '@/utils/storage';
@@ -17,7 +17,7 @@ import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
 import PointExplanationModal from './PointExplanationModal';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
-import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown } from 'lucide-react';
+import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
@@ -125,6 +125,11 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     const [selectedSkillForDetail, setSelectedSkillForDetail] = useState<string | null>(null);
     const [pointExplanation, setPointExplanation] = useState<'archetype' | 'personal' | 'occupation' | null>(null);
     const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+    const warningTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const [pointWarning, setPointWarning] = useState<{
+        message: string;
+        type: 'occupation' | 'archetype' | 'personal';
+    } | null>(null);
 
     const handleRollAttributes = () => {
         const roll = (n: number, sides: number) => {
@@ -430,21 +435,76 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
 
 
-    const handleSkillPointChange = (skillName: string, points: number, type: 'occupation' | 'personal' | 'archetype') => {
+    const handleSkillPointChange = (skillName: string, rawPoints: string | number, type: 'occupation' | 'personal' | 'archetype') => {
         // Disallow applying personal interest points to 'Nível de Crédito'
         if (type === 'personal' && skillName === 'Nível de Crédito') return;
+
+        const currentSkill = character.skills.find(s => s.name === skillName);
+        if (!currentSkill) return;
+
+        const parsed = rawPoints === '' ? 0 : parseInt(String(rawPoints).replace(/^0+(?=\d)/, ''), 10);
+        let desired = isNaN(parsed) ? 0 : Math.max(0, parsed);
+        let finalPoints = desired;
+
+        if (type === 'occupation') {
+            const minOcc = (currentSkill as any).minOccupationPoints ?? 0;
+            const otherUsed = character.skills.reduce((sum, s) => s.name === skillName ? sum : sum + (s.occupationPoints || 0), 0);
+            const maxAvailable = Math.max(0, character.occupationSkillPoints - otherUsed);
+
+            if (desired > maxAvailable) {
+                finalPoints = maxAvailable;
+                if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+                setPointWarning({
+                    type: 'occupation',
+                    message: `Limite de Pontos Ocupacionais atingido! Você tem ${character.occupationSkillPoints} pontos no total (${maxAvailable} restantes para esta perícia). O valor foi ajustado para o máximo permitido.`
+                });
+                warningTimerRef.current = setTimeout(() => setPointWarning(null), 4500);
+            } else if (desired < minOcc) {
+                finalPoints = minOcc;
+                if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+                setPointWarning({
+                    type: 'occupation',
+                    message: `A ocupação selecionada exige um Nível de Crédito mínimo de ${minOcc}.`
+                });
+                warningTimerRef.current = setTimeout(() => setPointWarning(null), 4500);
+            }
+        } else if (type === 'archetype') {
+            const maxPool = character.archetypeSkillPoints || 100;
+            const otherUsed = character.skills.reduce((sum, s) => s.name === skillName ? sum : sum + (s.archetypePoints || 0), 0);
+            const maxAvailable = Math.max(0, maxPool - otherUsed);
+
+            if (desired > maxAvailable) {
+                finalPoints = maxAvailable;
+                if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+                setPointWarning({
+                    type: 'archetype',
+                    message: `Limite de Pontos de Arquétipo atingido! Você tem ${maxPool} pontos no total (${maxAvailable} restantes para esta perícia). O valor foi ajustado para o máximo permitido.`
+                });
+                warningTimerRef.current = setTimeout(() => setPointWarning(null), 4500);
+            }
+        } else if (type === 'personal') {
+            const otherUsed = character.skills.reduce((sum, s) => (s.name === skillName || s.name === 'Nível de Crédito') ? sum : sum + (s.personalPoints || 0), 0);
+            const maxAvailable = Math.max(0, character.personalInterestPoints - otherUsed);
+
+            if (desired > maxAvailable) {
+                finalPoints = maxAvailable;
+                if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
+                setPointWarning({
+                    type: 'personal',
+                    message: `Limite de Pontos de Interesse Pessoal atingido! Você tem ${character.personalInterestPoints} pontos no total (${maxAvailable} restantes para esta perícia). O valor foi ajustado para o máximo permitido.`
+                });
+                warningTimerRef.current = setTimeout(() => setPointWarning(null), 4500);
+            }
+        }
 
         const updatedSkills = character.skills.map(skill => {
             if (skill.name === skillName) {
                 if (type === 'occupation') {
-                    // enforce minimum occupation points if defined (for Nível de Crédito)
-                    const minOcc = (skill as any).minOccupationPoints ?? 0;
-                    const newVal = Math.max(points, minOcc);
-                    return { ...skill, occupationPoints: newVal };
+                    return { ...skill, occupationPoints: finalPoints };
                 } else if (type === 'archetype') {
-                    return { ...skill, archetypePoints: points };
+                    return { ...skill, archetypePoints: finalPoints };
                 } else {
-                    return { ...skill, personalPoints: points };
+                    return { ...skill, personalPoints: finalPoints };
                 }
             }
             return skill;
@@ -1436,8 +1496,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                 type="number"
                                                                 min={typeof (skill as any).minOccupationPoints === 'number' ? (skill as any).minOccupationPoints : 0}
                                                                 max={character.occupationSkillPoints}
-                                                                value={skill.occupationPoints}
-                                                                onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'occupation')}
+                                                                value={skill.occupationPoints === 0 ? '' : skill.occupationPoints}
+                                                                placeholder="0"
+                                                                onFocus={(e) => e.target.select()}
+                                                                onChange={(e) => handleSkillPointChange(skillName, e.target.value, 'occupation')}
                                                             />
                                                         </div>
                                                         {character.gameMode === 'pulp' && (
@@ -1459,8 +1521,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                     type="number"
                                                                     min="0"
                                                                     max={100}
-                                                                    value={skill.archetypePoints || 0}
-                                                                    onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'archetype')}
+                                                                    value={!skill.archetypePoints ? '' : skill.archetypePoints}
+                                                                    placeholder="0"
+                                                                    onFocus={(e) => e.target.select()}
+                                                                    onChange={(e) => handleSkillPointChange(skillName, e.target.value, 'archetype')}
                                                                     style={{ 
                                                                         borderColor: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
                                                                         color: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
@@ -1481,8 +1545,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                 type="number"
                                                                 min="0"
                                                                 max={character.personalInterestPoints}
-                                                                value={skill.name === 'Nível de Crédito' ? 0 : skill.personalPoints}
-                                                                onChange={(e) => handleSkillPointChange(skillName, parseInt(e.target.value) || 0, 'personal')}
+                                                                value={skill.name === 'Nível de Crédito' || !skill.personalPoints ? '' : skill.personalPoints}
+                                                                placeholder="0"
+                                                                onFocus={(e) => e.target.select()}
+                                                                onChange={(e) => handleSkillPointChange(skillName, e.target.value, 'personal')}
                                                                 disabled={skill.name === 'Nível de Crédito'}
                                                             />
                                                         </div>
@@ -1623,8 +1689,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                     type="number"
                                                                     min="0"
                                                                     max={100}
-                                                                    value={skill.archetypePoints || 0}
-                                                                    onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'archetype')}
+                                                                    value={!skill.archetypePoints ? '' : skill.archetypePoints}
+                                                                    placeholder="0"
+                                                                    onFocus={(e) => e.target.select()}
+                                                                    onChange={(e) => handleSkillPointChange(skill.name, e.target.value, 'archetype')}
                                                                     style={{ 
                                                                         borderColor: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
                                                                         color: (skill.archetypePoints || 0) > 0 ? '#b91c1c' : undefined,
@@ -1649,8 +1717,10 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                                 type="number"
                                                                 min="0"
                                                                 max={character.personalInterestPoints}
-                                                                value={skill.name === 'Nível de Crédito' ? 0 : skill.personalPoints}
-                                                                onChange={(e) => handleSkillPointChange(skill.name, parseInt(e.target.value) || 0, 'personal')}
+                                                                value={skill.name === 'Nível de Crédito' || !skill.personalPoints ? '' : skill.personalPoints}
+                                                                placeholder="0"
+                                                                onFocus={(e) => e.target.select()}
+                                                                onChange={(e) => handleSkillPointChange(skill.name, e.target.value, 'personal')}
                                                                 disabled={skill.name === 'Nível de Crédito'}
                                                             />
                                                         </div>
@@ -2030,6 +2100,53 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 type={pointExplanation}
                 onClose={() => setPointExplanation(null)}
             />
+
+            {pointWarning && (
+                <div
+                    role="alert"
+                    style={{
+                        position: 'fixed',
+                        bottom: '24px',
+                        right: '24px',
+                        maxWidth: '400px',
+                        width: 'calc(100% - 48px)',
+                        background: '#1b1613',
+                        color: '#fef2f2',
+                        border: '2px solid #b91c1c',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.65)',
+                        padding: '12px 14px',
+                        zIndex: 99999,
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '12px',
+                        boxSizing: 'border-box'
+                    }}
+                >
+                    <AlertTriangle size={20} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+                    <div style={{ flex: 1, fontSize: '13px', lineHeight: 1.4 }}>
+                        <strong style={{ color: '#f87171', display: 'block', marginBottom: '2px', textTransform: 'uppercase', fontSize: '11px', letterSpacing: '0.05em' }}>
+                            Limite de Pontos Atingido
+                        </strong>
+                        {pointWarning.message}
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => setPointWarning(null)}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: '#efe2c3',
+                            cursor: 'pointer',
+                            padding: '2px',
+                            display: 'flex',
+                            alignItems: 'center'
+                        }}
+                        aria-label="Fechar aviso"
+                    >
+                        <X size={16} />
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
