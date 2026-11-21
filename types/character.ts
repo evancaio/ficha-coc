@@ -45,6 +45,8 @@ export interface Weapon {
   attacks: string | number; // allowing string for "1 (3)"
   ammo: string | number; // allowing string for "20/30"
   malfunction: string;
+  image?: string;
+  era?: string;
 }
 
 export interface BasicInfo {

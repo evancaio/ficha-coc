@@ -112,6 +112,16 @@ export default function WeaponSelectorModal({
                                     onClose();
                                 }}
                             >
+                                {weapon.image && (
+                                    <div className={styles.weaponImageContainer}>
+                                        <img
+                                            src={weapon.image}
+                                            alt={weapon.name}
+                                            className={styles.weaponImage}
+                                            loading="lazy"
+                                        />
+                                    </div>
+                                )}
                                 <div className={styles.weaponName}>{weapon.name}</div>
                                 <div className={styles.weaponDetails}>
                                     {weapon.era && (

@@ -85,6 +85,32 @@
     box-shadow: 3px 3px 0 var(--ink);
 }
 
+.weaponImageContainer {
+    width: 100%;
+    height: 85px;
+    background: #ffffff;
+    border: 1px dashed rgba(27, 22, 19, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 6px;
+    margin-bottom: 4px;
+}
+
+.weaponImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+    filter: contrast(125%) brightness(95%);
+    transition: transform 0.2s ease;
+}
+
+.weaponItem:hover .weaponImage {
+    transform: scale(1.06);
+}
+
 .weaponName {
     font-weight: bold;
     color: var(--ink);

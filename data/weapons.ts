@@ -9,6 +9,7 @@ export interface WeaponDefinition {
     category: string;
     cost?: string;
     era?: string;
+    image?: string;
 }
 
 export const weaponDefinitions: WeaponDefinition[] = [
@@ -44,9 +45,9 @@ export const weaponDefinitions: WeaponDefinition[] = [
     // ==========================================
     // 3. PISTOLAS & REVÓLVERES
     // ==========================================
-    { name: "Revólver Nagant M1895 (7.62mm)", skill: "Armas de Fogo (Pistolas)", damage: "1d8", range: "15m", attacks: "1 (3)", ammo: "7", malfunction: "100", category: "Pistolas", era: "Soviética (Padrão 1895-1945)" },
-    { name: "Revólver Nagant M1895 Silenciado (Bramit)", skill: "Armas de Fogo (Pistolas)", damage: "1d8 - 1", range: "10m", attacks: "1 (3)", ammo: "7", malfunction: "98", category: "Pistolas", era: "Cheka / Reconhecimento" },
-    { name: "Pistola TT-30 / TT-33 Tokarev (7.62mm)", skill: "Armas de Fogo (Pistolas)", damage: "1d8", range: "15m", attacks: "1 (3)", ammo: "8", malfunction: "99", category: "Pistolas", era: "Soviética (1930/1933)" },
+    { name: "Revólver Nagant M1895 (7.62mm)", skill: "Armas de Fogo (Pistolas)", damage: "1d8", range: "15m", attacks: "1 (3)", ammo: "7", malfunction: "100", category: "Pistolas", era: "Soviética (Padrão 1895-1945)", image: "/weapons/nagant-m1895.jpg" },
+    { name: "Revólver Nagant M1895 Silenciado (Bramit)", skill: "Armas de Fogo (Pistolas)", damage: "1d8 - 1", range: "10m", attacks: "1 (3)", ammo: "7", malfunction: "98", category: "Pistolas", era: "Cheka / Reconhecimento", image: "/weapons/nagant-m1895.jpg" },
+    { name: "Pistola TT-30 / TT-33 Tokarev (7.62mm)", skill: "Armas de Fogo (Pistolas)", damage: "1d8", range: "15m", attacks: "1 (3)", ammo: "8", malfunction: "99", category: "Pistolas", era: "Soviética (1930/1933)", image: "/weapons/tt-33.jpg" },
     { name: "Pistola Korovin TK (6.35mm / .25)", skill: "Armas de Fogo (Pistolas)", damage: "1d6", range: "10m", attacks: "1 (3)", ammo: "8", malfunction: "99", category: "Pistolas", era: "Soviética (1926)" },
     { name: "Mauser C96 'Bolo' (7.63mm)", skill: "Armas de Fogo (Pistolas)", damage: "1d8", range: "20m", attacks: "1 (3)", ammo: "10", malfunction: "99", category: "Pistolas", era: "Bolchevique (Anos 20)" },
     { name: "Pistola Browning M1903 (9mm Browning)", skill: "Armas de Fogo (Pistolas)", damage: "1d10", range: "15m", attacks: "1 (3)", ammo: "7", malfunction: "99", category: "Pistolas", era: "Polícia Czarista / Revolução" },
@@ -56,11 +57,11 @@ export const weaponDefinitions: WeaponDefinition[] = [
     // ==========================================
     // 4. RIFLES, FUZIS & CARABINAS
     // ==========================================
-    { name: "Fuzil Mosin-Nagant M1891/30 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "110m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Soviética (Padrão 1930)" },
-    { name: "Fuzil Mosin-Nagant M1891 'Trilineyka'", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "110m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Imperial Russo / Guerra Civil" },
-    { name: "Fuzil Mosin-Nagant Sniper (Mira PE/PU)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "150m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Atirador de Elite (1931)" },
-    { name: "Carabina Mosin-Nagant M1907 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 3", range: "80m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Cavalaria / Artilharia" },
-    { name: "Carabina Mosin-Nagant M1938 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 3", range: "90m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Soviética (1938)" },
+    { name: "Fuzil Mosin-Nagant M1891/30 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "110m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Soviética (Padrão 1930)", image: "/weapons/mosin-m91-30.jpg" },
+    { name: "Fuzil Mosin-Nagant M1891 'Trilineyka'", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "110m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Imperial Russo / Guerra Civil", image: "/weapons/mosin-m91-30.jpg" },
+    { name: "Fuzil Mosin-Nagant Sniper (Mira PE/PU)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "150m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Atirador de Elite (1931)", image: "/weapons/mosin-m91-30.jpg" },
+    { name: "Carabina Mosin-Nagant M1907 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 3", range: "80m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Cavalaria / Artilharia", image: "/weapons/mosin-m91-30.jpg" },
+    { name: "Carabina Mosin-Nagant M1938 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 3", range: "90m", attacks: "1", ammo: "5", malfunction: "100", category: "Rifles/Arcos", era: "Soviética (1938)", image: "/weapons/mosin-m91-30.jpg" },
     { name: "Fedorov Avtomat (6.5mm Fedorov)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6", range: "90m", attacks: "1 (2) ou Auto", ammo: "25", malfunction: "96", category: "Rifles/Arcos", era: "Soviética (1916/1920)" },
     { name: "Fuzil Semi-Auto AVS-36 Simonov (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "100m", attacks: "1 (2) ou Auto", ammo: "15", malfunction: "97", category: "Rifles/Arcos", era: "Soviética (1936)" },
     { name: "Fuzil Semi-Auto SVT-38 / SVT-40 (7.62mm)", skill: "Armas de Fogo (Rifles/Espingardas)", damage: "2d6 + 4", range: "110m", attacks: "1 (2)", ammo: "10", malfunction: "98", category: "Rifles/Arcos", era: "Soviética (1938/1940)" },
@@ -82,9 +83,9 @@ export const weaponDefinitions: WeaponDefinition[] = [
     // ==========================================
     // 6. SUBMETRALHADORAS (SMGs)
     // ==========================================
-    { name: "Submetralhadora PPD-34/38 (Degtyaryov)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 (2) ou Auto", ammo: "25", malfunction: "96", category: "Automáticas", era: "Soviética (1934/1938)" },
-    { name: "Submetralhadora PPD-40 (Tambor 71 Tiros)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 (2) ou Auto", ammo: "71", malfunction: "96", category: "Automáticas", era: "Soviética (1940)" },
-    { name: "Submetralhadora PPSh-41 'Papasha' (7.62mm)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 ou Auto", ammo: "71", malfunction: "96", category: "Automáticas", era: "Soviética (1941)" },
+    { name: "Submetralhadora PPD-34/38 (Degtyaryov)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 (2) ou Auto", ammo: "25", malfunction: "96", category: "Automáticas", era: "Soviética (1934/1938)", image: "/weapons/ppsh-41.jpg" },
+    { name: "Submetralhadora PPD-40 (Tambor 71 Tiros)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 (2) ou Auto", ammo: "71", malfunction: "96", category: "Automáticas", era: "Soviética (1940)", image: "/weapons/ppsh-41.jpg" },
+    { name: "Submetralhadora PPSh-41 'Papasha' (7.62mm)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 ou Auto", ammo: "71", malfunction: "96", category: "Automáticas", era: "Soviética (1941)", image: "/weapons/ppsh-41.jpg" },
     { name: "Submetralhadora PPS-43 (Sudaev)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10", range: "25m", attacks: "1 (2) ou Auto", ammo: "35", malfunction: "98", category: "Automáticas", era: "Soviética (Leningrado 1943)" },
     { name: "Carabina-Pistola Tokarev 1927", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d8", range: "20m", attacks: "1 ou Auto", ammo: "21", malfunction: "95", category: "Automáticas", era: "Protótipo Soviético" },
     { name: "Submetralhadora Thompson M1928 (Lend-Lease)", skill: "Armas de Fogo (Submetralhadoras)", damage: "1d10 + 2", range: "20m", attacks: "1 ou Auto", ammo: "20/30/50", malfunction: "96", category: "Automáticas", era: "Fornecimento Lend-Lease" },

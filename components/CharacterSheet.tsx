@@ -1841,6 +1841,15 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                             key={index}
                                             className={`${styles.weaponCard} ${isUnarmed ? styles.unarmedCard : ''}`}
                                         >
+                                            {weapon.image && (
+                                                <div className={styles.weaponCardIllustration}>
+                                                    <img
+                                                        src={weapon.image}
+                                                        alt={weapon.name}
+                                                        className={styles.weaponCardImage}
+                                                    />
+                                                </div>
+                                            )}
                                             <div className={styles.weaponHeader}>
                                                 <h3 className={styles.weaponName}>{weapon.name}</h3>
                                                 <div className={styles.weaponSkill}>
