@@ -17,7 +17,7 @@ import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
 import PointExplanationModal, { ExplanationType } from './PointExplanationModal';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
-import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle, HelpCircle } from 'lucide-react';
+import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
 
@@ -520,6 +520,13 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         setCharacter(prev => ({ ...prev, weapons: [...prev.weapons, weapon] }));
     };
 
+    const handleRemoveWeapon = (weaponIndex: number) => {
+        setCharacter(prev => ({
+            ...prev,
+            weapons: prev.weapons.filter((_, i) => i !== weaponIndex)
+        }));
+    };
+
     const occupationHasChoices = (occupationFormula?: string) => {
         if (!occupationFormula) return false;
         return /\bou\b/i.test(occupationFormula);
@@ -955,7 +962,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     title="Clique para entender o que são as Características e como rolar seus testes"
                                 >
                                     <span>Características</span>
-                                    <HelpCircle size={16} className={styles.helpIcon} />
+                                    <span className={styles.helpBadge}>?</span>
                                 </h2>
                                 <button
                                     type="button"
@@ -1083,7 +1090,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender as regras de Sanidade"
                                     >
                                         Sanidade (SAN)
-                                        <HelpCircle size={13} className={styles.statHelpIcon} />
+                                        <span className={styles.statHelpBadge}>?</span>
                                     </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
@@ -1124,7 +1131,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender as regras de Sorte"
                                     >
                                         Moedas da Sorte
-                                        <HelpCircle size={13} className={styles.statHelpIcon} />
+                                        <span className={styles.statHelpBadge}>?</span>
                                     </h3>
                                     <div className="flex items-center justify-center gap-2 mb-1">
                                         <button
@@ -1300,7 +1307,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('occupation')}
                                     title="Clique para entender os Pontos Ocupacionais e regras de rolagem"
                                 >
-                                    <HelpCircle size={15} className={styles.cardHelpIcon} />
+                                    <span className={styles.cardHelpBadge}>?</span>
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos Ocupacionais</h3>
                                     </div>
@@ -1330,7 +1337,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         style={{ borderLeft: '4px solid #b91c1c' }}
                                         title="Clique para entender o Bônus de Arquétipo (+100 pontos)"
                                     >
-                                        <HelpCircle size={15} className={styles.cardHelpIcon} style={{ color: '#b91c1c' }} />
+                                        <span className={styles.cardHelpBadge} style={{ color: '#b91c1c' }}>?</span>
                                         <div className={styles.cardHeaderArea}>
                                             <h3 style={{ color: '#b91c1c' }}>Pontos do Arquétipo</h3>
                                         </div>
@@ -1358,7 +1365,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     onClick={() => setPointExplanation('personal')}
                                     title="Clique para entender os Pontos de Interesse Pessoal"
                                 >
-                                    <HelpCircle size={15} className={styles.cardHelpIcon} />
+                                    <span className={styles.cardHelpBadge}>?</span>
                                     <div className={styles.cardHeaderArea}>
                                         <h3>Pontos de Interesse Pessoal</h3>
                                     </div>
@@ -1421,7 +1428,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender o que são Perícias Ocupacionais e como funcionam as rolagens"
                                     >
                                         <span>Perícias Ocupacionais</span>
-                                        <HelpCircle size={16} className={styles.helpIcon} />
+                                        <span className={styles.helpBadge}>?</span>
                                     </span>
                                     {character.basicInfo.occupation && (
                                         <span style={{ fontSize: '13px', color: 'var(--mute)', fontWeight: 400, marginLeft: '8px', textTransform: 'none' }}>
@@ -1613,7 +1620,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                         title="Clique para entender o que são Perícias de Interesse Pessoal e como funcionam as rolagens"
                                     >
                                         <span>Perícias de Interesse Pessoal</span>
-                                        <HelpCircle size={16} className={styles.helpIcon} />
+                                        <span className={styles.helpBadge}>?</span>
                                     </span>
                                 </h2>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1801,16 +1808,26 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     title="Clique para entender como funcionam o combate, iniciativa, esquiva e revide"
                                 >
                                     <span>Suas Armas & Combate</span>
-                                    <HelpCircle size={16} className={styles.helpIcon} />
+                                    <span className={styles.helpBadge}>?</span>
                                 </h2>
-                                <button
-                                    type="button"
-                                    onClick={() => setPointExplanation('rolls')}
-                                    className={styles.selectButton}
-                                    style={{ fontSize: '11px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                                >
-                                    <Dices size={14} /> Como funcionam os Ataques (d100)
-                                </button>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowWeaponModal(true)}
+                                        className={styles.redButton}
+                                        style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    >
+                                        + Selecionar Armamento
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPointExplanation('rolls')}
+                                        className={styles.selectButton}
+                                        style={{ fontSize: '11px', padding: '5px 10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    >
+                                        <Dices size={14} /> Como funcionam os Ataques (d100)
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="grid grid-2 mb-6">
@@ -1851,7 +1868,20 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                                 </div>
                                             )}
                                             <div className={styles.weaponHeader}>
-                                                <h3 className={styles.weaponName}>{weapon.name}</h3>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <h3 className={styles.weaponName}>{weapon.name}</h3>
+                                                    {index > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            className={styles.removeWeaponButton}
+                                                            onClick={() => handleRemoveWeapon(index - 1)}
+                                                            title={`Remover ${weapon.name}`}
+                                                            aria-label={`Remover ${weapon.name}`}
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    )}
+                                                </div>
                                                 <div className={styles.weaponSkill}>
                                                     <span className={styles.weaponSkillLabel}>{weapon.skill}:</span>
                                                     <span className={styles.weaponSkillValue}>{skillTotal}%</span>
@@ -1886,20 +1916,14 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     );
                                 })}
                             </div>
-                        </section>
 
-                        <section className="card mt-6">
-                            <div className={styles.sectionHeader}>
-                                <h2>Arsenal</h2>
-                                <button
-                                    className={styles.selectButton}
-                                    onClick={() => setShowWeaponModal(true)}
-                                >
-                                    Selecionar Armamento
-                                </button>
-                            </div>
-                            <p className="text-gray-400 italic mb-4">Adicione armas aqui...</p>
-                            {/* Arsenal placeholder */}
+                            {character.weapons.length === 0 && (
+                                <div style={{ textAlign: 'center', padding: '16px', background: 'var(--field)', border: '1px dashed var(--mute)', marginTop: '14px' }}>
+                                    <p style={{ margin: 0, fontStyle: 'italic', color: 'var(--mute)', fontSize: '13px' }}>
+                                        Nenhum armamento adicional no inventário. Clique em &quot;+ Selecionar Armamento&quot; acima para equipar armas soviéticas da época (revólver Nagant, fuzil Mosin-Nagant, pistola Tokarev, submetralhadora PPSh-41, etc.).
+                                    </p>
+                                </div>
+                            )}
                         </section>
                     </div>
                 )}

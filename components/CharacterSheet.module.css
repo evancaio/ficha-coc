@@ -252,21 +252,27 @@
     color: var(--red);
 }
 
-.cardHelpIcon {
+.cardHelpBadge {
     position: absolute;
     top: 8px;
     right: 10px;
+    font-family: var(--font-body, 'PT Serif', serif);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
     color: var(--mute);
-    opacity: 0.7;
+    opacity: 0.75;
     transition: all 0.15s ease;
     cursor: pointer;
     z-index: 2;
+    user-select: none;
 }
 
-.skillPoints:hover .cardHelpIcon {
+.skillPoints:hover .cardHelpBadge {
     color: #b91c1c;
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.25);
 }
 
 .interactiveTitle {
@@ -283,41 +289,53 @@
     color: #fca5a5;
 }
 
-.helpIcon {
+.helpBadge {
     display: inline-block;
     vertical-align: middle;
     margin-left: 6px;
+    font-family: var(--font-body, 'PT Serif', serif);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1;
     color: var(--paper);
+    opacity: 0.8;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+.interactiveTitle:hover .helpBadge,
+.helpBadge:hover {
+    color: #ef4444;
+    opacity: 1;
+    transform: scale(1.25);
+}
+
+.statHelpBadge {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 5px;
+    font-family: var(--font-body, 'PT Serif', serif);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--mute);
     opacity: 0.75;
     transition: all 0.15s ease;
     cursor: pointer;
     flex-shrink: 0;
+    user-select: none;
 }
 
-.interactiveTitle:hover .helpIcon,
-.helpIcon:hover {
-    color: #ef4444;
-    opacity: 1;
-    transform: scale(1.2);
-}
-
-.statHelpIcon {
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 5px;
-    color: var(--mute);
-    opacity: 0.7;
-    transition: all 0.15s ease;
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.statBox:hover .statHelpIcon,
-h3:hover .statHelpIcon,
-.statHelpIcon:hover {
+.statBox:hover .statHelpBadge,
+h3:hover .statHelpBadge,
+.statHelpBadge:hover {
     color: var(--red);
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.25);
 }
 
 .pointsValue {
@@ -616,6 +634,29 @@ h3:hover .statHelpIcon,
     color: var(--ink);
     margin: 0;
     text-transform: uppercase;
+}
+
+.removeWeaponButton {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--mute);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.removeWeaponButton:hover {
+    background: #b91c1c;
+    color: #ffffff;
+    border-color: #7f1d1d;
+    transform: scale(1.15);
 }
 
 .weaponSkill {

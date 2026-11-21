@@ -29,20 +29,27 @@
     color: var(--red);
 }
 
-.luckHelpIcon {
+.luckHelpBadge {
     display: inline-block;
     vertical-align: middle;
     margin-left: 6px;
+    font-family: var(--font-body, 'PT Serif', serif);
+    font-style: italic;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
     color: var(--mute);
-    opacity: 0.7;
+    opacity: 0.75;
     transition: all 0.15s ease;
     cursor: pointer;
+    user-select: none;
 }
 
-.titleGroup:hover .luckHelpIcon {
+.titleGroup:hover .luckHelpBadge,
+.luckHelpBadge:hover {
     color: #b91c1c;
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.25);
 }
 
 .title {

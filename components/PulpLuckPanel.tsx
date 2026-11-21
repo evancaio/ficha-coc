@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Clover, HelpCircle } from 'lucide-react';
+import { Clover } from 'lucide-react';
 import { pulpLuckOptions, canAffordLuckSpend, executeLuckSpend, PulpLuckOption } from '@/utils/pulpLuck';
 import styles from './PulpLuckPanel.module.css';
 
@@ -55,7 +55,9 @@ export default function PulpLuckPanel({
           >
             Mecânicas de Sorte Pulp
             {onExplainLuck && (
-              <HelpCircle size={15} className={styles.luckHelpIcon} />
+              <span className={styles.luckHelpBadge} title="Clique para ver explicação da Sorte Pulp">
+                ?
+              </span>
             )}
           </h3>
         </div>
