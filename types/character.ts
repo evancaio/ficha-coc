@@ -49,6 +49,21 @@ export interface Weapon {
   era?: string;
 }
 
+export interface InventoryItem {
+  id: string;
+  name: string;
+  quantity: number;
+  category: 'Sobrevivência' | 'Investigação' | 'Médico' | 'Ferramentas' | 'Documentos' | 'Geral';
+  description?: string;
+  weightOrBulk?: string;
+}
+
+export interface Finances {
+  cash: string; // Dinheiro em mãos (Rublos / ₽)
+  spendingLevel: string; // Nível de Gasto Diário
+  assets: string; // Bens & Patrimônio
+}
+
 export interface BasicInfo {
   name: string;
   player: string;
@@ -108,6 +123,8 @@ export interface Character {
   derivedStats: DerivedStats;
   skills: Skill[];
   weapons: Weapon[];
+  inventory?: InventoryItem[];
+  finances?: Finances;
   backstory: Backstory;
   status: CharacterStatus; // Status do personagem
   occupationSkillPoints: number;

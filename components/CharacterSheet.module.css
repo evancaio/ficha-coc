@@ -884,6 +884,114 @@ h3:hover .statHelpBadge,
     font-style: italic;
 }
 
+/* Inventário & Equipamentos */
+.inventoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.inventoryCard {
+    background: var(--field);
+    border: 1.5px solid var(--ink);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.inventoryCard:hover {
+    border-color: var(--red);
+    box-shadow: 2px 2px 0 var(--ink);
+}
+
+.inventoryHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.inventoryName {
+    font: 700 15px/1.2 "PT Serif", Georgia, serif;
+    color: var(--ink);
+    margin: 0;
+}
+
+.inventoryBadge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border: 1px solid;
+    white-space: nowrap;
+}
+
+.inventoryDesc {
+    font: 400 12px/1.35 "PT Serif", serif;
+    color: var(--mute);
+    margin: 4px 0 10px;
+    flex: 1;
+}
+
+.inventoryFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dotted rgba(27, 22, 19, 0.25);
+    padding-top: 8px;
+}
+
+.qtyControl {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--paper);
+    border: 1px solid var(--ink);
+    padding: 2px 6px;
+}
+
+.qtyBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--ink);
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.qtyBtn:hover {
+    color: var(--red);
+}
+
+.qtyValue {
+    font: 700 13px/1 "PT Serif", serif;
+    color: var(--ink);
+    min-width: 18px;
+    text-align: center;
+}
+
+.removeInventoryBtn {
+    background: transparent;
+    border: none;
+    color: var(--mute);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 6px;
+    transition: all 0.15s ease;
+}
+
+.removeInventoryBtn:hover {
+    color: #ffffff;
+    background: var(--red);
+    border-radius: 2px;
+}
+
 @media (max-width: 768px) {
     .idLayout {
         grid-template-columns: 1fr;

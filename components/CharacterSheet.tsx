@@ -16,10 +16,21 @@ import PulpTalentsModal from './PulpTalentsModal';
 import PulpLuckPanel from './PulpLuckPanel';
 import SkillDetailModal from './SkillDetailModal';
 import PointExplanationModal, { ExplanationType } from './PointExplanationModal';
+import EquipmentSelectorModal from './EquipmentSelectorModal';
+import { InventoryItem, Finances } from '@/types/character';
 import { downloadBookStylePdf } from '@/utils/pdfExport';
 import { Zap, Search, BookOpen, Download, Award, FileText, Save, X, Dices, Briefcase, ArrowDownAZ, ArrowUpDown, AlertTriangle } from 'lucide-react';
 import styles from './CharacterSheet.module.css';
 import Link from 'next/link';
+
+const inventoryCategoryColors: Record<string, { bg: string; color: string; border: string }> = {
+    'Sobrevivência': { bg: '#fef3c7', color: '#92400e', border: '#f59e0b' },
+    'Investigação': { bg: '#e0f2fe', color: '#075985', border: '#38bdf8' },
+    'Médico': { bg: '#dcfce7', color: '#166534', border: '#4ade80' },
+    'Ferramentas': { bg: '#f3f4f6', color: '#374151', border: '#9ca3af' },
+    'Documentos': { bg: '#fee2e2', color: '#991b1b', border: '#f87171' },
+    'Geral': { bg: '#f5f5f4', color: '#44403c', border: '#a8a29e' }
+};
 
 interface CharacterSheetProps {
     initialData?: Character;
@@ -110,7 +121,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         selectedArchetypeSkills: []
     });
 
-    const [activeTab, setActiveTab] = useState<'info' | 'skills' | 'combat' | 'backstory'>('info');
+    const [activeTab, setActiveTab] = useState<'info' | 'skills' | 'combat' | 'inventory' | 'backstory'>('info');
     const [occupationSearch, setOccupationSearch] = useState('');
     const [showOccupationModal, setShowOccupationModal] = useState(false);
     const [showOccupationSkillsModal, setShowOccupationSkillsModal] = useState(false);
@@ -119,6 +130,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
     const [personalSkillSearch, setPersonalSkillSearch] = useState('');
     const [personalSkillSort, setPersonalSkillSort] = useState<'name' | 'value'>('name');
     const [showWeaponModal, setShowWeaponModal] = useState(false);
+    const [showEquipmentModal, setShowEquipmentModal] = useState(false);
     const [showBookSheetModal, setShowBookSheetModal] = useState(false);
     const [lastCachedAt, setLastCachedAt] = useState<string | null>(null);
     const [backupText, setBackupText] = useState('');
@@ -527,6 +539,49 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
         }));
     };
 
+    const handleAddEquipment = (item: Omit<InventoryItem, 'id'>) => {
+        const newItem: InventoryItem = {
+            ...item,
+            id: Date.now().toString() + Math.random().toString(36).substring(2, 6)
+        };
+        setCharacter(prev => ({
+            ...prev,
+            inventory: [...(prev.inventory || []), newItem]
+        }));
+    };
+
+    const handleUpdateEquipmentQty = (id: string, delta: number) => {
+        setCharacter(prev => ({
+            ...prev,
+            inventory: (prev.inventory || []).map(item => {
+                if (item.id === id) {
+                    const newQty = Math.max(0, item.quantity + delta);
+                    return { ...item, quantity: newQty };
+                }
+                return item;
+            }).filter(item => item.quantity > 0)
+        }));
+    };
+
+    const handleRemoveEquipment = (id: string) => {
+        setCharacter(prev => ({
+            ...prev,
+            inventory: (prev.inventory || []).filter(item => item.id !== id)
+        }));
+    };
+
+    const handleUpdateFinances = (field: keyof Finances, value: string) => {
+        setCharacter(prev => ({
+            ...prev,
+            finances: {
+                cash: prev.finances?.cash || '',
+                spendingLevel: prev.finances?.spendingLevel || '',
+                assets: prev.finances?.assets || '',
+                [field]: value
+            }
+        }));
+    };
+
     const occupationHasChoices = (occupationFormula?: string) => {
         if (!occupationFormula) return false;
         return /\bou\b/i.test(occupationFormula);
@@ -736,6 +791,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     onClick={() => setActiveTab('combat')}
                 >
                     Combate
+                </button>
+                <button
+                    className={activeTab === 'inventory' ? styles.tabActive : styles.tab}
+                    onClick={() => setActiveTab('inventory')}
+                >
+                    Inventário
                 </button>
                 <button
                     className={activeTab === 'backstory' ? styles.tabActive : styles.tab}
@@ -1928,6 +1989,144 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                     </div>
                 )}
 
+                {activeTab === 'inventory' && (
+                    <div className="fade-in">
+                        {/* Finanças & Economia */}
+                        <section className="card mb-6">
+                            <div className={styles.sectionHeader}>
+                                <h2>Recursos & Economia (União Soviética)</h2>
+                            </div>
+                            <div className="grid grid-3">
+                                <div>
+                                    <label>Dinheiro em Mãos (Rublos / ₽)</label>
+                                    <input
+                                        type="text"
+                                        value={character.finances?.cash || ''}
+                                        onChange={(e) => handleUpdateFinances('cash', e.target.value)}
+                                        placeholder="Ex: 45 ₽ (em notas e moedas)"
+                                    />
+                                </div>
+                                <div>
+                                    <label>Nível de Gasto Diário</label>
+                                    <input
+                                        type="text"
+                                        value={character.finances?.spendingLevel || ''}
+                                        onChange={(e) => handleUpdateFinances('spendingLevel', e.target.value)}
+                                        placeholder="Ex: 2 ₽ / dia (Nível de Crédito)"
+                                    />
+                                </div>
+                                <div>
+                                    <label>Bens & Patrimônio</label>
+                                    <input
+                                        type="text"
+                                        value={character.finances?.assets || ''}
+                                        onChange={(e) => handleUpdateFinances('assets', e.target.value)}
+                                        placeholder="Ex: Quarto em Kommunalka, bicicleta, relógio..."
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Inventário & Suprimentos de Campo */}
+                        <section className="card">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+                                <h2 style={{ margin: 0 }}>
+                                    Inventário & Equipamentos de Campo
+                                </h2>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowEquipmentModal(true)}
+                                    className={styles.redButton}
+                                    style={{ fontSize: '12px', padding: '6px 14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                >
+                                    + Equipar Item / Suprimentos
+                                </button>
+                            </div>
+
+                            {(!character.inventory || character.inventory.length === 0) ? (
+                                <div style={{ textAlign: 'center', padding: '36px 16px', background: 'var(--field)', border: '2px dashed var(--mute)' }}>
+                                    <p style={{ margin: '0 0 12px', fontStyle: 'italic', color: 'var(--mute)', fontSize: '14px' }}>
+                                        A mochila e os bolsos do investigador estão vazios.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowEquipmentModal(true)}
+                                        className={styles.redButton}
+                                        style={{ fontSize: '12px', padding: '8px 16px' }}
+                                    >
+                                        + Abrir Catálogo de Equipamentos de Campo
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className={styles.inventoryGrid}>
+                                    {character.inventory.map(item => {
+                                        const badge = inventoryCategoryColors[item.category] || inventoryCategoryColors['Geral'];
+                                        return (
+                                            <div key={item.id} className={styles.inventoryCard}>
+                                                <div>
+                                                    <div className={styles.inventoryHeader}>
+                                                        <h3 className={styles.inventoryName}>{item.name}</h3>
+                                                        <span
+                                                            className={styles.inventoryBadge}
+                                                            style={{
+                                                                backgroundColor: badge.bg,
+                                                                color: badge.color,
+                                                                borderColor: badge.border
+                                                            }}
+                                                        >
+                                                            {item.category}
+                                                        </span>
+                                                    </div>
+                                                    {item.description && (
+                                                        <p className={styles.inventoryDesc}>{item.description}</p>
+                                                    )}
+                                                </div>
+                                                <div className={styles.inventoryFooter}>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <div className={styles.qtyControl} title="Alterar quantidade">
+                                                            <button
+                                                                type="button"
+                                                                className={styles.qtyBtn}
+                                                                onClick={() => handleUpdateEquipmentQty(item.id, -1)}
+                                                                aria-label="Diminuir"
+                                                            >
+                                                                -
+                                                            </button>
+                                                            <span className={styles.qtyValue}>{item.quantity}</span>
+                                                            <button
+                                                                type="button"
+                                                                className={styles.qtyBtn}
+                                                                onClick={() => handleUpdateEquipmentQty(item.id, 1)}
+                                                                aria-label="Aumentar"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+                                                        {item.weightOrBulk && (
+                                                            <span style={{ fontSize: '11px', color: 'var(--mute)' }}>
+                                                                {item.weightOrBulk}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        className={styles.removeInventoryBtn}
+                                                        onClick={() => handleRemoveEquipment(item.id)}
+                                                        title={`Remover ${item.name}`}
+                                                        aria-label={`Remover ${item.name}`}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </section>
+                    </div>
+                )}
+
                 {activeTab === 'backstory' && (
                     <div className="fade-in">
                         <section className="card">
@@ -2166,6 +2365,12 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                 isOpen={showWeaponModal}
                 onClose={() => setShowWeaponModal(false)}
                 onSelect={handleSelectWeapon}
+            />
+
+            <EquipmentSelectorModal
+                isOpen={showEquipmentModal}
+                onClose={() => setShowEquipmentModal(false)}
+                onAdd={handleAddEquipment}
             />
 
             <BookSheetModal

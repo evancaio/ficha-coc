@@ -220,8 +220,21 @@ export function formatBackstoryItems(character: Character): FormattedBackstoryIt
     if (b.traits?.trim()) {
         items.push({ label: 'Características', value: b.traits.trim() });
     }
-    if (b.equipment?.trim()) {
+    if (character.inventory && character.inventory.length > 0) {
+        const invSummary = character.inventory.map(i => `${i.name} (x${i.quantity})`).join(', ');
+        const fullEquip = b.equipment?.trim() ? `${invSummary}\n${b.equipment.trim()}` : invSummary;
+        items.push({ label: 'Equipamento & Suprimentos', value: fullEquip });
+    } else if (b.equipment?.trim()) {
         items.push({ label: 'Equipamento', value: b.equipment.trim() });
+    }
+    if (character.finances) {
+        const finParts: string[] = [];
+        if (character.finances.cash?.trim()) finParts.push(`Dinheiro: ${character.finances.cash.trim()}`);
+        if (character.finances.spendingLevel?.trim()) finParts.push(`Gasto Diário: ${character.finances.spendingLevel.trim()}`);
+        if (character.finances.assets?.trim()) finParts.push(`Patrimônio: ${character.finances.assets.trim()}`);
+        if (finParts.length > 0) {
+            items.push({ label: 'Recursos & Bens', value: finParts.join(' · ') });
+        }
     }
     const wounds = character.status?.woundsAndScars?.trim() || b.injuriesScars?.trim();
     if (wounds) {
