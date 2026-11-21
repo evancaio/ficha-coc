@@ -30,7 +30,7 @@ export const pulpLuckOptions: PulpLuckOption[] = [
     name: 'Evitar a Morte Certa',
     cost: 'all',
     minLuckRequired: 30,
-    description: 'Queima toda a Sorte atual (mínimo de 30 pontos, ou 20 com o talento Vida de Gato) para escapar milagrosamente de um ferimento mortal.'
+    description: 'Queima toda a Sorte atual (mínimo de 30 pontos, ou 20 com o talento Duro na Queda) para escapar milagrosamente de um ferimento mortal.'
   }
 ];
 

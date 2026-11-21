@@ -339,49 +339,6 @@ export const skillDescriptions: Record<string, SkillDetail> = {
     category: "Físicas",
     baseValue: 10,
     description: "Sobreviver em ambientes hostis (desertos, selvas, ártico): encontrar água potável, construir abrigos e evitar hipotermia."
-  },
-
-  // PULP CTHULHU ESPECIAIS
-  "Ciência Estranha": {
-    name: "Ciência Estranha",
-    category: "Manipulação",
-    baseValue: 1,
-    isPulp: true,
-    description: "A ciência dos gênios inventores e cientistas loucos de Pulp Cthulhu. Permite projetar, construir e consertar protótipos de alta tecnologia futurista ou absurda: armas de raios da morte, soros de invisibilidade, capacetes telepáticos e máquinas do tempo.",
-    examples: ["Construir uma pistola de calor iônico", "Reparar um aparato alienígena de teletransporte"],
-    pulpNote: "Exclusiva de Pulp Cthulhu para inventores e arquétipos como Gênio/Cientista."
-  },
-  "Clarividência": {
-    name: "Clarividência",
-    category: "Especiais",
-    baseValue: 0,
-    isPulp: true,
-    description: "Habilidade psíquica de receber visões do presente em locais distantes ou vislumbres do futuro imediato.",
-    pulpNote: "Poder psíquico opcional de Pulp Cthulhu."
-  },
-  "Psicometria": {
-    name: "Psicometria",
-    category: "Especiais",
-    baseValue: 0,
-    isPulp: true,
-    description: "Capacidade psíquica de tocar um objeto ou local e vivenciar memórias ou emoções residuais de quem o segurou no passado.",
-    pulpNote: "Poder psíquico opcional de Pulp Cthulhu."
-  },
-  "Telecinese": {
-    name: "Telecinese",
-    category: "Especiais",
-    baseValue: 0,
-    isPulp: true,
-    description: "Mover e manipular objetos físicos usando apenas a força da mente e Pontos de Magia.",
-    pulpNote: "Poder psíquico opcional de Pulp Cthulhu."
-  },
-  "Telepatia": {
-    name: "Telepatia",
-    category: "Especiais",
-    baseValue: 0,
-    isPulp: true,
-    description: "Comunicação mental direta entre mentes e leitura de pensamentos superficiais.",
-    pulpNote: "Poder psíquico opcional de Pulp Cthulhu."
   }
 };
 

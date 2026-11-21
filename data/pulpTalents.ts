@@ -127,8 +127,8 @@ export const pulpTalents: PulpTalent[] = [
     description: 'Ignora a penalidade de dado por alvos em cobertura parcial ou alvos em movimento ao disparar com armas de fogo.'
   },
   {
-    id: 'esquiva-sobrenatural',
-    name: 'Esquiva Sobrenatural',
+    id: 'reflexos-evasivos',
+    name: 'Reflexos Evasivos',
     category: 'Combate',
     description: 'Reflexos defensivos impressionantes. Pode contra-atacar ou esquivar mesmo contra oponentes que o superem numericamente.'
   },
@@ -165,10 +165,10 @@ export const pulpTalents: PulpTalent[] = [
     description: 'Pico de carisma e lábia. Seus testes forçados de Charme, Persuasão ou Lábia nunca resultam em desastres catastróficos imediatos.'
   },
   {
-    id: 'mecanico-miraculoso',
-    name: 'Mecânico Miraculoso',
+    id: 'mecanico-habilidoso',
+    name: 'Mecânico Habilidoso',
     category: 'Diversos',
-    description: 'Pode consertar ou improvisar veículos, motores e dispositivos mecânicos complexos em minutos usando peças descartadas.'
+    description: 'Capaz de realizar consertos de emergência e colocar motores e maquinários complexos para funcionar mesmo sob condições adversas usando peças improvisadas.'
   },
   {
     id: 'mestre-dos-disfarces',
@@ -189,10 +189,10 @@ export const pulpTalents: PulpTalent[] = [
     description: 'Consegue escapar de amarras, cordas, nós e algemas com teste bem-sucedido de Destreza ou Prestidigitação.'
   },
   {
-    id: 'vida-de-gato',
-    name: 'Vida de Gato',
+    id: 'duro-na-queda',
+    name: 'Duro na Queda',
     category: 'Diversos',
-    description: 'O custo de pontos de Sorte para escapar da morte certa é reduzido para 20 pontos de Sorte (ao invés de queimar toda a Sorte).'
+    description: 'Resiliência e tenacidade impressionantes. O custo de pontos de Sorte para escapar da morte certa é reduzido para 20 pontos de Sorte (ao invés de queimar toda a Sorte).'
   }
 ];
 

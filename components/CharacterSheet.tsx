@@ -1246,7 +1246,7 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                         {character.gameMode === 'pulp' && (
                             <PulpLuckPanel
                                 currentLuck={character.derivedStats.currentLUCK ?? character.derivedStats.LUCK ?? 50}
-                                hasNineLivesTalent={character.pulpTalents?.includes('vida-de-gato')}
+                                hasNineLivesTalent={character.pulpTalents?.includes('duro-na-queda') || character.pulpTalents?.includes('vida-de-gato')}
                                 onUpdateLuck={(val) => updateDerivedStats('currentLUCK', val)}
                                 onExplainLuck={() => setPointExplanation('luck')}
                             />

@@ -213,8 +213,8 @@ export const occupations: Occupation[] = [
             },
             {
                 count: 1,
-                options: ["Usar Computadores", "Usar Bibliotecas"],
-                description: "Usar Computadores ou Usar Bibliotecas"
+                options: ["Usar Bibliotecas"],
+                description: "Usar Bibliotecas"
             }
         ]
     },
@@ -1147,39 +1147,6 @@ export const occupations: Occupation[] = [
         era: "classic"
     },
     {
-        name: "Programador",
-        skillPoints: "EDU × 4",
-        creditRating: "10–65",
-        suggestedSkills: ["Ciência (Matemática)", "Consertos Elétricos", "Eletrônica", "Encontrar", "Usar Bibliotecas", "Usar Computadores"],
-        skillChoices: [
-            {
-                count: 2,
-                options: [],
-                description: "Quaisquer outras duas perícias como especialidades pessoais ou da era"
-            }
-        ],
-        era: "modern"
-    },
-    {
-        name: "Hacker",
-        skillPoints: "EDU × 4",
-        creditRating: "10–70",
-        suggestedSkills: ["Consertos Elétricos", "Eletrônica", "Encontrar", "Usar Bibliotecas", "Usar Computadores"],
-        skillChoices: [
-            {
-                count: 1,
-                options: ["Charme", "Intimidação", "Lábia", "Persuasão"],
-                description: "Uma perícia interpessoal"
-            },
-            {
-                count: 2,
-                options: [],
-                description: "Quaisquer outras duas perícias"
-            }
-        ],
-        era: "modern"
-    },
-    {
         name: "Prostituta",
         skillPoints: "EDU × 2 + APA × 2",
         creditRating: "5–50",
@@ -1259,8 +1226,8 @@ export const occupations: Occupation[] = [
             },
             {
                 count: 1,
-                options: ["Usar Bibliotecas", "Usar Computadores"],
-                description: "Usar Bibliotecas ou Usar Computadores"
+                options: ["Usar Bibliotecas"],
+                description: "Usar Bibliotecas"
             },
             {
                 count: 1,

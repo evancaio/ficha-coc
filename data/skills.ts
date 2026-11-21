@@ -38,7 +38,6 @@ export const skills: SkillDefinition[] = [
     { name: "Lutar (Lanças)", baseValue: 20, category: "Combate" },
     { name: "Lutar (Machados)", baseValue: 15, category: "Combate" },
     { name: "Lutar (Manguais)", baseValue: 10, category: "Combate" },
-    { name: "Lutar (Motosserras)", baseValue: 10, category: "Combate" },
 
     // Interpessoal
     { name: "Charme", baseValue: 15, category: "Interpessoal" },
@@ -61,13 +60,10 @@ export const skills: SkillDefinition[] = [
     { name: "Consertos Mecânicos", baseValue: 10, category: "Manipulação" },
     { name: "Demolições", baseValue: 1, category: "Manipulação", uncommon: true },
     { name: "Disfarce", baseValue: 5, category: "Manipulação" },
-    { name: "Eletrônica", baseValue: 1, category: "Manipulação", modern: true },
     { name: "Falsificação", baseValue: 5, category: "Manipulação" },
     { name: "Fotografia", baseValue: 5, category: "Manipulação" },
     { name: "Operar Maquinário Pesado", baseValue: 1, category: "Manipulação" },
     { name: "Prestidigitação", baseValue: 10, category: "Manipulação" },
-    { name: "Ciência Estranha", baseValue: 1, category: "Manipulação", isPulp: true, requiresSpecialization: true },
-    { name: "Usar Computadores", baseValue: 5, category: "Manipulação", modern: true },
 
     // Conhecimento
     { name: "Contabilidade", baseValue: 5, category: "Conhecimento" },
@@ -115,10 +111,6 @@ export const skills: SkillDefinition[] = [
     // Especiais
     { name: "Nível de Crédito", baseValue: 0, category: "Especiais" },
     { name: "Mythos de Cthulhu", baseValue: 0, category: "Mythos" },
-    { name: "Clarividência", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
-    { name: "Psicometria", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
-    { name: "Telecinese", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
-    { name: "Telepatia", baseValue: 0, category: "Especiais", isPulp: true, uncommon: true },
 ];
 
 // Função auxiliar para obter o valor base de uma perícia

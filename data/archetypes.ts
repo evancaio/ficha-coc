@@ -163,15 +163,15 @@ export const archetypes: Archetype[] = [
     coreCharacteristic: ['INT'],
     skills: [
       'Ciência',
-      'Ciência Estranha',
+      'Ciência (Física)',
+      'Ciência (Química)',
       'Consertos Elétricos',
       'Consertos Mecânicos',
       'História',
       'Língua (Outra)',
       'Mundo Natural',
       'Operar Maquinário Pesado',
-      'Usar Bibliotecas',
-      'Usar Computadores'
+      'Usar Bibliotecas'
     ],
     suggestedOccupations: [
       'Arqueólogo', 'Cientista', 'Engenheiro', 'Médico', 'Professor'
@@ -472,27 +472,6 @@ export const archetypes: Archetype[] = [
       'Animador', 'Apostador', 'Artista', 'Diletante', 'Espião', 'Gatuno', 'Ladrão de Bancos', 'Piloto de Fuga', 'Vigarista'
     ],
     suggestedTalents: ['dois quaisquer (Sortudo ou Fala Mansa)']
-  },
-  {
-    id: 'mistico',
-    name: 'Místico',
-    description: 'Sensitivo conectado às forças invisíveis do universo, capaz de pressentir energias sutis, auras e distorções da realidade.',
-    coreCharacteristic: ['POW'],
-    skills: [
-      'Arte e Ofício',
-      'Clarividência',
-      'História',
-      'Hipnose',
-      'Língua (Outra)',
-      'Mundo Natural',
-      'Ocultismo',
-      'Psicologia',
-      'Telecinese'
-    ],
-    suggestedOccupations: [
-      'Artista', 'Astrólogo', 'Curandeiro', 'Líder Espiritual', 'Médium', 'Místico', 'Ocultista'
-    ],
-    suggestedTalents: ['dois quaisquer (Vontade de Ferro ou Intuição Aguçada)']
   },
   {
     id: 'ocultista',
