@@ -1991,44 +1991,8 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
 
                 {activeTab === 'inventory' && (
                     <div className="fade-in">
-                        {/* Finanças & Economia */}
-                        <section className="card mb-6">
-                            <div className={styles.sectionHeader}>
-                                <h2>Recursos & Economia (União Soviética)</h2>
-                            </div>
-                            <div className="grid grid-3">
-                                <div>
-                                    <label>Dinheiro em Mãos (Rublos / ₽)</label>
-                                    <input
-                                        type="text"
-                                        value={character.finances?.cash || ''}
-                                        onChange={(e) => handleUpdateFinances('cash', e.target.value)}
-                                        placeholder="Ex: 45 ₽ (em notas e moedas)"
-                                    />
-                                </div>
-                                <div>
-                                    <label>Nível de Gasto Diário</label>
-                                    <input
-                                        type="text"
-                                        value={character.finances?.spendingLevel || ''}
-                                        onChange={(e) => handleUpdateFinances('spendingLevel', e.target.value)}
-                                        placeholder="Ex: 2 ₽ / dia (Nível de Crédito)"
-                                    />
-                                </div>
-                                <div>
-                                    <label>Bens & Patrimônio</label>
-                                    <input
-                                        type="text"
-                                        value={character.finances?.assets || ''}
-                                        onChange={(e) => handleUpdateFinances('assets', e.target.value)}
-                                        placeholder="Ex: Quarto em Kommunalka, bicicleta, relógio..."
-                                    />
-                                </div>
-                            </div>
-                        </section>
-
                         {/* Inventário & Suprimentos de Campo */}
-                        <section className="card">
+                        <section className="card mb-6">
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
                                 <h2 style={{ margin: 0 }}>
                                     Inventário & Equipamentos de Campo
@@ -2123,6 +2087,42 @@ export default function CharacterSheet({ initialData, characterId: initialCharac
                                     })}
                                 </div>
                             )}
+                        </section>
+
+                        {/* Dinheiro & Patrimônio */}
+                        <section className="card">
+                            <div className={styles.sectionHeader}>
+                                <h2>Dinheiro & Patrimônio</h2>
+                            </div>
+                            <div className="grid grid-2 mb-4">
+                                <div>
+                                    <label>Dinheiro em Mãos</label>
+                                    <input
+                                        type="text"
+                                        value={character.finances?.cash || ''}
+                                        onChange={(e) => handleUpdateFinances('cash', e.target.value)}
+                                        placeholder="Ex: 50 ₽"
+                                    />
+                                </div>
+                                <div>
+                                    <label>Gasto Diário (Nível de Crédito)</label>
+                                    <input
+                                        type="text"
+                                        value={character.finances?.spendingLevel || ''}
+                                        onChange={(e) => handleUpdateFinances('spendingLevel', e.target.value)}
+                                        placeholder="Ex: 2 ₽ / dia"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label>Bens, Imóveis & Posses</label>
+                                <input
+                                    type="text"
+                                    value={character.finances?.assets || ''}
+                                    onChange={(e) => handleUpdateFinances('assets', e.target.value)}
+                                    placeholder="Ex: Quarto em Kommunalka, bicicleta, relógio de ouro..."
+                                />
+                            </div>
                         </section>
                     </div>
                 )}
