@@ -143,8 +143,7 @@ export const weaponDefinitions: WeaponDefinition[] = [
         ammo: "7", 
         malfunction: "100", 
         category: "Pistolas", 
-        era: "Padrão Soviético (1895-1945)", 
-        image: "/weapons/nagant-m1895.jpg" 
+        era: "Padrão Soviético (1895-1945)" 
     },
     { 
         name: "Pistola TT-33 Tokarev (7.62mm)", 
@@ -155,8 +154,7 @@ export const weaponDefinitions: WeaponDefinition[] = [
         ammo: "8", 
         malfunction: "99", 
         category: "Pistolas", 
-        era: "Soviética (1933)", 
-        image: "/weapons/tt-33.jpg" 
+        era: "Soviética (1933)" 
     },
     { 
         name: "Mauser C96 'Bolo' (7.63mm)", 
@@ -204,8 +202,7 @@ export const weaponDefinitions: WeaponDefinition[] = [
         ammo: "5", 
         malfunction: "100", 
         category: "Rifles/Arcos", 
-        era: "Fuzil Padrão (1930)", 
-        image: "/weapons/mosin-m91-30.jpg" 
+        era: "Fuzil Padrão (1930)" 
     },
     { 
         name: "Carabina Mosin-Nagant M1938", 
@@ -301,8 +298,7 @@ export const weaponDefinitions: WeaponDefinition[] = [
         ammo: "71", 
         malfunction: "96", 
         category: "Automáticas", 
-        era: "Tambor 71 Tiros (1941)", 
-        image: "/weapons/ppsh-41.jpg" 
+        era: "Tambor 71 Tiros (1941)" 
     },
     { 
         name: "Submetralhadora PPS-43 (Sudaev)", 
