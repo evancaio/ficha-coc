@@ -114,6 +114,19 @@ export default function WeaponSelectorModal({
                             >
                                 <div className={styles.weaponName}>{weapon.name}</div>
                                 <div className={styles.weaponDetails}>
+                                    {weapon.era && (
+                                        <span
+                                            className={styles.detailTag}
+                                            style={{
+                                                background: '#fef2f2',
+                                                color: '#991b1b',
+                                                borderColor: '#fca5a5',
+                                                fontWeight: 600
+                                            }}
+                                        >
+                                            {weapon.era}
+                                        </span>
+                                    )}
                                     <span className={styles.detailTag}>{weapon.skill}</span>
                                     <span className={styles.detailTag}>Dano: {weapon.damage}</span>
                                     {weapon.range && <span className={styles.detailTag}>Alcance: {weapon.range}</span>}
